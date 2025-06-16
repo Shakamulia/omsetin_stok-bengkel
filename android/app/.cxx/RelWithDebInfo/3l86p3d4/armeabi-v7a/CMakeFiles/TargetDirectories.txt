@@ -1,0 +1,2 @@
+C:/Users/slim3/OneDrive/Documents/Kerja/Lariskas/laris_kas/android/app/.cxx/RelWithDebInfo/3l86p3d4/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/slim3/OneDrive/Documents/Kerja/Lariskas/laris_kas/android/app/.cxx/RelWithDebInfo/3l86p3d4/armeabi-v7a/CMakeFiles/rebuild_cache.dir

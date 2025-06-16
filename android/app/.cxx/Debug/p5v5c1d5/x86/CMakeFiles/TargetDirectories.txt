@@ -1,0 +1,2 @@
+C:/File Sekolah/kas-mini/android/app/.cxx/Debug/p5v5c1d5/x86/CMakeFiles/edit_cache.dir
+C:/File Sekolah/kas-mini/android/app/.cxx/Debug/p5v5c1d5/x86/CMakeFiles/rebuild_cache.dir

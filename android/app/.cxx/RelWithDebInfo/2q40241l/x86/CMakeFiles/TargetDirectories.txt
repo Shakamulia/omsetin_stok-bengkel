@@ -1,0 +1,2 @@
+C:/Users/ADVAN WORKPRO/Documents/AERA/omsetin_stok/android/app/.cxx/RelWithDebInfo/2q40241l/x86/CMakeFiles/edit_cache.dir
+C:/Users/ADVAN WORKPRO/Documents/AERA/omsetin_stok/android/app/.cxx/RelWithDebInfo/2q40241l/x86/CMakeFiles/rebuild_cache.dir

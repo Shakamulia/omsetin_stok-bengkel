@@ -1,0 +1,223 @@
+import 'dart:math';
+
+class Produk {
+  final String productName;
+  final double productPrice;
+  final String productImage;
+  final int productStock;
+  final String productCategory;
+  final int productSold;
+  final String dateAdded;
+
+  Produk( 
+    
+      {required this.productSold,required this.dateAdded,
+      required this.productStock,
+      required this.productName,
+      required this.productPrice,
+      required this.productImage,
+      required this.productCategory});
+}
+
+List<Produk> itemProduk = [
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().toIso8601String(),
+      productStock: 5,
+      productName: 'Produk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PSSSSS"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 1)).toIso8601String(),
+      productStock: 4,
+      productName: 'Produk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 2)).toIso8601String(),
+      productStock: 25,
+      productName: 'Produk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 3)).toIso8601String(),
+      productStock: 8,
+      productName: 'Produk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 4)).toIso8601String(),
+      productStock: 4,
+      productName: 'Produk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 5)).toIso8601String(),
+      productStock: 5555,
+      productName: 'Produk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 6)).toIso8601String(),
+      productStock: 11,
+      productName: 'Produk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 7)).toIso8601String(),
+      productStock: 3,
+      productName: 'Produk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 8)).toIso8601String(),
+      productStock: 66,
+      productName: 'Produk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 9)).toIso8601String(),
+      productStock: 7,
+      productName: 'aProduk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 10)).toIso8601String(),
+      productStock: 2,
+      productName: 'Anjay 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 11)).toIso8601String(),
+      productStock: 4,
+      productName: 'bProduk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 12)).toIso8601String(),
+      productStock: 55,
+      productName: 'cProduk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 13)).toIso8601String(),
+      productStock: 2,
+      productName: 'dProduk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 14)).toIso8601String(),
+      productStock: 1,
+      productName: 'eProduk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 15)).toIso8601String(),
+      productStock: 99,
+      productName: 'fProduk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 16)).toIso8601String(),
+      productStock: 9,
+      productName: 'gProduk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 17)).toIso8601String(),
+      productStock: 5,
+      productName: 'hProduk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 18)).toIso8601String(),
+      productStock: 20,
+      productName: 'iProduk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 19)).toIso8601String(),
+      productStock: 1,
+      productName: 'jProduk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 20)).toIso8601String(),
+      productStock: 7,
+      productName: 'kProduk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 21)).toIso8601String(),
+      productStock: 33,
+      productName: 'lProduk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 22)).toIso8601String(),
+      productStock: 4,
+      productName: 'mProduk 1',
+      productPrice: 10000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 23)).toIso8601String(),
+      productStock: 3,
+      productName: 'nProduk 2',
+      productPrice: 20000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+  Produk(
+      productSold: Random().nextInt(100),
+      dateAdded: DateTime.now().add(const Duration(days: 24)).toIso8601String(),
+      productStock: 44,
+      productName: 'oProduk 3',
+      productPrice: 50000,
+      productImage: "image.png",
+      productCategory: "PQ"),
+];
