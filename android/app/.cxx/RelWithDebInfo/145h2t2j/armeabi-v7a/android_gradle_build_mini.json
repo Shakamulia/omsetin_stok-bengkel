@@ -6,14 +6,14 @@
     [
       "C:\\Users\\Chaka\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
       "-C",
-      "C:\\Penyimpanan Utama\\Documents\\omsetin_stok-main\\android\\app\\.cxx\\RelWithDebInfo\\145h2t2j\\armeabi-v7a",
+      "C:\\Penyimpanan Utama\\Documents\\omsetin_bengkel-main\\android\\app\\.cxx\\RelWithDebInfo\\145h2t2j\\armeabi-v7a",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "C:\\Users\\Chaka\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
     "-C",
-    "C:\\Penyimpanan Utama\\Documents\\omsetin_stok-main\\android\\app\\.cxx\\RelWithDebInfo\\145h2t2j\\armeabi-v7a",
+    "C:\\Penyimpanan Utama\\Documents\\omsetin_bengkel-main\\android\\app\\.cxx\\RelWithDebInfo\\145h2t2j\\armeabi-v7a",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {}

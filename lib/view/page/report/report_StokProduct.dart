@@ -3,15 +3,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/formatter/Rupiah.dart';
-import 'package:omsetin_stok/view/widget/modals.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
-import 'package:omsetin_stok/services/database_service.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/formatter/Rupiah.dart';
+import 'package:omsetin_bengkel/view/widget/modals.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
 import 'package:sizer/sizer.dart';
 
 class ReportStokproduct extends StatefulWidget {

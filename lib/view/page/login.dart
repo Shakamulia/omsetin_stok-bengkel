@@ -4,13 +4,13 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ic.dart';
-import 'package:omsetin_stok/providers/appVersionProvider.dart';
-import 'package:omsetin_stok/services/authService.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/failedAlert.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/page/home/home.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/providers/appVersionProvider.dart';
+import 'package:omsetin_bengkel/services/authService.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/failedAlert.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/page/home/home.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
         appVersion = appVersionProvider.appVersion;
       });
     });
-    
+
     _loadRememberedCredentials();
   }
 
@@ -106,9 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void _loadRememberedCredentials() async {
     final secure = FlutterSecureStorage();
 
-      _serialNumberController.text =
-          await secure.read(key: 'remember_serial') ?? '';
-      _passwordController.text = await secure.read(key: 'remember_pass') ?? '';
+    _serialNumberController.text =
+        await secure.read(key: 'remember_serial') ?? '';
+    _passwordController.text = await secure.read(key: 'remember_pass') ?? '';
   }
 
   @override

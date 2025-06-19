@@ -1,9 +1,8 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:omsetin_stok/model/cashier.dart';
-import 'package:omsetin_stok/services/database_service.dart';
+import 'package:omsetin_bengkel/model/cashier.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CashierProvider with ChangeNotifier {

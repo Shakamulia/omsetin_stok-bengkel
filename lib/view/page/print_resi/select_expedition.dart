@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/expeditions.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/expeditions.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 
 class SelectExpedition extends StatefulWidget {
   const SelectExpedition({super.key});
@@ -54,15 +54,14 @@ class _SelectExpeditionState extends State<SelectExpedition> {
           ),
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                )
-            ),
+                gradient: LinearGradient(
+              colors: [
+                secondaryColor,
+                primaryColor,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            )),
             child: AppBar(
               title: Text(
                 "Pilih Ekspedisi",

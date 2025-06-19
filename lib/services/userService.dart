@@ -6,13 +6,13 @@ import 'dart:convert';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:omsetin_stok/constants/apiConstants.dart';
-import 'package:omsetin_stok/model/serialNumberPayload.dart';
-import 'package:omsetin_stok/model/tokenPayload.dart';
-import 'package:omsetin_stok/providers/userProvider.dart';
-import 'package:omsetin_stok/utils/loadingAlert.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
+import 'package:omsetin_bengkel/constants/apiConstants.dart';
+import 'package:omsetin_bengkel/model/serialNumberPayload.dart';
+import 'package:omsetin_bengkel/model/tokenPayload.dart';
+import 'package:omsetin_bengkel/providers/userProvider.dart';
+import 'package:omsetin_bengkel/utils/loadingAlert.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
 import 'package:provider/provider.dart';
 
 class UserService {
@@ -232,21 +232,21 @@ class UserService {
   // }
 
   // Di userService.dart tambahkan:
-static Future<String> getCurrentCashierName() async {
-  final storage = FlutterSecureStorage();
-  try {
-    // Cek dari token atau storage
-    final token = await storage.read(key: 'token');
-    if (token != null) {
-      final payload = Jwt.parseJwt(token);
-      return payload['name'] ?? 'System'; // Ambil nama dari JWT
+  static Future<String> getCurrentCashierName() async {
+    final storage = FlutterSecureStorage();
+    try {
+      // Cek dari token atau storage
+      final token = await storage.read(key: 'token');
+      if (token != null) {
+        final payload = Jwt.parseJwt(token);
+        return payload['name'] ?? 'System'; // Ambil nama dari JWT
+      }
+      return 'System';
+    } catch (e) {
+      debugPrint('Error getting cashier name: $e');
+      return 'System';
     }
-    return 'System';
-  } catch (e) {
-    debugPrint('Error getting cashier name: $e');
-    return 'System';
   }
-}
 
   Future<void> postSerialNumber(
       String name, String email, String phoneNumber) async {
@@ -295,5 +295,3 @@ static Future<String> getCurrentCashierName() async {
     }
   }
 }
-
-

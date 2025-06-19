@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 
 class ConnectivityController extends GetxController {
   final Connectivity _connectivity = Connectivity();

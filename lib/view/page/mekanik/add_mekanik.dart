@@ -1,126 +1,273 @@
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:omsetin_stok/model/mekanik.dart';
-import 'package:omsetin_stok/services/db_helper.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/image.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/utils/failedAlert.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:omsetin_bengkel/model/mekanik.dart';
+import 'package:omsetin_bengkel/providers/mekanikProvider.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:provider/provider.dart';
+import 'package:omsetin_bengkel/model/cashierImageProfile.dart'; // Make sure this import is correct
 
-class AddMekanikPage extends StatefulWidget {
-  const AddMekanikPage({super.key});
+class AddPegawaiPage extends StatefulWidget {
+  final Mekanik? pegawai;
+
+  const AddPegawaiPage({this.pegawai, Key? key}) : super(key: key);
 
   @override
-  State<AddMekanikPage> createState() => _AddMekanikPageState();
+  State<AddPegawaiPage> createState() => _AddPegawaiPageState();
 }
 
-class _AddMekanikPageState extends State<AddMekanikPage> {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
-  final TextEditingController _namaController = TextEditingController();
-  final TextEditingController _spesialisController = TextEditingController();
-  final TextEditingController _noHpController = TextEditingController();
-  final TextEditingController _alamatController = TextEditingController();
+class _AddPegawaiPageState extends State<AddPegawaiPage> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _nameController;
+  late TextEditingController _spesialisController;
+  late TextEditingController _noHpController;
+  late TextEditingController _alamatController;
+  String? _selectedImagePath;
   String _gender = 'Laki-laki';
-  File? image;
-  String noImage = "assets/newProfiles/owner.png";
+  File? _imageFile;
+  bool _isLoading = false;
+  final ImagePicker _picker = ImagePicker();
 
-  Future pickImage(ImageSource source, context) async {
+  @override
+  void initState() {
+    super.initState();
+    _initializeControllers();
+  }
+
+  void _selectProfileImage() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Pilih Profil',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: SizeHelper.Fsize_normalTitle(context),
+                fontWeight: FontWeight.bold,
+              )),
+          backgroundColor: primaryColor,
+          content: SingleChildScrollView(
+            child: Wrap(
+              spacing: 8.0,
+              alignment: WrapAlignment.center,
+              runSpacing: 8.0,
+              children: cashierImage.map((profile) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      // Simpan sebagai asset path dan set _imageFile ke null
+                      _imageFile = null;
+                      _selectedImagePath = profile.imageUrl; // Store asset path
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: AssetImage(profile.imageUrl),
+                      ),
+                      SizedBox(height: 8),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _initializeControllers() {
+    _nameController =
+        TextEditingController(text: widget.pegawai?.namaMekanik ?? '');
+    _spesialisController =
+        TextEditingController(text: widget.pegawai?.spesialis ?? '');
+    _noHpController =
+        TextEditingController(text: widget.pegawai?.noHandphone ?? '');
+    _alamatController =
+        TextEditingController(text: widget.pegawai?.alamat ?? '');
+    _gender = widget.pegawai?.gender ?? 'Laki-laki';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _spesialisController.dispose();
+    _noHpController.dispose();
+    _alamatController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Pilih dari Gallery'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  try {
+                    final XFile? pickedFile = await _picker.pickImage(
+                      source: ImageSource.gallery,
+                      maxWidth: 800,
+                      maxHeight: 800,
+                      imageQuality: 85,
+                    );
+                    if (pickedFile != null) {
+                      setState(() {
+                        _imageFile = File(pickedFile.path);
+                        _selectedImagePath = pickedFile.path; // Store file path
+                      });
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Gagal memilih gambar: ${e.toString()}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.face),
+                title: Text('Pilih Profil Bawaan'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _selectProfileImage();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
     try {
-      final pickedImage = await ImagePicker().pickImage(source: source);
-      Navigator.pop(context);
-      if (pickedImage == null) return;
+      final pegawaiProvider =
+          Provider.of<MekanikProvider>(context, listen: false);
 
-      final imageTemporary = File(pickedImage.path);
-      setState(() => this.image = imageTemporary);
+      // Debug: Cetak nilai sebelum dikirim
+      debugPrint('Data yang akan dikirim:');
+      debugPrint('Nama: ${_nameController.text}');
+      debugPrint('Spesialis: ${_spesialisController.text}');
+      debugPrint('No HP: ${_noHpController.text}');
+      debugPrint('Gender: $_gender');
+      debugPrint('Alamat: ${_alamatController.text}');
+      debugPrint('Image: ${_imageFile?.path ?? widget.pegawai?.profileImage}');
 
-      final croppedImage = await cropImage(imageTemporary);
-      if (croppedImage != null) {
-        setState(() => image = croppedImage);
+      final mekanikData = Mekanik(
+          id: widget.pegawai?.id ?? 0,
+          namaMekanik: _nameController.text.trim(),
+          spesialis: _spesialisController.text.trim(),
+          noHandphone: _noHpController.text.trim(),
+          gender: _gender,
+          alamat: _alamatController.text.trim(),
+          profileImage: _imageFile?.path ??
+              _selectedImagePath ??
+              widget.pegawai?.profileImage ??
+              '');
+
+      // Debug: Cetak data yang akan dikirim dalam format map
+      debugPrint('Data Map: ${mekanikData.toJson()}');
+
+      if (widget.pegawai == null) {
+        await pegawaiProvider.addMekanik(mekanikData.toJson());
+        showSuccessAlert(context, 'Data pegawai berhasil ditambahkan');
+      } else {
+        await pegawaiProvider.updatePegawai(
+            widget.pegawai!.id!, mekanikData.toJson());
+        showSuccessAlert(context, 'Data pegawai berhasil diperbarui');
       }
+
+      if (mounted) Navigator.pop(context);
     } catch (e) {
-      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+      debugPrint('Error saat mengirim data: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  void _selectCameraOrGalery() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Kamera"),
-              onTap: () => pickImage(ImageSource.camera, context),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text("Galeri"),
-              onTap: () => pickImage(ImageSource.gallery, context),
-            ),
-          ],
+  Widget _buildProfileImage() {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: Container(
+        width: 70,
+        height: 70,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          shape: BoxShape.circle,
+          image: DecorationImage(
+            image: _getProfileImage() ??
+                AssetImage('assets/products/no-image.png'),
+            fit: BoxFit.cover,
+            onError: (exception, stackTrace) {
+              debugPrint('Error loading image: $exception');
+            },
+          ),
         ),
       ),
     );
   }
 
-  Future<void> _submitForm() async {
-    String profileImage;
+  ImageProvider? _getProfileImage() {
+    // Priority 1: Newly selected file image
+    if (_imageFile != null) return FileImage(_imageFile!);
 
-    if (image == null || image!.path.isEmpty) {
-      profileImage = "assets/customers/no-image.png";
-    } else {
-      final directory = await getExternalStorageDirectory();
-      final mekanikDir = Directory('${directory!.path}/mekanik');
-      if (!await mekanikDir.exists()) {
-        await mekanikDir.create(recursive: true);
+    // Priority 2: Selected asset image path
+    if (_selectedImagePath != null &&
+        _selectedImagePath!.startsWith('assets/')) {
+      return AssetImage(_selectedImagePath!);
+    }
+
+    // Priority 3: Existing pegawai image
+    final existingImage = widget.pegawai?.profileImage;
+    if (existingImage != null && existingImage.isNotEmpty) {
+      if (existingImage.startsWith('http')) {
+        return NetworkImage(existingImage);
+      } else if (existingImage.startsWith('assets/')) {
+        return AssetImage(existingImage);
+      } else {
+        return FileImage(File(existingImage));
       }
-
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
-      final savedImage = await image!.copy('${mekanikDir.path}/$fileName');
-      profileImage = savedImage.path;
     }
 
-    if (_namaController.text.isEmpty ||
-        _spesialisController.text.isEmpty ||
-        _noHpController.text.isEmpty ||
-        _alamatController.text.isEmpty) {
-      showNullDataAlert(context, message: "Harap isi semua kolom yang wajib!");
-      return;
-    }
-
-    try {
-      final mekanik = Mekanik(
-        profileImage: profileImage,
-        namaMekanik: _namaController.text,
-        spesialis: _spesialisController.text,
-        noHandphone: _noHpController.text,
-        gender: _gender,
-        alamat: _alamatController.text,
-      );
-
-      await _dbHelper.insertMekanik(mekanik);
-      showSuccessAlert(context, "Berhasil Menambahkan Mekanik!");
-      Navigator.pop(context, true);
-    } catch (e, stackTrace) {
-      debugPrint("🛑 Error saat insert mekanik: $e");
-      debugPrint("📍 Stack trace:\n$stackTrace");
-      showFailedAlert(context, message: "Gagal menambahkan mekanik: $e");
-    }
+    // Default image
+    return AssetImage('assets/products/no-image.png');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
+      resizeToAvoidBottomInset: true,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 20),
         child: ClipRRect(
@@ -129,205 +276,210 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
             bottomRight: Radius.circular(20),
           ),
           child: Container(
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [secondaryColor, primaryColor],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [secondaryColor, primaryColor],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
             child: AppBar(
-              backgroundColor: Colors.transparent,
-              titleSpacing: 0,
-              scrolledUnderElevation: 0,
-              toolbarHeight: kToolbarHeight + 20,
-              leading: const CustomBackButton(),
               title: Text(
-                'KELOLA MEKANIK',
+                widget.pegawai == null ? 'TAMBAH PEGAWAI' : 'EDIT PEGAWAI',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: SizeHelper.Fsize_normalTitle(context),
                   color: bgColor,
                 ),
               ),
               centerTitle: true,
+              backgroundColor: Colors.transparent,
+              leading: CustomBackButton(),
+              elevation: 0,
+              toolbarHeight: kToolbarHeight + 20,
             ),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: GestureDetector(
-                onTap: _selectCameraOrGalery,
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: image != null
-                            ? Image.file(
-                                image!,
-                                width: 160,
-                                height: 160,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.asset(
-                                noImage,
-                                width: 160,
-                                height: 160,
-                                fit: BoxFit.cover,
-                              ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.only(
+                      top: 20,
+                      left: 20,
+                      right: 20,
+                      bottom: 100, // Extra space for floating button
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(child: _buildProfileImage()),
+                          const Gap(15),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Nama Pegawai",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(5),
+                                CustomTextField(
+                                  obscureText: false,
+                                  fillColor: Colors.grey[200],
+                                  hintText: "Masukkan Nama Pegawai",
+                                  prefixIcon: null,
+                                  controller: _nameController,
+                                  hintStyle: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.grey[400],
+                                  ),
+                                  maxLines: 1,
+                                  suffixIcon: null,
+                                ),
+                                const Gap(15),
+                                const Text(
+                                  "Spesialis",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(5),
+                                CustomTextField(
+                                  obscureText: false,
+                                  fillColor: Colors.grey[200],
+                                  hintText: "Masukkan Spesialis",
+                                  prefixIcon: null,
+                                  controller: _spesialisController,
+                                  hintStyle: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.grey[400],
+                                  ),
+                                  maxLines: 1,
+                                  suffixIcon: null,
+                                ),
+                                const Gap(15),
+                                const Text(
+                                  "Jenis Kelamin",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(5),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: RadioListTile<String>(
+                                        title: const Text('Laki-laki'),
+                                        value: 'Laki-laki',
+                                        groupValue: _gender,
+                                        activeColor: primaryColor,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _gender = value!;
+                                          });
+                                        },
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: RadioListTile<String>(
+                                        title: const Text('Perempuan'),
+                                        value: 'Perempuan',
+                                        groupValue: _gender,
+                                        activeColor: primaryColor,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _gender = value!;
+                                          });
+                                        },
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Gap(15),
+                                const Text(
+                                  "Nomor Handphone",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(5),
+                                CustomTextField(
+                                  obscureText: false,
+                                  fillColor: Colors.grey[200],
+                                  hintText: "Masukkan Nomor Handphone",
+                                  prefixIcon: null,
+                                  controller: _noHpController,
+                                  hintStyle: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.grey[400],
+                                  ),
+                                  maxLines: 1,
+                                  keyboardType: TextInputType.phone,
+                                  suffixIcon: null,
+                                ),
+                                const Gap(15),
+                                const Text(
+                                  "Alamat",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(5),
+                                CustomTextField(
+                                  obscureText: false,
+                                  fillColor: Colors.grey[200],
+                                  hintText: "Masukkan Alamat",
+                                  prefixIcon: null,
+                                  controller: _alamatController,
+                                  hintStyle: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.grey[400],
+                                  ),
+                                  maxLines: 3,
+                                  suffixIcon: null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (image != null)
-                      Positioned(
-                        top: 10,
-                        right: 15,
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white),
-                            onPressed: () {
-                              setState(() => image = null);
-                            },
-                          ),
-                        ),
-                      ),
-                    Positioned(
-                      bottom: 10,
-                      right: 10,
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          color: primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                      ),
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                    child: ExpensiveFloatingButton(
+                      onPressed: _submitForm,
+                      text: widget.pegawai == null
+                          ? 'SIMPAN DATA'
+                          : 'UPDATE DATA',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const Text(
-              "Nama Mekanik",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: _namaController,
-              hintText: "Nama Mekanik",
-              obscureText: false,
-              prefixIcon: const Icon(Icons.person),
-              maxLines: 1,
-              suffixIcon: null,
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Spesialis",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: _spesialisController,
-              hintText: "Spesialis (Contoh: Mesin, Elektrik, dll)",
-              obscureText: false,
-              prefixIcon: const Icon(Icons.engineering),
-              maxLines: 1,
-              suffixIcon: null,
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "No. Handphone",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: _noHpController,
-              hintText: "No. Handphone",
-              obscureText: false,
-              prefixIcon: const Icon(Icons.phone),
-              maxLines: 1,
-              suffixIcon: null,
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Jenis Kelamin",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              value: _gender,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-              items: ['Laki-laki', 'Perempuan']
-                  .map((gender) => DropdownMenuItem(
-                        value: gender,
-                        child: Text(gender),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() => _gender = value!);
-              },
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Alamat",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: _alamatController,
-              hintText: "Alamat",
-              obscureText: false,
-              prefixIcon: const Icon(Icons.home),
-              maxLines: 3,
-              suffixIcon: null,
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _submitForm,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                'SIMPAN',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/page/addStockProduct/add_stock_product.dart';
-import 'package:omsetin_stok/view/page/addStockProduct/select_product.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/add_product_stock_card.dart';
-import 'package:omsetin_stok/view/widget/app_bar_stock.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/page/addStockProduct/add_stock_product.dart';
+import 'package:omsetin_bengkel/view/page/addStockProduct/select_product.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/add_product_stock_card.dart';
+import 'package:omsetin_bengkel/view/widget/app_bar_stock.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:gap/gap.dart';
 
 class SelectAndAddStockProduct extends StatefulWidget {
@@ -139,11 +139,10 @@ class _SelectAndAddStockProductState extends State<SelectAndAddStockProduct> {
                                   selectedProductStock: selectedProductStock),
                             ),
                           );
-      
+
                           if (result != null) {
                             setState(() {
-                              selectedProductStock =
-                                  List<Product>.from(result);
+                              selectedProductStock = List<Product>.from(result);
                             });
                           }
                         },

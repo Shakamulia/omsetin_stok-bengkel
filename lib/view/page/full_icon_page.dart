@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/providers/cashierProvider.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/pinModalWithAnimation.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/page/History_transaksi.dart';
-import 'package:omsetin_stok/view/page/addStockProduct/add_stock_product.dart';
-import 'package:omsetin_stok/view/page/cashier/cashier_page.dart';
-import 'package:omsetin_stok/view/page/change_password/changePassword.dart';
-import 'package:omsetin_stok/view/page/expense/expense_page.dart';
-import 'package:omsetin_stok/view/page/income/income_page.dart';
-import 'package:omsetin_stok/view/page/print_resi/input_resi.dart';
-import 'package:omsetin_stok/view/page/product/product.dart';
-import 'package:omsetin_stok/view/page/report/report_page.dart';
-import 'package:omsetin_stok/view/page/settings/scanDevicePrinter.dart';
-import 'package:omsetin_stok/view/page/settings/securityPage.dart';
-import 'package:omsetin_stok/view/page/settings/setting.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/menu_card.dart';
-import 'package:omsetin_stok/view/widget/pinModal.dart';
+import 'package:omsetin_bengkel/providers/cashierProvider.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/page/History_transaksi.dart';
+import 'package:omsetin_bengkel/view/page/addStockProduct/add_stock_product.dart';
+import 'package:omsetin_bengkel/view/page/cashier/cashier_page.dart';
+import 'package:omsetin_bengkel/view/page/change_password/changePassword.dart';
+import 'package:omsetin_bengkel/view/page/expense/expense_page.dart';
+import 'package:omsetin_bengkel/view/page/income/income_page.dart';
+import 'package:omsetin_bengkel/view/page/print_resi/input_resi.dart';
+import 'package:omsetin_bengkel/view/page/product/product.dart';
+import 'package:omsetin_bengkel/view/page/report/report_page.dart';
+import 'package:omsetin_bengkel/view/page/settings/scanDevicePrinter.dart';
+import 'package:omsetin_bengkel/view/page/settings/securityPage.dart';
+import 'package:omsetin_bengkel/view/page/settings/setting.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/menu_card.dart';
+import 'package:omsetin_bengkel/view/widget/pinModal.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -39,24 +39,18 @@ class _AllIconPageState extends State<AllIconPage> {
 
     return Scaffold(
       backgroundColor: bgColor,
-           appBar: PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 20),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20)
-          ),
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20)),
           child: Container(
-                      decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter
-              )
-            ),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              secondaryColor,
+              primaryColor,
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
             child: AppBar(
               title: Text(
                 "SELENGKAPNYA",

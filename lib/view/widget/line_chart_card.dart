@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/view/widget/custom_card_widget.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/view/widget/custom_card_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LineChartCard extends StatelessWidget {

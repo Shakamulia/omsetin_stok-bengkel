@@ -3,13 +3,13 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/providers/appVersionProvider.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/services/db.copy.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/providers/appVersionProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/services/db.copy.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class UpdatePage extends StatefulWidget {

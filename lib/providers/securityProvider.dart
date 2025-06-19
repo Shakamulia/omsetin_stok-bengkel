@@ -36,6 +36,18 @@ class SecurityProvider with ChangeNotifier {
   bool _kunciRestoreData = false;
   bool _sembunyikanHapusBackup = false;
   bool _sembunyikanLogout = false;
+      bool _kunciPelanggan = false;
+  bool _kunciAddPelanggan = false;
+  bool _kunciUpdatePelanggan = false;
+  bool _kunciDeletePelanggan = false;
+  bool _kunciPegawai = false;
+  bool _kunciAddPegawai = false;
+  bool _kunciUpdatePegawai = false;
+  bool _kunciDeletePegawai = false;
+    bool _kunciServices = false;
+  bool _tambahServices = false;
+  bool _editServices = false;
+  bool _hapusServices = false;
 
   // true
   bool _kunciGantiPassword = true;
@@ -75,6 +87,18 @@ class SecurityProvider with ChangeNotifier {
   bool get kunciGantiPassword => _kunciGantiPassword;
   bool get kunciKeamanan => _kunciKeamanan;
   bool get kunciRestoreData => _kunciRestoreData;
+  bool get kunciPelanggan => _kunciPelanggan;
+  bool get kunciAddPelanggan => _kunciAddPelanggan;
+  bool get kunciUpdatePelanggan => _kunciUpdatePelanggan;
+  bool get kunciDeletePelanggan => _kunciDeletePelanggan;
+    bool get kunciPegawai => _kunciPegawai;
+  bool get kunciAddPegawai => _kunciAddPegawai;
+  bool get kunciUpdatePegawai => _kunciUpdatePegawai;
+  bool get kunciDeletePegawai => _kunciDeletePegawai;
+  bool get kunciServices => _kunciServices;
+  bool get tambahServices => _tambahServices;
+  bool get editServices => _editServices;
+  bool get hapusServices => _hapusServices;
   bool get sembunyikanHapusBackup => _sembunyikanHapusBackup;
   bool get sembunyikanLogout => _sembunyikanLogout;
 
@@ -118,6 +142,18 @@ class SecurityProvider with ChangeNotifier {
     _kunciGantiPassword = prefs.getBool('kunciGantiPassword') ?? false;
     _kunciKeamanan = prefs.getBool('kunciKeamanan') ?? false;
     _kunciRestoreData = prefs.getBool('kunciRestoreData') ?? false;
+    _kunciPelanggan = prefs.getBool('kunciPelanggan') ?? false;
+    _kunciAddPelanggan = prefs.getBool('kunciAddPelanggan') ?? false;
+    _kunciUpdatePelanggan = prefs.getBool('kunciUpdatePelanggan') ?? false;
+    _kunciDeletePelanggan = prefs.getBool('kunciDeletePelanggan') ?? false;
+    _kunciPegawai = prefs.getBool('kunciPegawai') ?? false;
+    _kunciAddPegawai = prefs.getBool('kunciAddPegawai') ?? false;
+    _kunciUpdatePegawai = prefs.getBool('kunciUpdatePegawai') ?? false;
+    _kunciDeletePegawai = prefs.getBool('kunciDeletePegawai') ?? false;
+    _kunciServices = prefs.getBool('kunciServices') ?? false;
+    _tambahServices = prefs.getBool('tambahServices') ?? false;
+    _editServices = prefs.getBool('editServices') ?? false;
+    _hapusServices = prefs.getBool('hapusServices') ?? false;
     _sembunyikanHapusBackup = prefs.getBool('sembunyikanHapusBackup') ?? false;
     _sembunyikanLogout = prefs.getBool('sembunyikanLogout') ?? false;
     notifyListeners();

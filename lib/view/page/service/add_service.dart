@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/service.dart';
-import 'package:omsetin_stok/services/service_db_helper.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/formatters.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/utils/failedAlert.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/services/service_db_helper.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/formatters.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/utils/failedAlert.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
 
 class AddServicePage extends StatefulWidget {
   const AddServicePage({super.key});
@@ -34,8 +34,9 @@ class _AddServicePageState extends State<AddServicePage> {
 
     try {
       await _serviceHelper.createService(Service(
-        name: serviceName,
-        price: double.parse(servicePrice.replaceAll('.', '')),
+        serviceId: 0, // Dummy value, will be replaced by DB auto-increment
+        serviceName: serviceName,
+        servicePrice: int.parse(servicePrice.replaceAll('.', '')),
         dateAdded: DateTime.now().toIso8601String(),
       ));
 

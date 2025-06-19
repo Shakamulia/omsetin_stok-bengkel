@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_stok/services/database_service.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
 
 class AddCategoryWidget extends StatefulWidget {
   final Function onCategoryAdded;

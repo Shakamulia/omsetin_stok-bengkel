@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/uim.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -207,7 +207,8 @@ class _ScanDevicePrinterState extends State<ScanDevicePrinter> {
                                             bluetoothProvider.connectedDevice!
                                                     .platformName.isNotEmpty
                                                 ? bluetoothProvider
-                                                    .connectedDevice!.platformName
+                                                    .connectedDevice!
+                                                    .platformName
                                                 : "Unknown Device",
                                             style: TextStyle(
                                                 fontSize: MediaQuery.of(context)

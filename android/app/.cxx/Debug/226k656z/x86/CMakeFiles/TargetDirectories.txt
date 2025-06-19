@@ -1,2 +1,2 @@
-C:/aeratek/lariskas/omsetin_stok/android/app/.cxx/Debug/226k656z/x86/CMakeFiles/edit_cache.dir
-C:/aeratek/lariskas/omsetin_stok/android/app/.cxx/Debug/226k656z/x86/CMakeFiles/rebuild_cache.dir
+C:/aeratek/lariskas/omsetin_bengkel/android/app/.cxx/Debug/226k656z/x86/CMakeFiles/edit_cache.dir
+C:/aeratek/lariskas/omsetin_bengkel/android/app/.cxx/Debug/226k656z/x86/CMakeFiles/rebuild_cache.dir

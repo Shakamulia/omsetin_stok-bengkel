@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_stok/model/category.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/services/database_service.dart';
+import 'package:omsetin_bengkel/model/category.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
 
 class CategoryProvider with ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;

@@ -2,10 +2,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/utils/modal_animation.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/settings/scanDevicePrinter.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/utils/modal_animation.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/settings/scanDevicePrinter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 

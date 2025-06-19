@@ -1,12 +1,12 @@
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
-// import 'package:omsetin_stok/model/product.dart';
-// import 'package:omsetin_stok/utils/colors.dart';
-// import 'package:omsetin_stok/view/page/home-2.dart';
-// import 'package:omsetin_stok/view/widget/category_product.dart';
-// import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-// import 'package:omsetin_stok/view/widget/page_title.dart';
-// import 'package:omsetin_stok/view/widget/primary_button.dart';
+// import 'package:omsetin_bengkel/model/product.dart';
+// import 'package:omsetin_bengkel/utils/colors.dart';
+// import 'package:omsetin_bengkel/view/page/home-2.dart';
+// import 'package:omsetin_bengkel/view/widget/category_product.dart';
+// import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+// import 'package:omsetin_bengkel/view/widget/page_title.dart';
+// import 'package:omsetin_bengkel/view/widget/primary_button.dart';
 
 // class CategoryProductPage extends StatefulWidget {
 //   const CategoryProductPage({super.key});

@@ -1,29 +1,30 @@
 import 'dart:io';
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/bluetoothAlert.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/pinModalWithAnimation.dart';
-import 'package:omsetin_stok/utils/printer_helper.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/transaction/share_struck_page.dart';
-import 'package:omsetin_stok/view/page/transaction/transactions_page.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/pinModal.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/bluetoothAlert.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omsetin_bengkel/utils/printer_helper.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/transaction/share_struck_page.dart';
+import 'package:omsetin_bengkel/view/page/transaction/transactions_page.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/confirm_delete_dialog.dart';
+import 'package:omsetin_bengkel/view/widget/pinModal.dart';
 import 'package:provider/provider.dart';
 
-class 
- extends StatefulWidget {
+class DetailHistoryTransaction extends StatefulWidget {
   final TransactionData? transactionDetail;
   const DetailHistoryTransaction({super.key, this.transactionDetail});
 
@@ -39,14 +40,25 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
   void initState() {
     super.initState();
     _transactionDetail = widget.transactionDetail!;
+    print(_transactionDetail!.transactionServices);
   }
 
   Future<void> refreshTransactionDetail() async {
-    final updated = await DatabaseService.instance
-        .getTransactionById(_transactionDetail!.transactionId);
-    setState(() {
-      _transactionDetail = updated;
-    });
+    try {
+      final updated = await DatabaseService.instance
+          .getTransactionById(_transactionDetail!.transactionId);
+      if (mounted) {
+        setState(() {
+          _transactionDetail = updated;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memperbarui data transaksi: $e')),
+        );
+      }
+    }
   }
 
   Future<String> calculateTransactionStatus(
@@ -65,11 +77,11 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
     required int transactionId,
     required int currentPayAmount,
     required int transactionTotal,
+    required String paymentMethod,
   }) {
     final jumlahSisa = transactionTotal - currentPayAmount;
     final jumlahBayarController =
         TextEditingController(text: jumlahSisa.toString());
-    String selectedPaymentMethod = 'Tunai'; // default value
 
     showDialog(
       context: context,
@@ -110,7 +122,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<String>(
-                      value: selectedPaymentMethod,
+                      value: paymentMethod,
                       decoration: const InputDecoration(
                         labelText: "Metode Pembayaran",
                         border: OutlineInputBorder(),
@@ -123,7 +135,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          selectedPaymentMethod = value!;
+                          paymentMethod = value!;
                         });
                       },
                     ),
@@ -134,28 +146,43 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                             .replaceAll(RegExp(r'[^0-9]'), '');
                         final bayarBaru = int.tryParse(cleaned) ?? 0;
 
+                        if (bayarBaru <= 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Jumlah pembayaran tidak valid')),
+                          );
+                          return;
+                        }
+
                         final totalBaru = currentPayAmount + bayarBaru;
-                        final newStatus = (totalBaru >= transactionTotal)
-                            ? 'Lunas'
-                            : 'Belum Lunas';
+                        final isLunas = totalBaru >= transactionTotal;
 
                         await DatabaseService.instance
                             .updateTransactionPayAmount(
                           transactionId,
                           totalBaru,
-                          newStatus,
-                          selectedPaymentMethod,
+                          isLunas
+                              ? 'Selesai'
+                              : 'Belum Lunas', // Gunakan status yang konsisten
+                          paymentMethod,
                         );
 
                         Navigator.pop(context);
-                        refreshTransactionDetail();
+                        await refreshTransactionDetail(); // Tambahkan await
+
+                        // Tampilkan notifikasi sukses
+                        showSuccessAlert(
+                            context,
+                            isLunas
+                                ? "Pembayaran lunas!"
+                                : "Pembayaran berhasil dicatat");
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0)),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 10),
                       ),
                       child: Text(
                         "Bayar",
@@ -179,17 +206,29 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
   Product mapToProduct(Map<String, dynamic> data) {
     return Product(
       productId: data['productId'] ?? data['product_id'] ?? 0,
-      productBarcode: data['product_barcode'].toString(),
-      productBarcodeType: data['product_barcode_type'].toString(),
-      productName: data['product_name'].toString(),
+      productBarcode: data['product_barcode']?.toString() ?? '',
+      productBarcodeType: data['product_barcode_type']?.toString() ?? '',
+      productName: data['product_name']?.toString() ?? '',
       productStock: data['product_stock'] ?? 0,
-      productUnit: data['product_unit'].toString(),
+      productUnit: data['product_unit']?.toString() ?? '',
       productSold: data['product_sold'] ?? 0,
       productPurchasePrice: data['product_purchase_price'] ?? 0,
       productSellPrice: data['product_sell_price'] ?? 0,
-      productDateAdded: data['product_date_added'].toString(),
-      productImage: data['product_image'].toString(),
-      categoryName: data['category_name']?.toString(),
+      productDateAdded: data['product_date_added']?.toString() ?? '',
+      productImage: data['product_image']?.toString() ?? '',
+    );
+  }
+
+  Service mapToService(Map<String, dynamic> data) {
+    return Service(
+      serviceId:
+          data['serviceId'] ?? data['service_id'] ?? data['services_id'] ?? 0,
+      serviceName:
+          (data['service_name'] ?? data['services_name'])?.toString() ?? '',
+      servicePrice: (data['service_price'] ?? data['services_price']) ?? 0,
+      dateAdded: (data['service_date_added'] ?? data['services_date_added'])
+              ?.toString() ??
+          '',
     );
   }
 
@@ -210,24 +249,18 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
 
     return Scaffold(
       backgroundColor: bgColor,
-           appBar: PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 20),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20)
-          ),
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20)),
           child: Container(
-                      decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter
-              )
-            ),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              secondaryColor,
+              primaryColor,
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
             child: AppBar(
               title: Text(
                 "DETAIL TRANSAKSI",
@@ -241,7 +274,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
               toolbarHeight: kToolbarHeight + 20,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: CustomBackButton(), // Custom back button
+              leading: CustomBackButton(),
             ),
           ),
         ),
@@ -264,7 +297,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                         decoration: BoxDecoration(
                             color: statusColor,
                             borderRadius: BorderRadius.circular(30)),
-                        child: const Center(child: Icon(Icons.receipt_long_rounded)),
+                        child: const Center(
+                            child: Icon(Icons.receipt_long_rounded)),
                       ),
                       const Gap(10),
                       Expanded(
@@ -281,7 +315,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                 ),
                                 const Spacer(),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
                                   height: 25,
                                   decoration: BoxDecoration(
                                       color: statusColor,
@@ -323,7 +358,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                     children: [
                       Row(
                         children: [
-                          Text("Kasir ${_transactionDetail!.transactionCashier}",
+                          Text(
+                              "Kasir ${_transactionDetail!.transactionCashier}",
                               style: GoogleFonts.poppins(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                           const Spacer(),
@@ -331,6 +367,15 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                               "Antrian ${_transactionDetail!.transactionQueueNumber}",
                               style: GoogleFonts.poppins(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Pegawai ${_transactionDetail!.transactionPegawaiName}",
+                            style: GoogleFonts.poppins(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          )
                         ],
                       ),
                       const Divider(
@@ -343,7 +388,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                               style: GoogleFonts.poppins(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                           const Spacer(),
-                          Text("${_transactionDetail!.transactionQuantity}",
+                          Text(
+                              "${_transactionDetail!.transactionQuantity + _transactionDetail!.transactionQuantityServices}",
                               style: GoogleFonts.poppins(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                         ],
@@ -405,7 +451,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: Row(children: [
                     Text("Total bayar :",
                         style: GoogleFonts.poppins(
@@ -422,20 +469,20 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                           ? TextButton(
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 alignment: Alignment.center,
                               ),
                               onPressed: () {
                                 showBayarSisaModal(
                                   context,
-                                  transactionId: widget
-                                      .transactionDetail!.transactionId,
+                                  transactionId:
+                                      widget.transactionDetail!.transactionId,
                                   currentPayAmount: widget
-                                      .transactionDetail!
-                                      .transactionPayAmount,
+                                      .transactionDetail!.transactionPayAmount,
                                   transactionTotal: widget
                                       .transactionDetail!.transactionTotal,
+                                  paymentMethod: widget.transactionDetail!
+                                      .transactionPaymentMethod,
                                 );
                               },
                               child: Center(
@@ -454,8 +501,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                   locale: 'id',
                                   symbol: 'Rp. ',
                                   decimalDigits: 0,
-                                ).format(_transactionDetail!
-                                    .transactionPayAmount),
+                                ).format(
+                                    _transactionDetail!.transactionPayAmount),
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -468,7 +515,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
               ),
               const Gap(10),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 child: Row(
                   children: [
                     Text("Detail Pesanan",
@@ -478,20 +526,36 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                     GestureDetector(
                         onTap: () {
                           List<Product> selectedProducts = [];
+                          List<Service> selectedServices = [];
                           Map<int, int> quantities = {};
 
-                          for (var p in widget
-                              .transactionDetail!.transactionProduct) {
+                          // Handle products
+                          for (var p
+                              in widget.transactionDetail!.transactionProduct) {
                             final product = mapToProduct(p);
                             selectedProducts.add(product);
                             quantities[product.productId] = p['quantity'];
                           }
 
+                          // Handle services (jika ada)
+                          if (widget.transactionDetail!.transactionServices !=
+                              null) {
+                            for (var s in widget
+                                .transactionDetail!.transactionServices) {
+                              final service = mapToService(s);
+                              selectedServices.add(service);
+                              quantities[service.serviceId] = s['quantity'];
+                            }
+                          }
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TransaksiPage(
-                                selectedProducts: selectedProducts,
+                              builder: (context) => TransactionPage(
+                                selectedItems: [
+                                  ...selectedProducts,
+                                  ...selectedServices
+                                ],
                                 initialQuantities: quantities,
                                 transactionId:
                                     _transactionDetail!.transactionId,
@@ -525,8 +589,10 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                         : GestureDetector(
                             onTap: () {
                               List<Product> selectedProducts = [];
+                              List<Service> selectedServices = [];
                               Map<int, int> quantities = {};
 
+                              // Handle products
                               for (var p in widget
                                   .transactionDetail!.transactionProduct) {
                                 final product = mapToProduct(p);
@@ -534,14 +600,29 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                 quantities[product.productId] = p['quantity'];
                               }
 
+                              // Handle services (jika ada)
+                              if (widget
+                                      .transactionDetail!.transactionServices !=
+                                  null) {
+                                for (var s in widget
+                                    .transactionDetail!.transactionServices) {
+                                  final service = mapToService(s);
+                                  selectedServices.add(service);
+                                  quantities[service.serviceId] = s['quantity'];
+                                }
+                              }
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => TransaksiPage(
-                                    selectedProducts: selectedProducts,
+                                  builder: (context) => TransactionPage(
+                                    selectedItems: [
+                                      ...selectedProducts,
+                                      ...selectedServices
+                                    ],
                                     initialQuantities: quantities,
-                                    transactionId: widget
-                                        .transactionDetail!.transactionId,
+                                    transactionId:
+                                        widget.transactionDetail!.transactionId,
                                     isUpdate: true,
                                   ),
                                 ),
@@ -570,7 +651,6 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                 ),
               ),
               const Gap(5),
-              // Product list section
               Container(
                 constraints: const BoxConstraints(
                   minHeight: 100,
@@ -579,80 +659,26 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                 child: ListView.builder(
                   shrinkWrap: true,
                   physics: const ClampingScrollPhysics(),
-                  itemCount: _transactionDetail!.transactionProduct.length,
+                  itemCount: (_transactionDetail!.transactionProduct.length +
+                      (_transactionDetail!.transactionServices?.length ?? 0)),
                   itemBuilder: (context, index) {
-                    var product =
-                        _transactionDetail!.transactionProduct[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Hero(
-                              tag: "productImage_${product['productId']}",
-                              child: Image.file(
-                                File(product['product_image'].toString()),
-                                width: 45,
-                                height: 45,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    "assets/products/no-image.png",
-                                    width: 45,
-                                    height: 45,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          const Gap(10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product['product_name'],
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "${product['quantity']} x ${NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0).format(product['product_sell_price'])}",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Subtotal: ${NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0).format((product['quantity'] as int) * (product['product_sell_price'] as int))}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    // Jika index masih dalam range produk
+                    if (index < _transactionDetail!.transactionProduct.length) {
+                      return _buildProductItem(
+                          _transactionDetail!.transactionProduct[index]);
+                    }
+                    // Jika ada services dan index dalam range services
+                    else if (_transactionDetail!.transactionServices != null &&
+                        index - _transactionDetail!.transactionProduct.length <
+                            _transactionDetail!.transactionServices!.length) {
+                      return _buildServiceItem(
+                          _transactionDetail!.transactionServices![index -
+                              _transactionDetail!.transactionProduct.length]);
+                    }
+                    return const SizedBox();
                   },
                 ),
               ),
-
-              // Action buttons section
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
@@ -668,6 +694,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                 if (bluetoothProvider.isConnected) {
                                   PrinterHelper.printReceiptAndOpenDrawer(
                                       context,
+                                      services: _transactionDetail!
+                                          .transactionServices,
                                       bluetoothProvider.connectedDevice!,
                                       products: _transactionDetail!
                                           .transactionProduct);
@@ -678,10 +706,11 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                             } else {
                               if (bluetoothProvider.isConnected) {
                                 PrinterHelper.printReceiptAndOpenDrawer(
-                                    context,
-                                    bluetoothProvider.connectedDevice!,
-                                    products: _transactionDetail!
-                                        .transactionProduct);
+                                    context, bluetoothProvider.connectedDevice!,
+                                    services:
+                                        _transactionDetail!.transactionServices,
+                                    products:
+                                        _transactionDetail!.transactionProduct);
                                 showSuccessAlert(context,
                                     "Berhasil mencetak, silahkan tunggu sebentar!.");
                               } else {
@@ -726,8 +755,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                             .transactionProduct,
                                         transactionId:
                                             _transactionDetail!.transactionId,
-                                        transactionDate: _transactionDetail!
-                                            .transactionDate,
+                                        transactionDate:
+                                            _transactionDetail!.transactionDate,
                                         totalPrice: _transactionDetail!
                                             .transactionTotal,
                                         amountPrice: _transactionDetail!
@@ -789,7 +818,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                   child: const Padding(
                                     padding: EdgeInsets.all(4),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(Icons.close_outlined,
                                             color: Colors.white, size: 20),
@@ -810,7 +840,51 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                           Expanded(
                             child: InkWell(
                               onTap: () {
-                                // Add delete functionality here
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return ConfirmDeleteDialog(
+                                      message: "Hapus transaksi ini?",
+                                      onConfirm: () async {
+                                        try {
+                                          // Tutup dialog konfirmasi
+                                          Navigator.pop(context);
+
+                                          // Tampilkan loading indicator
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                          );
+
+                                          // Hapus transaksi
+                                          await DatabaseService.instance
+                                              .deleteTransaction(
+                                                  _transactionDetail!
+                                                      .transactionId);
+
+                                          // Tutup loading indicator
+                                          Navigator.pop(context);
+
+                                          // Kembali ke halaman sebelumnya dengan hasil sukses
+                                          Navigator.pop(context, true);
+                                          await refreshTransactionDetail();
+                                        } catch (e) {
+                                          // Tutup loading indicator jika ada error
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Gagal menghapus transaksi: $e')),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
+                                );
                               },
                               child: Container(
                                 height: 50,
@@ -848,4 +922,127 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
       ),
     );
   }
+}
+
+Widget _buildProductItem(Map<String, dynamic> product) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: cardColor,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Row(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Hero(
+            tag: "productImage_${product['productId']}",
+            child: Image.file(
+              File(product['product_image'].toString()),
+              width: 45,
+              height: 45,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  "assets/products/no-image.png",
+                  width: 45,
+                  height: 45,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
+        ),
+        const Gap(10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                product['product_name'],
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "${product['quantity']} x ${NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0).format(product['product_sell_price'])}",
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Subtotal: ${NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0).format((product['quantity'] as int) * (product['product_sell_price'] as int))}',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildServiceItem(Map<String, dynamic> service) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: cardColor,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 45,
+          height: 45,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.construction, color: Colors.grey),
+        ),
+        const Gap(10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                service['services_name'],
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "${service['quantity']} x ${NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0).format(service['services_price'])}",
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Subtotal: ${NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0).format((service['quantity'] as int) * (service['services_price'] as int))}',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }

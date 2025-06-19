@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_stok/model/cashier.dart';
-import 'package:omsetin_stok/providers/cashierProvider.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/cashier/update_cashier_page.dart';
-import 'package:omsetin_stok/view/widget/confirm_delete_dialog.dart';
-import 'package:omsetin_stok/view/widget/pin_input.dart';
+import 'package:omsetin_bengkel/model/cashier.dart';
+import 'package:omsetin_bengkel/providers/cashierProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/cashier/update_cashier_page.dart';
+import 'package:omsetin_bengkel/view/widget/confirm_delete_dialog.dart';
+import 'package:omsetin_bengkel/view/widget/pin_input.dart';
 import 'package:provider/provider.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
@@ -74,8 +74,7 @@ class _CardCashierState extends State<CardCashier> {
                         child: Text(
                           widget.cashier.cashierName,
                           style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
+                              fontSize: 16, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

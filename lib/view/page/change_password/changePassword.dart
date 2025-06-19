@@ -7,18 +7,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http; // Tambahkan ini
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ic.dart';
-import 'package:omsetin_stok/constants/apiConstants.dart';
-import 'package:omsetin_stok/providers/userProvider.dart';
-import 'package:omsetin_stok/utils/checkConnection.dart';
+import 'package:omsetin_bengkel/constants/apiConstants.dart';
+import 'package:omsetin_bengkel/providers/userProvider.dart';
+import 'package:omsetin_bengkel/utils/checkConnection.dart';
 import 'dart:convert'; // Untuk JSON encoding/decoding
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
@@ -124,38 +124,40 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
           child: Container(
-                        decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            secondaryColor, // Warna akhir gradient
-            primaryColor, // Warna awal gradient
-          ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-        ),
-      ),
-            child: AppBar(
-                    title: Text(
-            'GANTI PASSWORD',
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: SizeHelper.Fsize_normalTitle(context), // Perbesar font
-              color: bgColor,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  secondaryColor, // Warna akhir gradient
+                  primaryColor, // Warna awal gradient
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-                    ),
-                    centerTitle: true,
-                    backgroundColor: Colors.transparent,
-                    leading: CustomBackButton(),
-                    elevation: 0,
-                    toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
+            child: AppBar(
+              title: Text(
+                'GANTI PASSWORD',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize:
+                      SizeHelper.Fsize_normalTitle(context), // Perbesar font
+                  color: bgColor,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              leading: CustomBackButton(),
+              elevation: 0,
+              toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
             ),
           ),
         ),

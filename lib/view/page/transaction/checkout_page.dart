@@ -1,548 +1,658 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/mekanik.dart';
-import 'package:omsetin_stok/services/db_helper.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/view/page/transaction/transactions_page.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/model/mekanik.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/model/pelanggan.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/providers/cashierProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/alert.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/confirmation_transaction.dart';
+import 'package:omsetin_bengkel/view/widget/modals.dart';
 import 'package:provider/provider.dart';
 
-import 'package:omsetin_stok/model/pelanggan.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/model/service.dart';
-import 'package:omsetin_stok/services/authService.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/services/userService.dart';
-
 class CheckoutPage extends StatefulWidget {
-  final Pelanggan pelanggan;
-  final List<dynamic> items; // Berisi Service atau Product
-  final int total;
+  final List<Product> selectedProducts;
+  final List<Service> selectedServices;
+  final Map<int, int> productQuantities;
+  final Map<int, int> serviceQuantities;
+  final int queueNumber;
+  final DateTime? lastTransactionDate;
   final int? transactionId;
   final bool isUpdate;
-  final VoidCallback? onTransactionSuccess;
+  final Pelanggan? selectedCustomer;
+  final Mekanik? selectedEmployee;
 
   const CheckoutPage({
-    Key? key,
-    required this.pelanggan,
-    required this.items,
-    required this.total,
+    super.key,
+    required this.selectedProducts,
+    required this.selectedServices,
+    required this.productQuantities,
+    required this.serviceQuantities,
+    required this.queueNumber,
+    required this.lastTransactionDate,
     this.transactionId,
-    required this.isUpdate,
-    this.onTransactionSuccess,
-  }) : super(key: key);
+    this.isUpdate = false,
+    this.selectedCustomer,
+    this.selectedEmployee,
+  });
+
   @override
-  _CheckoutPageState createState() => _CheckoutPageState();
+  State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  String? selectedMekanik;
-  String keterangan = '';
-  String metodeBayar = 'Cash';
-  int diskon = 0;
-  bool isDiskonRupiah = true;
-  int biayaTambahan = 0;
+  String selectedPaymentMethod = "Cash";
+  bool isPercentDiscount = false;
+  int subtotal = 0;
+  int discount = 0;
+  int totalItems = 0;
+  List<String> _paymentMethods = [];
+  final TextEditingController _discountController = TextEditingController();
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    try {
+      await _loadPaymentMethods();
+      _calculateSubtotalAndTotalItems();
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        showErrorDialog(context, "Gagal memuat data: ${e.toString()}");
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loadPaymentMethods() async {
+    final methods = await DatabaseService.instance.getPaymentMethods();
+    if (mounted) {
+      setState(() {
+        _paymentMethods = methods.map((e) => e.paymentMethodName).toList();
+        if (_paymentMethods.isNotEmpty) {
+          selectedPaymentMethod = _paymentMethods.first;
+        }
+      });
+    }
+  }
+
+  void _calculateSubtotalAndTotalItems() {
+    int newSubtotal = 0;
+    int newTotalItems = 0;
+
+    for (final product in widget.selectedProducts) {
+      final quantity = widget.productQuantities[product.productId] ?? 1;
+      newSubtotal += product.productSellPrice * quantity;
+      newTotalItems += quantity;
+    }
+
+    for (final service in widget.selectedServices) {
+      final quantity = widget.serviceQuantities[service.serviceId] ?? 1;
+      newSubtotal += service.servicePrice * quantity;
+      newTotalItems += quantity;
+    }
+
+    if (mounted) {
+      setState(() {
+        subtotal = newSubtotal;
+        totalItems = newTotalItems;
+      });
+    }
+  }
+
+  int get totalPrice =>
+      subtotal - (isPercentDiscount ? (subtotal * discount) ~/ 100 : discount);
+
+  void _updateDiscount(String value) {
+    final parsedValue = int.tryParse(value) ?? 0;
+    if (parsedValue < 0) return;
+
+    setState(() {
+      discount = parsedValue;
+    });
+  }
+
+  void _navigateToConfirmation() {
+    if (widget.selectedProducts.isEmpty && widget.selectedServices.isEmpty) {
+      showErrorDialog(context, "Tidak ada item yang dipilih");
+      return;
+    }
+
+    final productData = widget.selectedProducts.map((product) {
+      final quantity = widget.productQuantities[product.productId] ?? 1;
+      return {
+        'productId': product.productId,
+        'product_barcode': product.productBarcode,
+        'product_barcode_type': product.productBarcodeType,
+        'product_name': product.productName,
+        'product_stock': product.productStock,
+        'product_unit': product.productUnit,
+        'product_sold': product.productSold,
+        'product_purchase_price': product.productPurchasePrice,
+        'product_sell_price': product.productSellPrice,
+        'product_date_added': product.productDateAdded,
+        'product_image': product.productImage,
+        'quantity': quantity,
+      };
+    }).toList();
+
+    final serviceData = widget.selectedServices.map((service) {
+      final quantity = widget.serviceQuantities[service.serviceId] ?? 1;
+      return {
+        'servicesId': service.serviceId,
+        'services_name': service.serviceName,
+        'services_price': service.servicePrice,
+        'quantity': quantity,
+      };
+    }).toList();
+
+    final discountAmount = subtotal - totalPrice;
+
+    showModalKonfirmasi(
+      context,
+      totalPrice,
+      totalItems,
+      discountAmount,
+      productData,
+      serviceData,
+      {...widget.productQuantities, ...widget.serviceQuantities},
+      selectedPaymentMethod,
+      widget.queueNumber,
+      widget.lastTransactionDate,
+      isUpdate: widget.isUpdate,
+      transactionId: widget.transactionId,
+      selectedCustomer: widget.selectedCustomer,
+      selectedEmployee: widget.selectedEmployee,
+    );
+  }
+
+  @override
+  void dispose() {
+    _discountController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final formattedDate = DateFormat('dd/MM/yyyy - HH:mm').format(now);
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: bgColor,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final cashierProvider = Provider.of<CashierProvider>(context);
+    final currencyFormat = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp.',
+      decimalDigits: 0,
+    );
 
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 20),
         child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
+          borderRadius: const BorderRadius.vertical(
+            bottom: Radius.circular(20),
           ),
           child: Container(
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [secondaryColor, primaryColor],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [secondaryColor, primaryColor],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
             child: AppBar(
-              backgroundColor: Colors.transparent,
-              titleSpacing: 0,
-              scrolledUnderElevation: 0,
-              toolbarHeight: kToolbarHeight + 20,
-              leading: const CustomBackButton(),
               title: Text(
-                'CHECKOUT',
+                "CHECKOUT",
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: SizeHelper.Fsize_normalTitle(context),
                   color: bgColor,
                 ),
               ),
               centerTitle: true,
+              toolbarHeight: kToolbarHeight + 20,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: const CustomBackButton(),
             ),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Info Pelanggan
-            Text(widget.pelanggan.namaPelanggan,
-                style: TextStyle(fontSize: 16)),
-            Text(widget.pelanggan.noHandphone, style: TextStyle(fontSize: 16)),
-            SizedBox(height: 16),
-
-            // Detail Order
-            Text(
-              'Detail Order',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-
-            ...widget.items.map(
-              (item) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCustomerAndEmployeeSection(),
+                Expanded(
+                  child: ListView(
                     children: [
-                      Expanded(
-                        child: Text(
-                          item is Service
-                              ? item.name
-                              : item is ProductWithQuantity
-                                  ? item.product.productName
-                                  : item
-                                      .productName, // Fallback untuk Product biasa
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      Text(
-                        NumberFormat.currency(
-                          locale: 'id',
-                          symbol: 'Rp',
-                        ).format(item is Service
-                            ? item.price.toInt()
-                            : item is ProductWithQuantity
-                                ? item.product.productSellPrice
-                                : item.productSellPrice),
-                        // 'Rp.${item is Service ? item.price.toInt() : item is ProductWithQuantity ? item.product.productSellPrice : item.productSellPrice}', // Fallback untuk Product biasa
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      if (item is ProductWithQuantity)
-                        Text(' x${item.quantity}'),
+                      if (widget.selectedProducts.isNotEmpty) ...[
+                        _buildSectionHeader("Produk"),
+                        ...widget.selectedProducts.map(_buildProductItem),
+                      ],
+                      if (widget.selectedServices.isNotEmpty) ...[
+                        _buildSectionHeader("Layanan"),
+                        ...widget.selectedServices.map(_buildServiceItem),
+                      ],
+                      const SizedBox(height: 12),
+                      _buildSubtotalCard(currencyFormat),
+                      const SizedBox(height: 16),
+                      _buildPaymentMethodSection(),
+                      const SizedBox(height: 16),
+                      _buildDiscountSection(),
+                      const SizedBox(height: 100),
                     ],
                   ),
-                );
-              },
-            ).toList(),
-
-            Divider(thickness: 2),
-
-            // Subtotal
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Subtotal',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  NumberFormat.currency(
-                    locale: 'id',
-                    symbol: 'Rp',
-                  ).format(widget.total),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                // Text(
-                //   'Rp.${widget.total}',
-                //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                // ),
-              ],
-            ),
-
-            Divider(thickness: 2),
-            SizedBox(height: 16),
-
-            // Keterangan
-            Text(
-              'Keterangan',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '(Opsional)',
-              ),
-              onChanged: (value) => keterangan = value,
-            ),
-            SizedBox(height: 16),
-
-            // Tanggal Transaksi
-            Row(
-              children: [
-                Text('Tanggal Transaksi :'),
-                SizedBox(width: 8),
-                Text(formattedDate),
-                Icon(Icons.arrow_drop_down, size: 20),
-              ],
-            ),
-            SizedBox(height: 16),
-
-            // Mekanik
-            Text(
-              'Mekanik',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => _selectMekanik(context),
-              child: Text('Tambah Mekanik'),
-            ),
-            if (selectedMekanik != null)
-              Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text(selectedMekanik!),
-              ),
-            SizedBox(height: 16),
-
-            // Langsung Bayar
-            Row(
-              children: [
-                Checkbox(
-                  value: true,
-                  onChanged: null,
-                ),
-                Text('Langsung bayar'),
-                Spacer(),
-                OutlinedButton(
-                  onPressed: () => _addBiayaTambahan(context),
-                  child: Text('+ Tambah Biaya Tambahan'),
                 ),
               ],
             ),
-            if (biayaTambahan > 0)
-              Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text('Biaya Tambahan: Rp.$biayaTambahan'),
-              ),
-            SizedBox(height: 16),
-
-            // Metode Bayar
-            Text(
-              'Metode Bayar',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: metodeBayar,
-              items: ['Cash', 'Transfer Bank', 'Kredit'].map((method) {
-                return DropdownMenuItem(
-                  value: method,
-                  child: Text(method),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() => metodeBayar = value!);
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Diskon
-            Text(
-              'Diskon / Rupiah',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Checkbox(
-                  value: isDiskonRupiah,
-                  onChanged: (value) {
-                    setState(() => isDiskonRupiah = value!);
-                  },
-                ),
-                Text('Rupiah Rp'),
-                SizedBox(width: 16),
-                Checkbox(
-                  value: !isDiskonRupiah,
-                  onChanged: (value) {
-                    setState(() => isDiskonRupiah = !value!);
-                  },
-                ),
-                Text('Person'),
-                Icon(Icons.close, size: 20),
-              ],
-            ),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '0',
-                prefixText: 'Rp.',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() => diskon = int.tryParse(value) ?? 0);
-              },
-            ),
-            SizedBox(height: 24),
-
-            // Total Harga
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Harga',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  NumberFormat.currency(
-                    locale: 'id',
-                    symbol: 'Rp',
-                  ).format(_calculateFinalTotal()),
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 24),
-
-            // Tombol Bayar
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  final authService =
-                      Provider.of<AuthService>(context, listen: false);
-                  _processPayment(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
-                ),
-                child: Text(
-                  'Bayar',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  int _calculateFinalTotal() {
-    return widget.total + biayaTambahan - diskon;
-  }
-
-  void _selectMekanik(BuildContext context) async {
-    final mekanikList = await DatabaseHelper.instance.getAllMekanik();
-    // Contoh sederhana pilih mekanik
-    final result = await showDialog<Mekanik>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: Text('Pilih Mekanik'),
-        children: mekanikList.map((mekanik) {
-          return SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, mekanik),
-            child: Text(mekanik.namaMekanik),
-          );
-        }).toList(),
-      ),
-    );
-
-    if (result != null) {
-      setState(() => selectedMekanik = result.namaMekanik);
-    }
-  }
-
-  void _addBiayaTambahan(BuildContext context) async {
-    final controller = TextEditingController();
-    final result = await showDialog<int>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Tambah Biaya Tambahan'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: 'Jumlah Biaya Tambahan',
-            prefixText: 'Rp.',
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text) ?? 0;
-              Navigator.pop(context, value);
-            },
-            child: Text('Tambah'),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomPaymentButton(currencyFormat, cashierProvider),
           ),
         ],
       ),
     );
-
-    if (result != null) {
-      setState(() => biayaTambahan = result);
-    }
   }
 
-  Future<void> _processPayment(BuildContext context) async {
-    // Proses pembayaran disini
-    try {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      final cashierName = await authService.getCurrentUsername();
-      // Validasi input
-      if (widget.pelanggan.namaPelanggan.isEmpty) {
-        throw Exception('Nama pelanggan tidak boleh kosong');
-      }
-      if (widget.items.isEmpty) {
-        throw Exception('Tidak ada item untuk diproses');
-      }
-      if (metodeBayar.isEmpty) {
-        throw Exception('Metode pembayaran tidak boleh kosong');
-      }
-      if (isDiskonRupiah && diskon < 0) {
-        throw Exception('Diskon tidak boleh negatif');
-      }
-      if (!isDiskonRupiah && diskon < 0) {
-        throw Exception('Jumlah diskon tidak boleh negatif');
-      }
-      if (biayaTambahan < 0) {
-        throw Exception('Biaya tambahan tidak boleh negatif');
-      }
-      if (selectedMekanik == null) {
-        selectedMekanik = '(Tidak ada mekanik yang dipilih)';
-      }
-      // Jika update transaksi, pastikan transactionId ada
-      if (widget.isUpdate && widget.transactionId == null) {
-        throw Exception('ID transaksi tidak ditemukan untuk update');
-      }
-      // Jika bukan update, pastikan transactionId tidak ada
-      if (!widget.isUpdate && widget.transactionId != null) {
-        throw Exception('ID transaksi tidak boleh ada untuk transaksi baru');
-      }
-      // Jika update, gunakan transactionId yang ada
-      if (widget.isUpdate && widget.transactionId != null) {
-        print('Updating transaction with ID: ${widget.transactionId}');
-      } else {
-        print('Creating new transaction');
-      }
-      // Jika semua validasi berhasil, lanjutkan dengan proses pembayaran
-      print('All validations passed, proceeding with payment processing...');
-      // Siapkan data transaksi
+  Widget _buildCustomerAndEmployeeSection() {
+    return Column(
+      children: [
+        if (widget.selectedCustomer != null)
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundImage: widget.selectedCustomer!.profileImage != null
+                    ? FileImage(File(widget.selectedCustomer!.profileImage!))
+                    : null,
+                child: widget.selectedCustomer!.profileImage == null
+                    ? Text(widget.selectedCustomer!.namaPelanggan[0])
+                    : null,
+              ),
+              title: Text(widget.selectedCustomer!.namaPelanggan),
+              subtitle: Text(widget.selectedCustomer!.noHandphone),
+            ),
+          ),
+        if (widget.selectedEmployee != null)
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundImage: widget.selectedEmployee!.profileImage !=
+                            null &&
+                        widget.selectedEmployee!.profileImage!.isNotEmpty
+                    ? FileImage(File(widget.selectedEmployee!.profileImage!))
+                    : null,
+                child: widget.selectedEmployee!.profileImage == null ||
+                        widget.selectedEmployee!.profileImage!.isEmpty
+                    ? Text(widget.selectedEmployee!.namaMekanik[0])
+                    : null,
+              ),
+              title: Text(widget.selectedEmployee!.namaMekanik),
+              subtitle: Text(widget.selectedEmployee!.spesialis),
+            ),
+          ),
+      ],
+    );
+  }
 
-      final transactionData = {
-        'transaction_date': DateTime.now().toIso8601String(),
-        'transaction_customer_name': widget.pelanggan.namaPelanggan,
-        'transaction_cashier': cashierName, // Ganti dengan nama user yang login
-        'transaction_total': widget.total,
-        'transaction_pay_amount': _calculateFinalTotal(),
-        'transaction_discount': diskon,
-        'transaction_method': metodeBayar,
-        'transaction_note': keterangan,
-        'transaction_tax': 0,
-        'transaction_status': 'Selesai',
-        'transaction_quantity': widget.items.length,
-        'transaction_products': jsonEncode(widget.items.map((item) {
-          if (item is Service) {
-            return {
-              'type': 'service',
-              'id': item.id,
-              'name': item.name,
-              'price': item.price,
-            };
-          } else if (item is ProductWithQuantity) {
-            return {
-              'type': 'product',
-              'id': item.product.productId, // Perhatikan perubahan di sini
-              'name': item.product.productName, // Dan di sini
-              'price': item.product.productSellPrice,
-              'quantity': item.quantity,
-            };
-          } else if (item is Product) {
-            // Untuk kompatibilitas backward
-            return {
-              'type': 'product',
-              'id': item.productId,
-              'name': item.productName,
-              'price': item.productSellPrice,
-              'quantity': 1,
-            };
-          }
-          return {}; // Fallback
-        }).toList()),
-        'transaction_queue_number': 0, // Sesuaikan jika perlu
-        'transaction_profit':
-            _calculateProfit(), // Fungsi baru untuk hitung profit
-      };
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
+      child: Text(
+        title,
+        style: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey[700],
+        ),
+      ),
+    );
+  }
 
-      // Simpan ke database
-      final dbService = DatabaseService.instance;
-      await dbService.addTransaction(transactionData);
+  Widget _buildProductItem(Product product) {
+    final quantity = widget.productQuantities[product.productId] ?? 1;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: product.productImage.isNotEmpty
+                ? Image.file(
+                    File(product.productImage),
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildDefaultProductImage();
+                    },
+                  )
+                : _buildDefaultProductImage(),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.productName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "$quantity x ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(product.productSellPrice)}",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Text(
+                  "SubTotal ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(product.productSellPrice * quantity)}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-      // Tampilkan konfirmasi
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Transaksi Berhasil'),
-          content: Text('Transaksi telah berhasil diproses.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-                if (widget.onTransactionSuccess != null) {
-                  widget.onTransactionSuccess!();
-                }
-              },
-              child: Text('OK'),
+  Widget _buildDefaultProductImage() {
+    return Image.asset(
+      "assets/products/no-image.png",
+      width: 60,
+      height: 60,
+      fit: BoxFit.cover,
+    );
+  }
+
+  Widget _buildServiceItem(Service service) {
+    final quantity = widget.serviceQuantities[service.serviceId] ?? 1;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.blue.withOpacity(0.1),
+            ),
+            child: const Icon(Icons.medical_services, color: Colors.blue),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  service.serviceName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "$quantity x ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(service.servicePrice)}",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Text(
+                  "SubTotal ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(service.servicePrice * quantity)}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubtotalCard(NumberFormat currencyFormat) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: greenColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "SubTotal",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            currencyFormat.format(subtotal),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Metode Pembayaran",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: DropdownButton<String>(
+            value: selectedPaymentMethod,
+            isExpanded: true,
+            underline: const SizedBox(),
+            items: _paymentMethods
+                .map((method) => DropdownMenuItem(
+                      value: method,
+                      child: Text(method),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() => selectedPaymentMethod = value);
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDiscountSection() {
+    return Row(
+      children: [
+        const Icon(Icons.discount, color: Colors.blue),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: _discountController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText:
+                  isPercentDiscount ? "Diskon Persen %" : "Diskon Rupiah Rp",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onChanged: _updateDiscount,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Column(
+          children: [
+            Row(
+              children: [
+                const Text("Persen %"),
+                Transform.scale(
+                  scale: 0.6,
+                  child: Switch(
+                    value: isPercentDiscount,
+                    activeColor: greenColor,
+                    inactiveThumbColor: redColor,
+                    inactiveTrackColor: redColor.withOpacity(0.5),
+                    onChanged: (value) {
+                      setState(() {
+                        isPercentDiscount = value;
+                        _discountController.clear();
+                        discount = 0;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                const Text("Rupiah Rp"),
+                Transform.scale(
+                  scale: 0.6,
+                  child: Switch(
+                    value: !isPercentDiscount,
+                    activeColor: greenColor,
+                    inactiveThumbColor: redColor,
+                    inactiveTrackColor: redColor.withOpacity(0.5),
+                    onChanged: (value) {
+                      setState(() {
+                        isPercentDiscount = !value;
+                        _discountController.clear();
+                        discount = 0;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      );
-    } catch (e) {
-      print('Error processing transaction: $e');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Gagal memproses transaksi: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
+      ],
+    );
   }
 
-  int _calculateProfit() {
-    int profit = 0;
-    for (var item in widget.items) {
-      if (item is ProductWithQuantity) {
-        profit += ((item.product.productSellPrice -
-                    item.product.productPurchasePrice) *
-                item.quantity)
-            .toInt();
-      } else if (item is Product) {
-        profit += (item.productSellPrice - item.productPurchasePrice).toInt();
-      }
-    }
-    return profit;
+  Widget _buildBottomPaymentButton(
+    NumberFormat currencyFormat,
+    CashierProvider cashierProvider,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primaryColor, secondaryColor],
+          begin: const Alignment(0, 2),
+          end: const Alignment(-0, -2),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    'Total Jumlah: ',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    '$totalItems',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const Text(
+                'TOTAL HARGA',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                currencyFormat.format(totalPrice),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          ElevatedButton(
+            onPressed: _navigateToConfirmation,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(12),
+              child: Text(
+                'BAYAR',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

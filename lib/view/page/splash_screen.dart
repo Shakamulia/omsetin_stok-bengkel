@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/services/authService.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/page/home/home.dart';
-import 'package:omsetin_stok/view/page/login.dart';
-import 'package:omsetin_stok/main.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/services/authService.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/page/home/home.dart';
+import 'package:omsetin_bengkel/view/page/login.dart';
+import 'package:omsetin_bengkel/main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart'; // Import main.dart to access scaffoldMessengerKey
@@ -104,32 +104,31 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       final token = await _authService.getToken();
-      
-        if (token != null) {
-          final isExpired = await _authService.isTokenExpired(context, token,
-              autoLogout: false);
-          if (!isExpired) {
-            _navigateToHome();
-            return;
-          }
-        }
-        // Kalau token null atau expired, coba auto-login ulang pakai stored credential
-        final serial = await _authService.storage.read(key: 'remember_serial');
-        final pass = await _authService.storage.read(key: 'remember_pass');
 
-        if (serial != null && pass != null) {
-          try {
-            await _authService.loginWithSerialNumber(context, serial, pass);
-            _navigateToHome();
-            return;
-          } catch (e) {
-            print('Auto-login gagal: $e');
-            _navigateToLogin();
-          }
-        } else {
+      if (token != null) {
+        final isExpired = await _authService.isTokenExpired(context, token,
+            autoLogout: false);
+        if (!isExpired) {
+          _navigateToHome();
+          return;
+        }
+      }
+      // Kalau token null atau expired, coba auto-login ulang pakai stored credential
+      final serial = await _authService.storage.read(key: 'remember_serial');
+      final pass = await _authService.storage.read(key: 'remember_pass');
+
+      if (serial != null && pass != null) {
+        try {
+          await _authService.loginWithSerialNumber(context, serial, pass);
+          _navigateToHome();
+          return;
+        } catch (e) {
+          print('Auto-login gagal: $e');
           _navigateToLogin();
         }
-      
+      } else {
+        _navigateToLogin();
+      }
     } catch (e) {
       print("Error checking token: $e");
       _navigateToLogin();

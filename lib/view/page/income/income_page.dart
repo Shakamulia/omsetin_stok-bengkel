@@ -3,22 +3,22 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/income.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/search_utils.dart';
-import 'package:omsetin_stok/view/page/Income/Income_detail.dart';
-import 'package:omsetin_stok/view/page/income/input_expense_page.dart';
-import 'package:omsetin_stok/view/page/product/product.dart';
-import 'package:omsetin_stok/view/widget/Income_card.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/date_from_to/fromTo_v2.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/floating_button.dart';
-import 'package:omsetin_stok/view/widget/modals.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/income.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/search_utils.dart';
+import 'package:omsetin_bengkel/view/page/Income/Income_detail.dart';
+import 'package:omsetin_bengkel/view/page/income/input_expense_page.dart';
+import 'package:omsetin_bengkel/view/page/product/product.dart';
+import 'package:omsetin_bengkel/view/widget/Income_card.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/date_from_to/fromTo_v2.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/floating_button.dart';
+import 'package:omsetin_bengkel/view/widget/modals.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
@@ -136,10 +136,9 @@ class IncomePageState extends State<IncomePage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                       
                       ),
                     ),
-                     Padding(
+                    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: DateRangePickerButton(
                         initialStartDate: _fromDate,
@@ -154,12 +153,8 @@ class IncomePageState extends State<IncomePage> {
                       ),
                     ),
                     Gap(10),
-                  
-                  ]
-                  
-                  )
-                  ),
-                  Gap(13),
+                  ])),
+              Gap(13),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SearchTextField(
@@ -197,8 +192,8 @@ class IncomePageState extends State<IncomePage> {
                           DateTime startDate = DateTime(_fromDate.year,
                                   _fromDate.month, _fromDate.day, 0, 0, 0)
                               .toLocal();
-                          DateTime endDate = DateTime(_toDate.year, _toDate.month,
-                                  _toDate.day, 23, 59, 59)
+                          DateTime endDate = DateTime(_toDate.year,
+                                  _toDate.month, _toDate.day, 23, 59, 59)
                               .toLocal();
 
                           return (incomeDate.isAfter(startDate) ||

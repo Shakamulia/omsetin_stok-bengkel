@@ -1,6 +1,6 @@
 import 'dart:math';
 
-// Model untuk Pelanggan
+
 class Pelanggan {
   int? id;
   String? profileImage;
@@ -19,20 +19,45 @@ class Pelanggan {
     required this.noHandphone,
     required this.email,
     required this.gender,
-    required this.alamat,
+    required this.alamat,  });
+
+    Pelanggan.minimal({
+    required this.id,
+    required this.namaPelanggan,
+    this.kode = '',
+    this.noHandphone = '',
+    this.email = '',
+    this.gender = '',
+    this.alamat = '',
   });
 
-  // TAMBAHKAN KODE INI =========================
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
 
-    return other is Pelanggan && other.id == id && other.kode == kode;
+  factory Pelanggan.fromJson(Map<String, dynamic> json) {
+    return Pelanggan(
+      id: json['id'],
+      profileImage: json['profileImage'],
+      kode: json['kode'],
+      namaPelanggan: json['namaPelanggan'],
+      noHandphone: json['noHandphone'],
+      email: json['email'],
+      gender: json['gender'],
+      alamat: json['alamat'],
+    );
   }
 
-  @override
-  int get hashCode => id.hashCode ^ kode.hashCode;
-  // ============================================
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'kode': kode,
+      'namaPelanggan': namaPelanggan,
+      'noHandphone': noHandphone,
+      'email': email,
+      'gender': gender,
+      'alamat': alamat,
+      'profileImage': profileImage, // Make sure this matches your column name
+    };
+  }
+
 
   // Convert to Map untuk database
   Map<String, dynamic> toMap() {
@@ -48,17 +73,20 @@ class Pelanggan {
     };
   }
 
+
   // Create from Map
-  factory Pelanggan.fromMap(Map<String, dynamic> map) {
+  factory Pelanggan.fromMap(Map<String, dynamic> json) {
     return Pelanggan(
-      id: map['id'],
-      profileImage: map['profileImage'],
-      kode: map['kode'],
-      namaPelanggan: map['namaPelanggan'],
-      noHandphone: map['noHandphone'],
-      email: map['email'],
-      gender: map['gender'],
-      alamat: map['alamat'],
+      id: json['id'],
+      profileImage: json['profileImage'],
+      kode: json['kode'],
+      namaPelanggan: json['namaPelanggan'],
+      noHandphone: json['noHandphone'],
+      email: json['email'],
+      gender: json['gender'],
+      alamat: json['alamat'],
     );
   }
+
 }
+

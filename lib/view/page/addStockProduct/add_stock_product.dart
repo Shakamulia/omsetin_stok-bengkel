@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/stock_addition.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/page/addStockProduct/select_and_add_stock.dart';
-import 'package:omsetin_stok/view/page/expense/expense_page.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/date_from_to/fromTo_v2.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
-import 'package:omsetin_stok/view/widget/stock_addition_card.dart';
+import 'package:omsetin_bengkel/model/stock_addition.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/page/addStockProduct/select_and_add_stock.dart';
+import 'package:omsetin_bengkel/view/page/expense/expense_page.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/date_from_to/fromTo_v2.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/view/widget/stock_addition_card.dart';
 import 'package:provider/provider.dart';
 
 class AddStockProductPage extends StatefulWidget {
@@ -248,7 +248,8 @@ class _AddStockProductPageState extends State<AddStockProductPage> {
 
               if (result == true) {
                 _loadStockAddition();
-                showSuccessAlert(context, "Berhasil Menambahkan Stok Spare Part!");
+                showSuccessAlert(
+                    context, "Berhasil Menambahkan Stok Spare Part!");
               }
             },
             child: Text(

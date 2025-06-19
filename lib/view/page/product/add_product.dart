@@ -9,24 +9,24 @@ import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi_light.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/code.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/bluetoothAlert.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/failedAlert.dart';
-import 'package:omsetin_stok/utils/formatters.dart';
-import 'package:omsetin_stok/utils/image.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/utils/printer_helper.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/product/select_category.dart';
-import 'package:omsetin_stok/view/page/qr_code_scanner.dart';
-import 'package:omsetin_stok/view/widget/add_category_modal.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/model/code.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/bluetoothAlert.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/failedAlert.dart';
+import 'package:omsetin_bengkel/utils/formatters.dart';
+import 'package:omsetin_bengkel/utils/image.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/utils/printer_helper.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/product/select_category.dart';
+import 'package:omsetin_bengkel/view/page/qr_code_scanner.dart';
+import 'package:omsetin_bengkel/view/widget/add_category_modal.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -572,7 +572,7 @@ class _AddProductPageState extends State<AddProductPage> {
         // productStock.isEmpty ||
         productHargaBeli.isEmpty ||
         productHargaJual.isEmpty ||
-        productSatuan.isEmpty ) {
+        productSatuan.isEmpty) {
       showNullDataAlert(context,
           message: "Harap isi semua kolom yang wajib diisi!");
       return;
@@ -593,7 +593,8 @@ class _AddProductPageState extends State<AddProductPage> {
         productDateAdded,
       );
 
-      showSuccessAlert(context, "Berhasil Menambahkan Spare Part $productName!");
+      showSuccessAlert(
+          context, "Berhasil Menambahkan Spare Part $productName!");
       Navigator.pop(context, true);
     } catch (e) {
       showFailedAlert(context, message: "Gagal menambahkan Spare Part: $e");

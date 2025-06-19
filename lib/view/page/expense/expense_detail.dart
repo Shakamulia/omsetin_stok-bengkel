@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/expense.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/formatters.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:omsetin_stok/view/widget/expense_card.dart';
+import 'package:omsetin_bengkel/model/expense.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/formatters.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/view/widget/expense_card.dart';
 
 class ExpenseDetailPage extends StatefulWidget {
   final Expense? expense;
@@ -49,38 +49,39 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
+        preferredSize:
+            Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
           child: Container(
-                        decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            secondaryColor, // Warna akhir gradient
-            primaryColor, // Warna awal gradient
-          ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-        ),
-      ),
-            child: AppBar(
-            
-                    title: Text(
-            'DETAIL PENGELUARAN',
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: SizeHelper.Fsize_normalTitle(context), // Perbesar font
-              color: bgColor,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  secondaryColor, // Warna akhir gradient
+                  primaryColor, // Warna awal gradient
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-                    ),
-                    centerTitle: true,
-                    backgroundColor: Colors.transparent,
-                    leading: CustomBackButton(),
-                    elevation: 0,
-                    toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
+            child: AppBar(
+              title: Text(
+                'DETAIL PENGELUARAN',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize:
+                      SizeHelper.Fsize_normalTitle(context), // Perbesar font
+                  color: bgColor,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              leading: CustomBackButton(),
+              elevation: 0,
+              toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
             ),
           ),
         ),
@@ -110,7 +111,8 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                                 fillColor: Colors.grey[200],
                                 obscureText: false,
                                 hintText: "Nama Pengeluaran...",
-                                textColor: const Color.fromARGB(255, 77, 77, 77),
+                                textColor:
+                                    const Color.fromARGB(255, 77, 77, 77),
                                 prefixIcon: null,
                                 readOnly: true,
                                 controller: nameController,
@@ -160,7 +162,8 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                                   keyboardType: TextInputType.number,
                                   inputFormatter: [currencyInputFormatter()]),
                               const Gap(10),
-                              const TextFieldLabel(label: 'Tanggal Pengeluaran'),
+                              const TextFieldLabel(
+                                  label: 'Tanggal Pengeluaran'),
                               GestureDetector(
                                 onTap: () async {
                                   // final DateTime? picked = await showDatePicker(
@@ -214,8 +217,8 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 15, horizontal: 8.0),
                                   decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(255, 216, 216, 216),
+                                    color: const Color.fromARGB(
+                                        255, 216, 216, 216),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(

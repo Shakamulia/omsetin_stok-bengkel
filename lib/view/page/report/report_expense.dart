@@ -3,17 +3,17 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/expenceModel.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/expense_card.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/floating_button.dart';
-import 'package:omsetin_stok/view/widget/formatter/Rupiah.dart';
-import 'package:omsetin_stok/view/widget/modals.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/model/expenceModel.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/expense_card.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/floating_button.dart';
+import 'package:omsetin_bengkel/view/widget/formatter/Rupiah.dart';
+import 'package:omsetin_bengkel/view/widget/modals.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
 import 'package:sizer/sizer.dart';
 
 class ReportExpense extends StatefulWidget {
@@ -79,7 +79,8 @@ class _ReportExpenseState extends State<ReportExpense> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12),
                   child: DateRangePickerButton(
                     initialStartDate: dateFrom,
                     initialEndDate: dateTo,
@@ -121,10 +122,10 @@ class _ReportExpenseState extends State<ReportExpense> {
                       DateTime startDate = DateTime(dateFrom.year,
                               dateFrom.month, dateFrom.day, 0, 0, 0)
                           .toLocal();
-                      DateTime endDate = DateTime(dateTo.year,
-                              dateTo.month, dateTo.day, 23, 59, 59)
+                      DateTime endDate = DateTime(
+                              dateTo.year, dateTo.month, dateTo.day, 23, 59, 59)
                           .toLocal();
-      
+
                       return (expenseDate.isAfter(startDate) ||
                               expenseDate.isAtSameMomentAs(startDate)) &&
                           (expenseDate.isBefore(endDate) ||
@@ -134,10 +135,10 @@ class _ReportExpenseState extends State<ReportExpense> {
                       return false;
                     }
                   }).toList();
-      
+
                   int totalExpense = filteredExpenses.fold(
                       0, (sum, expense) => sum + (expense.amount ?? 0));
-      
+
                   if (filteredExpenses.isEmpty) {
                     return Center(
                         child: Column(
@@ -150,7 +151,7 @@ class _ReportExpenseState extends State<ReportExpense> {
                       ],
                     ));
                   }
-      
+
                   return Column(
                     children: [
                       Gap(20),
@@ -174,27 +175,27 @@ class _ReportExpenseState extends State<ReportExpense> {
                         ),
                       ),
                       Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: ExpensiveFloatingButton(
-                                      left: 12,
-                                      right: 12,
-                                      text: 'Export',
-                                      onPressed: () async {
-                                        CustomModals.modalExportExpenseData(
-                                            context, filteredExpenses);
-                                      },
-                                    ),
-                                  ),
-                                ],
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: ExpensiveFloatingButton(
+                                left: 12,
+                                right: 12,
+                                text: 'Export',
+                                onPressed: () async {
+                                  CustomModals.modalExportExpenseData(
+                                      context, filteredExpenses);
+                                },
                               ),
                             ),
+                          ],
+                        ),
+                      ),
                       Gap(10),
                       Container(
                         width: double.infinity,
@@ -350,9 +351,7 @@ class DateRangePickerButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.calendar_today, 
-                      size: 18, 
-                      color: primaryColor),
+                  Icon(Icons.calendar_today, size: 18, color: primaryColor),
                   const SizedBox(width: 8),
                   Text(
                     "Pilih Tanggal",

@@ -4,11 +4,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-import 'package:omsetin_stok/constants/apiConstants.dart';
-import 'package:omsetin_stok/model/serialNumberPayload.dart';
-import 'package:omsetin_stok/model/tokenPayload.dart';
-import 'package:omsetin_stok/services/authService.dart';
-import 'package:omsetin_stok/services/userService.dart';
+import 'package:omsetin_bengkel/constants/apiConstants.dart';
+import 'package:omsetin_bengkel/model/serialNumberPayload.dart';
+import 'package:omsetin_bengkel/model/tokenPayload.dart';
+import 'package:omsetin_bengkel/services/authService.dart';
+import 'package:omsetin_bengkel/services/userService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {
@@ -51,8 +51,6 @@ class UserProvider with ChangeNotifier {
     final token = await AuthService().getToken();
     if (token == null) return;
     try {
-  
-
       String? token = await _storage.read(key: "token");
       if (token != null && token.isNotEmpty) {
         Map<String, dynamic> payload = Jwt.parseJwt(token);

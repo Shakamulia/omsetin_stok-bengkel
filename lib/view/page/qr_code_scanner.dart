@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class QrCodeScanner extends StatefulWidget {
@@ -72,24 +72,18 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
 
     return Scaffold(
       backgroundColor: bgColor,
-          appBar: PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 20),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20)
-          ),
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20)),
           child: Container(
-                      decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter
-              )
-            ),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              secondaryColor,
+              primaryColor,
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
             child: AppBar(
               title: Text(
                 "SCAN QR CODE",

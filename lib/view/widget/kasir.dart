@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 
 class ReportCashierCard extends StatefulWidget {
   final String name;

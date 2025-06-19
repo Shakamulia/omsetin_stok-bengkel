@@ -1,1 +1,1 @@
-F:\omsetin_stok-main\build\app\intermediates\cxx\Debug\3j1d7049\obj\arm64-v8a
+F:\omsetin_bengkel-main\build\app\intermediates\cxx\Debug\3j1d7049\obj\arm64-v8a

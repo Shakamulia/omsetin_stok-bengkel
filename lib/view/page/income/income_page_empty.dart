@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/view/page/income/input_expense_page.dart';
-import 'package:omsetin_stok/view/widget/dateFrom-To.dart';
-import 'package:omsetin_stok/view/widget/floating_button.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/view/page/income/input_expense_page.dart';
+import 'package:omsetin_bengkel/view/widget/dateFrom-To.dart';
+import 'package:omsetin_bengkel/view/widget/floating_button.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 
 class IncomePageEmpty extends StatefulWidget {
   const IncomePageEmpty({super.key});

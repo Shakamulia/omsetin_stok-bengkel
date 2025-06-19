@@ -5,16 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/category.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/page/addStockProduct/select_product.dart';
-import 'package:omsetin_stok/view/page/select_category.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/model/category.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/page/addStockProduct/select_product.dart';
+import 'package:omsetin_bengkel/view/page/select_category.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
 
 class ProfitPercent extends StatefulWidget {
   const ProfitPercent({super.key});

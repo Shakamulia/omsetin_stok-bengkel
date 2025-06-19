@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/payment_method_data.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/page/cashier/cashier_page.dart';
-import 'package:omsetin_stok/view/page/report/report_StokProduct.dart';
-import 'package:omsetin_stok/view/page/report/report_category.dart';
-import 'package:omsetin_stok/view/page/report/report_expense.dart';
-import 'package:omsetin_stok/view/page/report/report_kasir.dart';
-import 'package:omsetin_stok/view/page/report/report_payment_method.dart';
-import 'package:omsetin_stok/view/page/report/report_product.dart';
-import 'package:omsetin_stok/view/page/report/report_profit.dart';
-import 'package:omsetin_stok/view/page/report/report_transaction.dart';
-import 'package:omsetin_stok/view/widget/app_bar_stock.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/menu_card.dart';
-import 'package:omsetin_stok/view/widget/modals.dart';
+import 'package:omsetin_bengkel/model/payment_method_data.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/page/cashier/cashier_page.dart';
+import 'package:omsetin_bengkel/view/page/report/report_StokProduct.dart';
+import 'package:omsetin_bengkel/view/page/report/report_category.dart';
+import 'package:omsetin_bengkel/view/page/report/report_expense.dart';
+import 'package:omsetin_bengkel/view/page/report/report_kasir.dart';
+import 'package:omsetin_bengkel/view/page/report/report_mekanik.dart';
+import 'package:omsetin_bengkel/view/page/report/report_payment_method.dart';
+import 'package:omsetin_bengkel/view/page/report/report_pelanggan.dart';
+import 'package:omsetin_bengkel/view/page/report/report_product.dart';
+import 'package:omsetin_bengkel/view/page/report/report_profit.dart';
+import 'package:omsetin_bengkel/view/page/report/report_services.dart';
+import 'package:omsetin_bengkel/view/page/report/report_transaction.dart';
+import 'package:omsetin_bengkel/view/widget/app_bar_stock.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/menu_card.dart';
+import 'package:omsetin_bengkel/view/widget/modals.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -111,6 +114,18 @@ class _ReportPageState extends State<ReportPage> {
                                   );
                                 },
                               ),
+                              _buildMainCard(
+                                title: "Service Terjual",
+                                imagePath: 'assets/images/laporan-terjual.png',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ReportService(),
+                                    ),
+                                  );
+                                },
+                              ),
                               // _buildMainCard(
                               //   title: "Kategori",
                               //   imagePath: 'assets/images/laporan-kategori.png',
@@ -123,18 +138,7 @@ class _ReportPageState extends State<ReportPage> {
                               //     );
                               //   },
                               // ),
-                              _buildMainCard(
-                                title: "Pengeluaran",
-                                imagePath: 'assets/images/pengeluaran.png',
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const ReportExpense(),
-                                    ),
-                                  );
-                                },
-                              ),
+
                               // _buildMainCard(
                               //   title: "Export Data Excel",
                               //   imagePath: 'assets/images/report_export.png',
@@ -150,6 +154,42 @@ class _ReportPageState extends State<ReportPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => const ReportKasir(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              _buildMainCard(
+                                title: "Pelanggan",
+                                imagePath: 'assets/images/laporan-kasir.png',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ReportPelanggan(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              _buildMainCard(
+                                title: "Mekanik",
+                                imagePath: 'assets/images/laporan-kategori.png',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ReportMekanik(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              _buildMainCard(
+                                title: "Pengeluaran",
+                                imagePath: 'assets/images/pengeluaran.png',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ReportExpense(),
                                     ),
                                   );
                                 },

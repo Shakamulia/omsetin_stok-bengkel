@@ -5,19 +5,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bi.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/service.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/services/service_db_helper.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/service/add_service.dart';
-import 'package:omsetin_stok/view/page/service/update_service.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/confirm_delete_dialog.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/services/service_db_helper.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/service/add_service.dart';
+import 'package:omsetin_bengkel/view/page/service/update_service.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/confirm_delete_dialog.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/pinModal.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
@@ -66,7 +68,7 @@ class _ServicePageState extends State<ServicePage> {
       } else {
         _futureServices = fetchServices().then((services) {
           return services.where((service) {
-            return service.name
+            return service.serviceName
                 .toLowerCase()
                 .contains(_searchController.text.toLowerCase());
           }).toList();
@@ -80,8 +82,8 @@ class _ServicePageState extends State<ServicePage> {
       String column, String sortOrder) async {
     final serviceData = await fetchServices();
     serviceData.sort((a, b) {
-      var aValue = a.toMap()[column];
-      var bValue = b.toMap()[column];
+      var aValue = a.toJson()[column];
+      var bValue = b.toJson()[column];
 
       if (aValue is String && bValue is String) {
         return sortOrder == 'asc'
@@ -102,8 +104,8 @@ class _ServicePageState extends State<ServicePage> {
       String column, String sortOrder) async {
     final serviceData = await fetchServices();
     serviceData.sort((a, b) {
-      var aValue = DateTime.parse(a.toMap()[column]);
-      var bValue = DateTime.parse(b.toMap()[column]);
+      var aValue = DateTime.parse(a.toJson()[column]);
+      var bValue = DateTime.parse(b.toJson()[column]);
       return sortOrder == 'asc'
           ? aValue.compareTo(bValue)
           : bValue.compareTo(aValue);
@@ -136,6 +138,8 @@ class _ServicePageState extends State<ServicePage> {
 
   @override
   Widget build(BuildContext context) {
+    var securityProvider = Provider.of<SecurityProvider>(context);
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: PreferredSize(
@@ -225,7 +229,15 @@ class _ServicePageState extends State<ServicePage> {
                                     top: 5.0, bottom: 5.0),
                                 child: ZoomTapAnimation(
                                   onTap: () async {
-                                    final result = await Navigator.push(
+                                    if (securityProvider.editServices) {
+                                      showPinModalWithAnimation(context,
+                                          pinModal: PinModal(
+                                            destination: UpdateServicePage(
+                                                service: service),
+                                          ));
+                                    }else{
+
+                                                                     final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) =>
@@ -237,6 +249,7 @@ class _ServicePageState extends State<ServicePage> {
                                       setState(() {
                                         _futureServices = fetchServices();
                                       });
+                                    }
                                     }
                                   },
                                   child: Container(
@@ -281,7 +294,7 @@ class _ServicePageState extends State<ServicePage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  service.name,
+                                                  service.serviceName,
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
@@ -293,7 +306,7 @@ class _ServicePageState extends State<ServicePage> {
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  "${ServicePage.formatCurrency(service.price.toInt())}",
+                                                  "${ServicePage.formatCurrency(service.servicePrice.toInt())}",
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     color: Colors.black,
@@ -302,7 +315,9 @@ class _ServicePageState extends State<ServicePage> {
                                               ],
                                             ),
                                           ),
-                                          if (_isDeleteServiceOn != true)
+                                          securityProvider.hapusServices
+                                              ? const SizedBox.shrink()
+                                              :
                                             GestureDetector(
                                               onTap: () {
                                                 showDialog(
@@ -315,7 +330,8 @@ class _ServicePageState extends State<ServicePage> {
                                                       onConfirm: () async {
                                                         await _serviceHelper
                                                             .deleteService(
-                                                                service.id!);
+                                                                service
+                                                                    .serviceId!);
                                                         Navigator.pop(context);
                                                         showSuccessAlert(
                                                             context,
@@ -349,22 +365,24 @@ class _ServicePageState extends State<ServicePage> {
                     Positioned(
                       bottom: 16,
                       right: 16,
-                      child: ExpensiveFloatingButton(
-                        text: 'TAMBAH',
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AddServicePage(),
+                      child: securityProvider.tambahServices
+                          ? const SizedBox.shrink()
+                          : ExpensiveFloatingButton(
+                              text: 'TAMBAH',
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AddServicePage(),
+                                  ),
+                                );
+                                if (result == true) {
+                                  setState(() {
+                                    _futureServices = fetchServices();
+                                  });
+                                }
+                              },
                             ),
-                          );
-                          if (result == true) {
-                            setState(() {
-                              _futureServices = fetchServices();
-                            });
-                          }
-                        },
-                      ),
                     ),
                   ],
                 ),

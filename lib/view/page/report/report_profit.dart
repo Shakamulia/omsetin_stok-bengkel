@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/expenceModel.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/model/expenceModel.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/modals.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/modals.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
 import 'package:sizer/sizer.dart';
 
 class ReportProfit extends StatefulWidget {

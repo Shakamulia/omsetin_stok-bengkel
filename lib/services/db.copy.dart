@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/widgets.dart';
-import 'package:omsetin_stok/utils/alert.dart';
+import 'package:omsetin_bengkel/utils/alert.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:omsetin_stok/model/product.dart';
+import 'package:omsetin_bengkel/model/product.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> requestStoragePermission() async {

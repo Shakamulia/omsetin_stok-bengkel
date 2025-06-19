@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/income.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/formatters.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/Income_card.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/model/income.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/formatters.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/Income_card.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
 
 class IncomeDetailPage extends StatefulWidget {
   final Income? income;
@@ -49,37 +49,39 @@ class _IncomeDetailPageState extends State<IncomeDetailPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
+        preferredSize:
+            Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
           child: Container(
-                        decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            secondaryColor, // Warna akhir gradient
-            primaryColor, // Warna awal gradient
-          ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-        ),
-      ),
-            child: AppBar(
-                    title: Text(
-            'DETAIL PEMASUKAN ${IncomeCard.truncate(name!, length: 5)}',
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: SizeHelper.Fsize_normalTitle(context), // Perbesar font
-              color: bgColor,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  secondaryColor, // Warna akhir gradient
+                  primaryColor, // Warna awal gradient
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-                    ),
-                    centerTitle: true,
-                    backgroundColor: primaryColor,
-                    leading: CustomBackButton(),
-                    elevation: 0,
-                    toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
+            child: AppBar(
+              title: Text(
+                'DETAIL PEMASUKAN ${IncomeCard.truncate(name!, length: 5)}',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize:
+                      SizeHelper.Fsize_normalTitle(context), // Perbesar font
+                  color: bgColor,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: primaryColor,
+              leading: CustomBackButton(),
+              elevation: 0,
+              toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
             ),
           ),
         ),

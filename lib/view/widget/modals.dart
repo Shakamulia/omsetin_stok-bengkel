@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/cashier.dart';
-import 'package:omsetin_stok/model/expenceModel.dart';
-import 'package:omsetin_stok/model/expense.dart';
-import 'package:omsetin_stok/model/paymentMethod.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/model/report_cashier.dart';
-import 'package:omsetin_stok/model/report_payment_model.dart';
-import 'package:omsetin_stok/model/report_sold_product.dart';
-import 'package:omsetin_stok/model/profit.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/failedAlert.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/report/report_payment_method.dart';
-import 'package:omsetin_stok/view/widget/custom_textfield.dart';
-import 'package:omsetin_stok/view/widget/dateFrom-To.dart';
-import 'package:omsetin_stok/view/widget/date_from_to/from_to_v3.dart';
+import 'package:omsetin_bengkel/model/cashier.dart';
+import 'package:omsetin_bengkel/model/expenceModel.dart';
+import 'package:omsetin_bengkel/model/expense.dart';
+import 'package:omsetin_bengkel/model/paymentMethod.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/model/report_cashier.dart';
+import 'package:omsetin_bengkel/model/report_mekanik_data.dart';
+import 'package:omsetin_bengkel/model/report_payment_model.dart';
+import 'package:omsetin_bengkel/model/report_pelanggan_data.dart';
+import 'package:omsetin_bengkel/model/report_sold_product.dart';
+import 'package:omsetin_bengkel/model/profit.dart';
+import 'package:omsetin_bengkel/model/report_sold_services.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/failedAlert.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/report/report_payment_method.dart';
+import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omsetin_bengkel/view/widget/dateFrom-To.dart';
+import 'package:omsetin_bengkel/view/widget/date_from_to/from_to_v3.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -82,8 +85,7 @@ class CustomModals {
     sheet.cell(CellIndex.indexByString('A1')).value = 'No';
     sheet.cell(CellIndex.indexByString('B1')).value = 'Tanggal Transaksi';
     sheet.cell(CellIndex.indexByString('C1')).value = 'Status Transaksi';
-    sheet.cell(CellIndex.indexByString('D1')).value =
-        'Nama Pelanggan';
+    sheet.cell(CellIndex.indexByString('D1')).value = 'Nama Pelanggan';
     sheet.cell(CellIndex.indexByString('E1')).value = 'Produk Transaksi';
     sheet.cell(CellIndex.indexByString('F1')).value = 'Profit';
 
@@ -122,6 +124,438 @@ class CustomModals {
       await file.writeAsBytes(fileBytes);
 
       print('File berhasil disimpan di: $filePath');
+    }
+  }
+
+  static Future<void> modalExportMekanikDataExcel(
+      BuildContext context, List<ReportMekanikData> dataToExport) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 500,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: secondaryColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Spacer(),
+                    Text(
+                      'Export Excel',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        clearTextFields();
+                      },
+                      child: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+                const Gap(20),
+                CustomTextField(
+                    obscureText: false,
+                    hintText: "Nama File",
+                    prefixIcon: null,
+                    controller: fileNameController,
+                    maxLines: 1,
+                    suffixIcon: null,
+                    fillColor: Colors.white),
+                const Gap(30),
+                InkWell(
+                  onTap: () async {
+                    final fileName = fileNameController.text.trim();
+                    if (fileName.isEmpty) {
+                      clearTextFields();
+                      Navigator.pop(context);
+                      showFailedAlert(context);
+                    } else {
+                      clearTextFields();
+                      Navigator.pop(context);
+                      showSuccessAlert(context, 'Berhasil');
+                      await saveExcelFileMekanikReport(fileName, dataToExport);
+                    }
+                  },
+                  child: Container(
+                    height: 40,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: greenColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Simpan',
+                        style: GoogleFonts.poppins(color: whiteMerona),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> saveExcelFileMekanikReport(
+      String fileName, List<ReportMekanikData> dataToExport) async {
+    if (fileName.isEmpty) {
+      print('Nama file tidak boleh kosong');
+    } else {
+      // Membuat file Excel
+      var excel = Excel.createExcel();
+      var sheet = excel['Sheet1'];
+
+      // Menambahkan header ke sheet
+      sheet.cell(CellIndex.indexByString('A1')).value = 'No';
+      sheet.cell(CellIndex.indexByString('B1')).value = 'Nama Mekanik';
+      sheet.cell(CellIndex.indexByString('C1')).value = 'Tanggal Transaksi';
+      sheet.cell(CellIndex.indexByString('D1')).value = 'Kuantitas Transaksi';
+      sheet.cell(CellIndex.indexByString('E1')).value = 'Total Pembayaran';
+      sheet.cell(CellIndex.indexByString('F1')).value = 'Selesai';
+      sheet.cell(CellIndex.indexByString('G1')).value = 'Belum Lunas';
+      sheet.cell(CellIndex.indexByString('H1')).value = 'Belum Bayar';
+      sheet.cell(CellIndex.indexByString('I1')).value = 'Dibatalkan';
+
+      int rowIndex =
+          2; // Mulai dari baris kedua (karena baris pertama adalah header)
+
+      for (var data in dataToExport) {
+        sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+            data.mekanikId;
+        sheet.cell(CellIndex.indexByString('B$rowIndex')).value =
+            data.mekanikName;
+        sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
+            data.transactionDateRange;
+        sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
+            data.mekanikTotalTransaction;
+        sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
+            data.mekanikTotalTransactionMoney;
+        sheet.cell(CellIndex.indexByString('F$rowIndex')).value = data.selesai;
+        sheet.cell(CellIndex.indexByString('G$rowIndex')).value = data.proses;
+        sheet.cell(CellIndex.indexByString('H$rowIndex')).value = data.pending;
+        sheet.cell(CellIndex.indexByString('I$rowIndex')).value = data.batal;
+        rowIndex++; // Move to the next row for the next data entry
+      }
+
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
+        // Simpan ke folder Download
+        final downloadDir = Directory('/storage/emulated/0/Download');
+        if (!await downloadDir.exists()) {
+          print('Folder Download tidak ditemukan');
+          return;
+        }
+
+        final directory = Directory('/storage/emulated/0/Download');
+        final filePath = join(directory.path, '$fileName.xlsx');
+        final file = File(filePath);
+        await file.writeAsBytes(fileBytes);
+
+        print('File berhasil disimpan di: $filePath');
+        print('Data $dataToExport.');
+      }
+    }
+  }
+
+  static Future<void> modalExportPelangganDataExcel(
+      BuildContext context, List<ReportPelangganData> dataToExport) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 500,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: secondaryColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Spacer(),
+                    Text(
+                      'Export Excel',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        clearTextFields();
+                      },
+                      child: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+                const Gap(20),
+                CustomTextField(
+                    obscureText: false,
+                    hintText: "Nama File",
+                    prefixIcon: null,
+                    controller: fileNameController,
+                    maxLines: 1,
+                    suffixIcon: null,
+                    fillColor: Colors.white),
+                const Gap(30),
+                InkWell(
+                  onTap: () async {
+                    final fileName = fileNameController.text.trim();
+                    if (fileName.isEmpty) {
+                      clearTextFields();
+                      Navigator.pop(context);
+                      showFailedAlert(context);
+                    } else {
+                      clearTextFields();
+                      Navigator.pop(context);
+                      showSuccessAlert(context, 'Berhasil');
+                      await saveExcelFilePelangganReport(
+                          fileName, dataToExport);
+                    }
+                  },
+                  child: Container(
+                    height: 40,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: greenColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Simpan',
+                        style: GoogleFonts.poppins(color: whiteMerona),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> saveExcelFilePelangganReport(
+      String fileName, List<ReportPelangganData> dataToExport) async {
+    if (fileName.isEmpty) {
+      print('Nama file tidak boleh kosong');
+    } else {
+      // Membuat file Excel
+      var excel = Excel.createExcel();
+      var sheet = excel['Sheet1'];
+
+      // Menambahkan header ke sheet
+      sheet.cell(CellIndex.indexByString('A1')).value = 'No';
+      sheet.cell(CellIndex.indexByString('B1')).value = 'Nama Pelanggan';
+      sheet.cell(CellIndex.indexByString('C1')).value = 'Tanggal Transaksi';
+      sheet.cell(CellIndex.indexByString('D1')).value = 'Kuantitas Transaksi';
+      sheet.cell(CellIndex.indexByString('E1')).value = 'Total Pembayaran';
+      sheet.cell(CellIndex.indexByString('F1')).value = 'Selesai';
+      sheet.cell(CellIndex.indexByString('G1')).value = 'Belum Lunas';
+      sheet.cell(CellIndex.indexByString('H1')).value = 'Belum Bayar';
+      sheet.cell(CellIndex.indexByString('I1')).value = 'Dibatalkan';
+
+      int rowIndex =
+          2; // Mulai dari baris kedua (karena baris pertama adalah header)
+
+      for (var data in dataToExport) {
+        sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+            data.pelangganId;
+        sheet.cell(CellIndex.indexByString('B$rowIndex')).value =
+            data.pelangganName;
+        sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
+            data.transactionDateRange;
+        sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
+            data.pelangganTotalTransaction;
+        sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
+            data.pelangganTotalTransactionMoney;
+        sheet.cell(CellIndex.indexByString('F$rowIndex')).value = data.selesai;
+        sheet.cell(CellIndex.indexByString('G$rowIndex')).value = data.proses;
+        sheet.cell(CellIndex.indexByString('H$rowIndex')).value = data.pending;
+        sheet.cell(CellIndex.indexByString('I$rowIndex')).value = data.batal;
+        rowIndex++; // Move to the next row for the next data entry
+      }
+
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
+        // Simpan ke folder Download
+        final downloadDir = Directory('/storage/emulated/0/Download');
+        if (!await downloadDir.exists()) {
+          print('Folder Download tidak ditemukan');
+          return;
+        }
+
+        final directory = Directory('/storage/emulated/0/Download');
+        final filePath = join(directory.path, '$fileName.xlsx');
+        final file = File(filePath);
+        await file.writeAsBytes(fileBytes);
+
+        print('File berhasil disimpan di: $filePath');
+        print('Data $dataToExport.');
+      }
+    }
+  }
+
+  static Future<void> modalExportSoldServices(
+      BuildContext context, List<ReportSoldServices> dataSoldServices) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 500,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: secondaryColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Spacer(),
+                    Text(
+                      'Export Excel',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        clearTextFields();
+                      },
+                      child: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+                const Gap(20),
+                CustomTextField(
+                    obscureText: false,
+                    hintText: "Nama File",
+                    prefixIcon: null,
+                    controller: fileNameController,
+                    maxLines: 1,
+                    suffixIcon: null,
+                    fillColor: Colors.white),
+                const Gap(30),
+                InkWell(
+                  onTap: () async {
+                    final fileName = fileNameController.text.trim();
+                    if (fileName.isEmpty) {
+                      clearTextFields();
+                      Navigator.pop(context);
+                      showFailedAlert(context);
+                    } else {
+                      clearTextFields();
+                      Navigator.pop(context);
+                      showSuccessAlert(context, 'Berhasil');
+                      await saveExcelReportSoldServices(
+                          fileName, dataSoldServices);
+                    }
+                  },
+                  child: Container(
+                    height: 40,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: greenColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Simpan',
+                        style: GoogleFonts.poppins(color: whiteMerona),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> saveExcelReportSoldServices(
+      String fileName, List<ReportSoldServices> dataSoldServices) async {
+    if (fileName.isEmpty) {
+      print('Nama file tidak boleh kosong');
+    } else {
+      // Membuat file Excel
+      var excel = Excel.createExcel();
+      var sheet = excel['Sheet1'];
+
+      // Menambahkan header ke sheet
+      sheet.cell(CellIndex.indexByString('A1')).value = 'No';
+      sheet.cell(CellIndex.indexByString('B1')).value = 'Nama Services';
+      sheet.cell(CellIndex.indexByString('C1')).value = 'Tanggal';
+      sheet.cell(CellIndex.indexByString('D1')).value =
+          'Kuantitas Services Terjual';
+
+      int rowIndex =
+          2; // Mulai dari baris kedua (karena baris pertama adalah header)
+
+      for (var data in dataSoldServices) {
+        print('saveexcel: $data');
+        sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+            data.servicesId;
+        sheet.cell(CellIndex.indexByString('B$rowIndex')).value =
+            data.servicesName;
+
+        sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
+            data.dateRange;
+        sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
+            data.servicesSold;
+        rowIndex++; // Move to the next row for the next data entry
+      }
+
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
+        // Simpan ke folder Download
+        final downloadDir = Directory('/storage/emulated/0/Download');
+        if (!await downloadDir.exists()) {
+          print('Folder Download tidak ditemukan');
+          return;
+        }
+
+        final directory = Directory('/storage/emulated/0/Download');
+        final filePath = join(directory.path, '$fileName.xlsx');
+        final file = File(filePath);
+        await file.writeAsBytes(fileBytes);
+
+        print('File berhasil disimpan di: $filePath');
+        print('Data $dataSoldServices.');
+      }
     }
   }
 
@@ -735,8 +1169,7 @@ class CustomModals {
       // Menambahkan header ke sheet
       sheet.cell(CellIndex.indexByString('A1')).value = 'No';
       sheet.cell(CellIndex.indexByString('B1')).value = 'Nama Kasir';
-      sheet.cell(CellIndex.indexByString('C1')).value =
-          'Tanggal Transaksi';
+      sheet.cell(CellIndex.indexByString('C1')).value = 'Tanggal Transaksi';
       sheet.cell(CellIndex.indexByString('D1')).value = 'Kuantitas Transaksi';
       sheet.cell(CellIndex.indexByString('E1')).value = 'Total Pembayaran';
       sheet.cell(CellIndex.indexByString('F1')).value = 'Selesai';
@@ -886,7 +1319,8 @@ class CustomModals {
       sheet.cell(CellIndex.indexByString('B1')).value = 'Nama Produk';
       sheet.cell(CellIndex.indexByString('C1')).value = 'Kategori';
       sheet.cell(CellIndex.indexByString('D1')).value = 'Tanggal';
-      sheet.cell(CellIndex.indexByString('E1')).value = 'Kuantitas Produk Terjual';
+      sheet.cell(CellIndex.indexByString('E1')).value =
+          'Kuantitas Produk Terjual';
 
       int rowIndex =
           2; // Mulai dari baris kedua (karena baris pertama adalah header)
@@ -979,7 +1413,7 @@ class CustomModals {
                       const Gap(10),
                       StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {
-                         return Padding(
+                          return Padding(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                             child: DateRangePickerButton(
                               initialStartDate: fromDate,

@@ -3,22 +3,29 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bi.dart';
-import 'package:omsetin_stok/model/category.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/not_enough_stock_alert.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/page/qr_code_scanner.dart';
-import 'package:omsetin_stok/view/page/transaction/transactions_page.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/card_select_product.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/not_enough_stock_alert.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/page/qr_code_scanner.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/card_select_product.dart';
+import 'package:omsetin_bengkel/view/widget/card_select_services.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 
 class SelectProductPage extends StatefulWidget {
   final List<Product> selectedProducts;
-  const SelectProductPage({super.key, required this.selectedProducts});
+  final List<Service> selectedServices;
+
+  const SelectProductPage({
+    super.key,
+    required this.selectedProducts,
+    required this.selectedServices,
+  });
 
   @override
   State<SelectProductPage> createState() => _SelectProductPageState();
@@ -26,442 +33,380 @@ class SelectProductPage extends StatefulWidget {
 
 class _SelectProductPageState extends State<SelectProductPage>
     with SingleTickerProviderStateMixin {
-  TabController? _tabController;
+  late final TabController _tabController;
+  late final TextEditingController _searchController;
+  late final TextEditingController _searchServicesController;
   final DatabaseService _databaseService = DatabaseService.instance;
+
+  final List<Product> _selectedProducts = [];
+  final List<Service> _selectedServices = [];
   String? barcodeProduct;
 
-  // List untuk menyimpan produk yang dipilih
-  final List<Product> _selectedProducts = [];
-  List<Product> _filteredProduct = [];
   Future<List<Product>>? _futureProducts;
-  List<Categories>? _categories;
-  bool _isTabControllerInitialized = false;
-
-  // Controller for the search TextField
-  final TextEditingController _searchController = TextEditingController();
-
-  Future<List<Product>> fetchProductsWithCategory() async {
-    final productData = await _databaseService.getProducts();
-    print("Fetched products: $productData");
-    return productData;
-  }
-
-  Future<void> _initializeCategories() async {
-    if (_categories != null) return;
-
-    try {
-      _categories = await _databaseService.getCategoriesSorted(
-          "category_name", "ASC", true);
-
-      if (!_isTabControllerInitialized &&
-          _categories != null &&
-          _categories!.isNotEmpty) {
-        setState(() {
-          _tabController =
-              TabController(length: _categories!.length, vsync: this);
-          _isTabControllerInitialized = true;
-        });
-      }
-    } catch (e) {
-      print("Error initializing categories: $e");
-    }
-  }
+  Future<List<Service>>? _futureServices;
 
   @override
   void initState() {
     super.initState();
-    _futureProducts = fetchProductsWithCategory();
-    _initializeCategories();
+    _initializeData();
+    _setupControllers();
+  }
 
-    // Add listener to the search controller
-    _searchController.addListener(() {
-      setState(() {}); // Trigger a rebuild when the search text changes
-    });
+  void _initializeData() {
+    _futureProducts = _databaseService.getProducts();
+    _futureServices = _databaseService.getServices() as Future<List<Service>>?;
+    _selectedProducts.addAll(widget.selectedProducts);
+    _selectedServices.addAll(widget.selectedServices);
+  }
+
+  void _setupControllers() {
+    _tabController = TabController(length: 2, vsync: this);
+    _searchController = TextEditingController();
+    _searchServicesController = TextEditingController();
+
+    _searchController.addListener(() => setState(() {}));
+    _searchServicesController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
-    _tabController?.dispose();
-    _searchController.dispose(); // Dispose the search controller
+    _tabController.dispose();
+    _searchController.dispose();
+    _searchServicesController.dispose();
     super.dispose();
   }
 
-  double totalTransaksi = 0; // Variabel untuk menyimpan total transaksi
-
-  // Fungsi untuk menerima data selectedProducts dari TransactionPage
-  void updateSelectedProducts(List<Product> products) {
-    setState(() {
-      _selectedProducts.clear();
-      _selectedProducts.addAll(products);
-    });
-  }
-
-  // Panggil fungsi ini ketika kembali dari TransactionPage
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final List<Product>? updatedProducts =
-        ModalRoute.of(context)?.settings.arguments as List<Product>?;
-    if (updatedProducts != null) {
-      updateSelectedProducts(updatedProducts);
-    }
-  }
-
-  // Function to filter products based on search query
   List<Product> _filterProducts(List<Product> products, String query) {
-    if (query.isEmpty) {
-      return products; // Return all products if the search query is empty
-    } else {
-      return products
-          .where((product) =>
-              product.productName.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    }
+    return query.isEmpty
+        ? products
+        : products
+            .where((p) =>
+                p.productName.toLowerCase().contains(query.toLowerCase()))
+            .toList();
   }
 
-  Future<void> scanQRCode() async {
+  List<Service> _filterServices(List<Service> service, String query) {
+    return query.isEmpty
+        ? service
+        : service
+            .where((s) =>
+                s.serviceName.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+  }
+
+  Future<void> _scanQRCode() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const QrCodeScanner()),
     );
 
     if (result != null && mounted) {
-      setState(() {
-        barcodeProduct = result;
-      });
+      setState(() => barcodeProduct = result);
+      await _handleScannedProduct();
+    }
+  }
 
-      // Cari produk berdasarkan barcode
-      List<Product> allProducts = await _databaseService.getProducts();
-      Product? foundProduct = allProducts.firstWhere(
+  Future<void> _handleScannedProduct() async {
+    try {
+      final allProducts = await _databaseService.getProducts();
+      final foundProduct = allProducts.firstWhere(
         (product) => product.productBarcode == barcodeProduct,
-        orElse: () => throw Exception('Product not found'),
       );
 
-      // Tambahkan ke selectedProducts yang dikirim ke TransactionPage
       setState(() {
-        if (!widget.selectedProducts
+        if (!_selectedProducts
             .any((p) => p.productId == foundProduct.productId)) {
-          widget.selectedProducts.add(foundProduct);
+          _selectedProducts.add(foundProduct);
         }
       });
 
       if (mounted) {
-        // Optional: Kasih toast atau snackbar biar user tau
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${foundProduct.productName} berhasil ditambahkan!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('${foundProduct.productName} berhasil ditambahkan!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ));
       }
-
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return TransaksiPage(
-          selectedProducts: List.from(widget.selectedProducts),
-        );
-      }));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Produk tidak ditemukan!'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ));
+      }
     }
+  }
+
+  void _onProductSelect(Product product) {
+    setState(() {
+      if (product.productStock < 1) {
+        showNotEnoughStock(context);
+      } else if (_selectedProducts.contains(product)) {
+        _selectedProducts.remove(product);
+      } else {
+        _selectedProducts.add(product);
+      }
+    });
+  }
+
+  void _onServiceSelect(Service service) {
+    setState(() {
+      if (_selectedServices.contains(service)) {
+        _selectedServices.remove(service);
+      } else {
+        _selectedServices.add(service);
+      }
+    });
+  }
+
+  void _onSavePressed() {
+    Navigator.pop(context, {
+      'products': _selectedProducts,
+      'services': _selectedServices,
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Dapatkan lebar layar
-    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + 20),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20)
-          ),
-          child: Container(
-                      decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter
-              )
-            ),
-            child: AppBar(
-              title: Text(
-                "PILIH Spare Part",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: SizeHelper.Fsize_normalTitle(context),
-                  color: bgColor,
-                ),
-              ),
-              centerTitle: true,
-              toolbarHeight: kToolbarHeight + 20,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: CustomBackButton(), // Custom back button
-            ),
-          ),
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return Row(
-                    children: [
-                      // TextField Search Responsif
-                      Expanded(
-                        child: SearchTextField(
-                            obscureText: false,
-                            hintText: "Cari Spare Part",
-                            prefixIcon: const Icon(
-                              Icons.search,
-                              size: 24,
-                            ),
-                            controller: _searchController,
-                            maxLines: 1,
-                            suffixIcon: null,
-                            color: cardColor),
-                      ),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildProductTab(),
+            _buildServiceTab(),
+          ],
+        ),
+      ),
+    );
+  }
 
-                      // Tombol Scan Responsif
-                      const Gap(10),
-                      Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: cardColor),
-                        child: GestureDetector(
-                          onTap: scanQRCode,
-                          child: const Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                Iconify(
-                                  Bi.qr_code_scan,
-                                  size: 24,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  );
-                },
+  PreferredSizeWidget _buildAppBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(kToolbarHeight + 20),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [secondaryColor, primaryColor],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            title: Text(
+              "PILIH PRODUK & LAYANAN",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: SizeHelper.Fsize_normalTitle(context),
+                color: bgColor,
               ),
-              const Gap(10), // Add spacing between search bar and navbar
-
-              // Navbar for switching between categories
-              Container(
-                height: 50, // Sesuaikan tinggi container
-                decoration: BoxDecoration(
-                  color: bgColor, // Warna latar belakang abu-abu muda
-                  borderRadius: BorderRadius.circular(15), // Sudut melengkung
-                ),
-                child: FutureBuilder<List<Categories>>(
-                  future: _databaseService.getCategoriesSorted(
-                    "category_name",
-                    "ASC",
-                    true,
-                  ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text("Error: ${snapshot.error}"),
-                      );
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
-                        child: Text("Tidak ada kategori"),
-                      );
-                    } else {
-                      // Check if categories changed or controller needs initialization
-                      if (_categories == null ||
-                          _categories!.length != snapshot.data!.length) {
-                        _categories = snapshot.data;
-                        // Only initialize if not already done
-                        if (!_isTabControllerInitialized &&
-                            _categories != null) {
-                          _tabController = TabController(
-                            length: _categories!.length,
-                            vsync: this,
-                          );
-                          _isTabControllerInitialized = true;
-                        }
-                      }
-
-                      return _tabController == null
-                          ? Center(child: CircularProgressIndicator())
-                          : TabBar(
-                              // indicatorPadding:
-                              //     EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                              controller: _tabController,
-                              indicator: BoxDecoration(
-                                color: secondaryColor, // Warna tab yang dipilih
-                                borderRadius: BorderRadius.circular(
-                                    15), // Sudut melengkung
-                              ),
-                              labelColor:
-                                  Colors.white, // Warna teks tab yang dipilih
-                              unselectedLabelColor: Colors
-                                  .grey, // Warna teks tab yang tidak dipilih
-                              labelStyle: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              unselectedLabelStyle: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              isScrollable:
-                                  true, // Memungkinkan tab dapat di-scroll
-                              // padding: EdgeInsets.symmetric(
-                              //     vertical: 4), // Padding container
-                              labelPadding: EdgeInsets.symmetric(
-                                  horizontal: 24), // Padding antar tab
-                              tabs: snapshot.data!.map((category) {
-                                return Tab(text: category.categoryName);
-                              }).toList(),
-                              indicatorSize: TabBarIndicatorSize
-                                  .tab, // Mengatur ukuran indikator mengikuti lebar tab
-                            );
-                    }
-                  },
-                ),
-              ),
-
-              // Content for each category
-              Gap(10),
-              Expanded(
-                child: _tabController == null
-                    ? Center(child: CircularProgressIndicator())
-                    : FutureBuilder<List<Categories>>(
-                        future: _databaseService.getCategoriesSorted(
-                          "category_name",
-                          "ASC",
-                          true,
-                        ),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text("Error: ${snapshot.error}"),
-                            );
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return const Center(
-                              child: Text("Tidak ada kategori"),
-                            );
-                          } else {
-                            return TabBarView(
-                              controller: _tabController,
-                              children: snapshot.data!.map((category) {
-                                return FutureBuilder<List<Product>>(
-                                  future:
-                                      _databaseService.getProductsByCategory(
-                                          category.categoryName),
-                                  builder: (context, productSnapshot) {
-                                    if (productSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    } else if (productSnapshot.hasError) {
-                                      return Center(
-                                        child: Text(
-                                            "Error: ${productSnapshot.error}"),
-                                      );
-                                    } else if (!productSnapshot.hasData ||
-                                        productSnapshot.data!.isEmpty) {
-                                      return const Center(
-                                        child: NotFoundPage(
-                                          title:
-                                              "Tidak Ada Spare Part Pada Kategori Ini!",
-                                        ),
-                                      );
-                                    } else {
-                                      // Filter products based on search query
-                                      List<Product> filteredProducts =
-                                          _filterProducts(productSnapshot.data!,
-                                              _searchController.text);
-                                      return ListView.builder(
-                                        itemCount: filteredProducts.length,
-                                        itemBuilder: (context, index) {
-                                          final product =
-                                              filteredProducts[index];
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 5.0, bottom: 5.0),
-                                            child: CardSelectProduct(
-                                              key: ValueKey(product.productId),
-                                              productSellPrice: product
-                                                  .productSellPrice
-                                                  .toInt(),
-                                              productImage:
-                                                  product.productImage,
-                                              dateAdded:
-                                                  product.productDateAdded,
-                                              productName: product.productName,
-                                              productSold: product.productSold
-                                                  .toString(),
-                                              stock: product.productStock,
-                                              category: product.categoryName
-                                                  .toString(),
-                                              productId: product.productId,
-                                              isSelected: widget
-                                                  .selectedProducts
-                                                  .contains(product),
-                                              onSelect: () {
-                                                setState(() {
-                                                  if (product.productStock <
-                                                      1) {
-                                                    showNotEnoughStock(context);
-                                                  } else {
-                                                    if (widget.selectedProducts
-                                                        .contains(product)) {
-                                                      widget.selectedProducts
-                                                          .remove(product);
-                                                    } else {
-                                                      widget.selectedProducts
-                                                          .add(product);
-                                                    }
-                                                    Navigator.pop(
-                                                        context,
-                                                        widget
-                                                            .selectedProducts);
-                                                  }
-                                                });
-                                              },
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    }
-                                  },
-                                );
-                              }).toList(),
-                            );
-                          }
-                        },
-                      ),
-              ),
-            ],
+            ),
+            centerTitle: true,
+            toolbarHeight: kToolbarHeight + 20,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: const CustomBackButton(),
+            bottom: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Produk'),
+                Tab(text: 'Layanan'),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProductTab() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          _buildProductSearchRow(),
+          const Gap(10),
+          Expanded(child: _buildProductList()),
+          _buildSaveButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductSearchRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: SearchTextField(
+            obscureText: false,
+            hintText: "Cari Produk",
+            prefixIcon: const Icon(Icons.search, size: 24),
+            controller: _searchController,
+            maxLines: 1,
+            suffixIcon: null,
+            color: cardColor,
+          ),
+        ),
+        const Gap(10),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: cardColor,
+          ),
+          child: GestureDetector(
+            onTap: _scanQRCode,
+            child: const Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Iconify(Bi.qr_code_scan, size: 24),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductList() {
+    return FutureBuilder<List<Product>>(
+      future: _futureProducts,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: NotFoundPage(title: "Tidak Ada Produk!"));
+        }
+
+        final filteredProducts =
+            _filterProducts(snapshot.data!, _searchController.text);
+
+        return ListView.builder(
+          itemCount: filteredProducts.length,
+          itemBuilder: (context, index) {
+            final product = filteredProducts[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: CardSelectProduct(
+                key: ValueKey(product.productId),
+                productSellPrice: product.productSellPrice.toInt(),
+                productImage: product.productImage,
+                dateAdded: product.productDateAdded,
+                productName: product.productName,
+                productSold: product.productSold.toString(),
+                stock: product.productStock,
+                productId: product.productId,
+                isSelected: _selectedProducts.contains(product),
+                onSelect: () => _onProductSelect(product),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildServiceTab() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          _buildServiceSearchRow(),
+          const Gap(10),
+          Expanded(child: _buildServiceList()),
+          _buildSaveButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceSearchRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: SearchTextField(
+            obscureText: false,
+            hintText: "Cari Layanan",
+            prefixIcon: const Icon(Icons.search, size: 24),
+            controller: _searchServicesController,
+            maxLines: 1,
+            suffixIcon: null,
+            color: cardColor,
+          ),
+        ),
+        const Gap(10),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: cardColor,
+          ),
+          child: const Padding(
+            padding: EdgeInsets.all(12.0),
+            child:
+                Iconify(Bi.qr_code_scan, size: 24, color: Colors.transparent),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildServiceList() {
+    return FutureBuilder<List<Service>>(
+      future: _futureServices,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: NotFoundPage(title: "Tidak Ada Layanan!"));
+        }
+
+        final filteredServices =
+            _filterServices(snapshot.data!, _searchServicesController.text);
+
+        return ListView.builder(
+          itemCount: filteredServices.length,
+          itemBuilder: (context, index) {
+            final service = filteredServices[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: CardSelectService(
+                key: ValueKey(service.serviceId),
+                servicePrice: service.servicePrice,
+                serviceName: service.serviceName,
+                isSelected: _selectedServices.contains(service),
+                onSelect: () => _onServiceSelect(service),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return ExpensiveFloatingButton(
+      text: 'SIMPAN',
+      onPressed: _onSavePressed,
+      left: 15,
+      right: 15,
+      bottom: 15,
     );
   }
 }

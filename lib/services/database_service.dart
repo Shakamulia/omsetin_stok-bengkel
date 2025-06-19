@@ -2,19 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
-import 'package:omsetin_stok/model/cashier.dart';
-import 'package:omsetin_stok/model/category.dart';
-import 'package:omsetin_stok/model/expenceModel.dart';
-import 'package:omsetin_stok/model/expense.dart';
-import 'package:omsetin_stok/model/income.dart';
-import 'package:omsetin_stok/model/paymentMethod.dart';
-import 'package:omsetin_stok/model/pelanggan.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/model/service.dart';
-import 'package:omsetin_stok/model/setting.dart';
-import 'package:omsetin_stok/model/stock_addition.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/utils/failedAlert.dart';
+import 'package:omsetin_bengkel/model/cashier.dart';
+import 'package:omsetin_bengkel/model/category.dart';
+import 'package:omsetin_bengkel/model/expenceModel.dart';
+import 'package:omsetin_bengkel/model/expense.dart';
+import 'package:omsetin_bengkel/model/income.dart';
+import 'package:omsetin_bengkel/model/paymentMethod.dart';
+import 'package:omsetin_bengkel/model/pelanggan.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/model/setting.dart';
+import 'package:omsetin_bengkel/model/stock_addition.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/utils/failedAlert.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:synchronized/synchronized.dart';
@@ -104,6 +104,7 @@ class DatabaseService {
   final String _transactionDate = "transaction_date";
   final String _transactionCashier = "transaction_cashier";
   final String _transactionCustomerName = "transaction_customer_name";
+  final String _transactionPegawaiName = "transaction_pegawai_name";
   final String _transactionTotal = "transaction_total";
   final String _transactionPayAmount = "transaction_pay_amount";
   final String _transactionDiscount = "transaction_discount";
@@ -112,7 +113,10 @@ class DatabaseService {
   final String _transactionNote = "transaction_note";
   final String _transactionStatus = "transaction_status";
   final String _transactionQuantity = "transaction_quantity";
+  final String _transactionQuantityServices = "transaction_quantity_services";
   final String _transactionProducts = "transaction_products";
+  final String _transactionServices = "transaction_services";
+
   final String _transactionQueueNumber = "transaction_queue_number";
   final String _transactionProfit = "transaction_profit";
 
@@ -216,6 +220,19 @@ class DatabaseService {
     return await openDatabase(path);
   }
 
+  Future<void> deleteOldDatabase() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'master_db.db');
+    final exists = await databaseExists(path);
+
+    if (exists) {
+      await deleteDatabase(path);
+      print('Database lama dihapus.');
+    } else {
+      print('Database tidak ditemukan.');
+    }
+  }
+
   Future<Database> getDatabase() async {
     final databaseDirPath = await getDatabasesPath();
     final databasepath = join(databaseDirPath, "master_db.db");
@@ -246,7 +263,7 @@ class DatabaseService {
     CREATE TABLE $_serviceTable (
       $_serviceId INTEGER PRIMARY KEY AUTOINCREMENT,
       $_serviceName TEXT NOT NULL,
-      $_servicePrice REAL NOT NULL,
+      $_servicePrice INTEGER NOT NULL,
       $_serviceDateAdded TEXT NOT NULL
     )
   ''');
@@ -320,6 +337,7 @@ class DatabaseService {
           $_transactionDate TEXT NOT NULL,
           $_transactionCashier TEXT NOT NULL,
           $_transactionCustomerName TEXT NOT NULL,
+          $_transactionPegawaiName TEXT NOT NULL,
           $_transactionTotal INTEGER NOT NULL,
           $_transactionPayAmount INTEGER NOT NULL,
           $_transactionDiscount INTEGER NOT NULL,
@@ -328,7 +346,9 @@ class DatabaseService {
           $_transactionNote TEXT NOT NULL,
           $_transactionStatus TEXT NOT NULL,
           $_transactionQuantity INTEGER NOT NULL,
+          $_transactionQuantityServices INTEGER NOT NULL,
           $_transactionProducts TEXT NOT NULL,
+          $_transactionServices INTEGER NOT NULL,
           $_transactionQueueNumber INTEGER NOT NULL,
           $_transactionProfit INTEGER NOT NULL
         )
@@ -882,6 +902,7 @@ class DatabaseService {
   //? //* //* //* //* //* //* //* //* // //
 
   //method lapran metode pembahayaran
+  //method lapran metode pembahayaran
   Future<List<Map<String, dynamic>>> getpaymedmethodandcount() async {
     final db = await database;
 
@@ -908,28 +929,98 @@ class DatabaseService {
     final db = await database;
     final data = await db.query(_transactionTable);
 
-    List<TransactionData> transactions = data
-        .map((e) => TransactionData(
-            transactionId: e['transaction_id'] as int,
-            transactionDate: e['transaction_date'] as String,
-            transactionTotal: e['transaction_total'] as int,
-            transactionPayAmount: e['transaction_pay_amount'] as int,
-            transactionPaymentMethod: e['transaction_method'] as String,
-            transactionCashier: e['transaction_cashier'] as String,
-            transactionCustomerName: e['transaction_customer_name'] as String,
-            transactionDiscount: e['transaction_discount'] as int,
-            transactionNote: e['transaction_note'] as String,
-            transactionTax: e['transaction_tax'] as int,
-            transactionStatus: e['transaction_status'] as String,
-            transactionQuantity: e['transaction_quantity'] as int,
-            transactionProduct: e['transaction_products'] is String
-                ? jsonDecode(e['transaction_products'] as String)
-                : (e['transaction_products'] is List
-                    ? e['transaction_products']
-                    : []),
-            transactionQueueNumber: e['transaction_queue_number'] as int,
-            transactionProfit: e['transaction_profit'] as int))
-        .toList();
+    List<TransactionData> transactions = data.map((e) {
+      // Handle transaction_services conversion
+      List<dynamic> productsRaw = [];
+      if (e['transaction_products'] is String) {
+        productsRaw = jsonDecode(e['transaction_products'] as String);
+      } else if (e['transaction_products'] is List) {
+        productsRaw = e['transaction_products'] as List;
+      }
+
+      // Convert to List<Map<String, dynamic>>
+      List<Map<String, dynamic>> products = productsRaw.map((products) {
+        if (products is Map<String, dynamic>) {
+          return products;
+        } else if (products is Map) {
+          return Map<String, dynamic>.from(products);
+        }
+        return <String, dynamic>{};
+      }).toList();
+
+      return TransactionData(
+        transactionId: e['transaction_id'] as int,
+        transactionDate: e['transaction_date'] as String,
+        transactionTotal: e['transaction_total'] as int,
+        transactionPayAmount: e['transaction_pay_amount'] as int,
+        transactionPaymentMethod: e['transaction_method'] as String,
+        transactionCashier: e['transaction_cashier'] as String,
+        transactionCustomerName: e['transaction_customer_name'] as String,
+        transactionDiscount: e['transaction_discount'] as int,
+        transactionNote: e['transaction_note'] as String,
+        transactionTax: e['transaction_tax'] as int,
+        transactionStatus: e['transaction_status'] as String,
+        transactionQuantity: e['transaction_quantity'] as int,
+        transactionProduct: products,
+        transactionQueueNumber: e['transaction_queue_number'] as int,
+        transactionProfit: e['transaction_profit'] as int,
+        transactionPegawaiName: e['transaction_pegawai_name'] as String,
+        transactionQuantityServices: e['transaction_quantity_services'] as int,
+        transactionServices: [],
+      );
+    }).toList();
+
+    return transactions;
+  }
+
+  Future<List<TransactionData>> getServicesSell() async {
+    final db = await database;
+    final data = await db.query(_transactionTable);
+
+    List<TransactionData> transactions = data.map((e) {
+      // Handle transaction_services conversion
+      List<dynamic> servicesRaw = [];
+      if (e['transaction_services'] is String) {
+        servicesRaw = jsonDecode(e['transaction_services'] as String);
+      } else if (e['transaction_services'] is List) {
+        servicesRaw = e['transaction_services'] as List;
+      }
+
+      // Convert to List<Map<String, dynamic>>
+      List<Map<String, dynamic>> services = servicesRaw.map((service) {
+        if (service is Map<String, dynamic>) {
+          return service;
+        } else if (service is Map) {
+          return Map<String, dynamic>.from(service);
+        }
+        return <String, dynamic>{};
+      }).toList();
+
+      return TransactionData(
+        transactionId: e['transaction_id'] as int,
+        transactionDate: e['transaction_date'] as String,
+        transactionTotal: e['transaction_total'] as int,
+        transactionPayAmount: e['transaction_pay_amount'] as int,
+        transactionPaymentMethod: e['transaction_method'] as String,
+        transactionCashier: e['transaction_cashier'] as String,
+        transactionCustomerName: e['transaction_customer_name'] as String,
+        transactionDiscount: e['transaction_discount'] as int,
+        transactionNote: e['transaction_note'] as String,
+        transactionTax: e['transaction_tax'] as int,
+        transactionStatus: e['transaction_status'] as String,
+        transactionQuantity: e['transaction_quantity'] as int,
+        transactionProduct: e['transaction_products'] is String
+            ? jsonDecode(e['transaction_products'] as String)
+            : (e['transaction_products'] is List
+                ? e['transaction_products']
+                : []),
+        transactionQueueNumber: e['transaction_queue_number'] as int,
+        transactionProfit: e['transaction_profit'] as int,
+        transactionPegawaiName: e['transaction_pegawai_name'] as String,
+        transactionQuantityServices: e['transaction_quantity_services'] as int,
+        transactionServices: services,
+      );
+    }).toList();
 
     return transactions;
   }
@@ -1144,6 +1235,75 @@ class DatabaseService {
     );
   }
 
+  Future<int> addPelanggan(Map<String, dynamic> dataToInsert) async {
+    final db = await database;
+
+    // Ensure all required fields are present
+    final data = {
+      'kode': dataToInsert['kode'],
+      'namaPelanggan': dataToInsert['namaPelanggan'],
+      'profileImage': dataToInsert['profileImage'],
+      'noHandphone': dataToInsert['noHandphone'],
+      'email': dataToInsert['email'],
+      'gender': dataToInsert['gender'],
+      'alamat': dataToInsert['alamat'],
+    };
+
+    return await db.insert(_pelangganTable, data);
+  }
+
+  Future<int> updatePelanggan(int id, Map<String, dynamic> pelanggan) async {
+    final db = await database;
+    return await db.update(
+      _pelangganTable,
+      pelanggan,
+      where: '$_pelangganId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> deletePelanggan(int id) async {
+    final db = await database;
+    return await db.delete(
+      _pelangganTable,
+      where: '$_pelangganId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> addMekanik(Map<String, dynamic> mekanik) async {
+    final db = await database;
+    return await db.insert(_mekanikTable, mekanik);
+  }
+
+  Future<List<Map<String, dynamic>>> getAllMekanik() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      _mekanikTable,
+      orderBy: '$_mekanikNama ASC',
+    );
+    return result;
+  }
+
+  Future<int> updateMekanik(int id, Map<String, dynamic> mekanik) async {
+    final db = await database;
+    return await db.update(
+      _mekanikTable,
+      mekanik,
+      where: '$_mekanikId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> deleteMekanik(int id) async {
+    final db = await database;
+    return await db.delete(
+      _mekanikTable,
+      where: '$_mekanikId = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<List<StockAdditionData>> getStockAddition() async {
     final db = await database;
     final data = await db.rawQuery('SELECT * FROM $_stockAdditionTable');
@@ -1201,14 +1361,8 @@ class DatabaseService {
   // Function insert transaction data to table transaction
   Future<void> addTransaction(Map<String, dynamic> transactionData) async {
     final db = await database;
-
-    // Validasi cashier sudah terisi
-    if (transactionData['transaction_cashier'] == null) {
-      throw Exception('Cashier name must be provided');
-    }
-
     await db.insert(_transactionTable, {
-      'transaction_date': DateTime.now().toIso8601String(),
+      'transaction_date': transactionData['transaction_date'],
       'transaction_cashier': transactionData['transaction_cashier'],
       'transaction_customer_name': transactionData['transaction_customer_name'],
       'transaction_total': transactionData['transaction_total'],
@@ -1219,10 +1373,17 @@ class DatabaseService {
       'transaction_tax': transactionData['transaction_tax'],
       'transaction_status': transactionData['transaction_status'],
       'transaction_quantity': transactionData['transaction_quantity'],
+      'transaction_quantity_services':
+          transactionData['transaction_quantity_services'],
+      'transaction_pegawai_name': transactionData['transaction_pegawai_name'],
       'transaction_products': transactionData['transaction_products'],
+      'transaction_services': transactionData['transaction_services'],
       'transaction_queue_number': transactionData['transaction_queue_number'],
       'transaction_profit': transactionData['transaction_profit'],
     });
+
+    print("Berhasil menambahkan transaksi"
+        " dengan id ${transactionData['transaction_services']}");
   }
 
   Future<List<TransactionData>> getTransaction() async {
@@ -1234,11 +1395,28 @@ class DatabaseService {
 
       for (var e in data) {
         List<Map<String, dynamic>> productList = [];
+        List<Map<String, dynamic>> servicesList = [];
         try {
           final productJsonString = e['transaction_products'] as String;
-          productList =
-              List<Map<String, dynamic>>.from(jsonDecode(productJsonString))
-                  .map((product) {
+          productList = List<Map<String, dynamic>>.from(
+            jsonDecode(productJsonString),
+          ).map((product) {
+            return product.map((key, value) {
+              if (value is String && int.tryParse(value) != null) {
+                return MapEntry(key, int.parse(value));
+              }
+              return MapEntry(key, value);
+            });
+          }).toList();
+        } catch (error) {
+          print('Error decoding products in getTransaction: $error');
+        }
+
+        try {
+          final servicesJsonString = e['transaction_services'] as String;
+          servicesList = List<Map<String, dynamic>>.from(
+            jsonDecode(servicesJsonString),
+          ).map((product) {
             return product.map((key, value) {
               if (value is String && int.tryParse(value) != null) {
                 return MapEntry(key, int.parse(value));
@@ -1258,12 +1436,16 @@ class DatabaseService {
           transactionPaymentMethod: e['transaction_method'] as String,
           transactionCashier: e['transaction_cashier'] as String,
           transactionCustomerName: e['transaction_customer_name'] as String,
+          transactionPegawaiName: e['transaction_pegawai_name'] as String,
           transactionDiscount: e['transaction_discount'] as int,
           transactionNote: e['transaction_note'] as String,
           transactionTax: e['transaction_tax'] as int,
           transactionStatus: e['transaction_status'] as String,
           transactionQuantity: e['transaction_quantity'] as int,
+          transactionQuantityServices:
+              e['transaction_quantity_services'] as int,
           transactionProduct: productList,
+          transactionServices: servicesList,
           transactionQueueNumber: e['transaction_queue_number'] as int,
           transactionProfit: e['transaction_profit'] as int,
         ));
@@ -1287,12 +1469,14 @@ class DatabaseService {
 
       final e = results.first;
       List<Map<String, dynamic>> productList = [];
+      List<Map<String, dynamic>> servicesList = [];
 
       try {
         final productJsonString = e['transaction_products'] as String;
         productList =
-            List<Map<String, dynamic>>.from(jsonDecode(productJsonString))
-                .map((product) {
+            List<Map<String, dynamic>>.from(jsonDecode(productJsonString)).map((
+          product,
+        ) {
           return product.map((key, value) {
             if (value is String && int.tryParse(value) != null) {
               return MapEntry(key, int.parse(value));
@@ -1303,6 +1487,29 @@ class DatabaseService {
       } catch (error) {
         print('Error decoding products in getTransactionById: $error');
       }
+
+      try {
+        // Handle services - IMPORTANT: Check the exact column name
+        final servicesJsonString = e['transaction_services'] as String?;
+
+        if (servicesJsonString != null && servicesJsonString.isNotEmpty) {
+          servicesList =
+              List<Map<String, dynamic>>.from(jsonDecode(servicesJsonString))
+                  .map((service) => service.map((key, value) {
+                        if (value is String && int.tryParse(value) != null) {
+                          return MapEntry(key, int.parse(value));
+                        }
+                        return MapEntry(key, value);
+                      }))
+                  .toList();
+        }
+      } catch (error) {
+        print('Error decoding services: $error');
+      }
+
+      // Debug print to verify decoded data
+      print('Decoded products: $productList');
+      print('Decoded services: $servicesList');
 
       return TransactionData(
         transactionId: e['transaction_id'] as int,
@@ -1318,14 +1525,19 @@ class DatabaseService {
         transactionStatus: e['transaction_status'] as String,
         transactionQuantity: e['transaction_quantity'] as int,
         transactionProduct: productList,
+        transactionServices: servicesList,
         transactionQueueNumber: e['transaction_queue_number'] as int,
         transactionProfit: e['transaction_profit'] as int,
+        transactionPegawaiName: e['transaction_pegawai_name'] as String,
+        transactionQuantityServices: e['transaction_quantity_services'] as int,
       );
     });
   }
 
   Future<void> updateTransaction(
-      int id, Map<String, dynamic> transactionData) async {
+    int id,
+    Map<String, dynamic> transactionData,
+  ) async {
     final db = await database;
     await db.update(
       _transactionTable,
@@ -1366,7 +1578,9 @@ class DatabaseService {
   }
 
   Future<void> updateTransactionStatus(
-      int transactionId, String newStatus) async {
+    int transactionId,
+    String newStatus,
+  ) async {
     final db = await database;
     try {
       await db.update(
@@ -1388,26 +1602,83 @@ class DatabaseService {
     String paymentMethod,
   ) async {
     final db = await database;
-    try {
-      await db.update(
-        _transactionTable,
-        {
-          _transactionPayAmount: newPayAmount,
-          _transactionStatus: newStatus,
-          _transactionMethod: paymentMethod,
-        },
-        where: '$_transactionId = ?',
-        whereArgs: [transactionId],
-      );
-      print(
-          "Successfully updated transaction pay amount for id $transactionId");
-    } catch (e) {
-      print("Error updating transaction pay amount: $e");
-    }
+    await db.transaction((txn) async {
+      // Update transaksi utama
+      await txn.rawUpdate('''
+      UPDATE transactions 
+      SET transaction_pay_amount = ?, 
+          transaction_status = ?,
+          transaction_method = ?
+      WHERE transaction_id = ?
+    ''', [newPayAmount, newStatus, paymentMethod, transactionId]);
+
+      // Jika status menjadi Selesai, hitung dan update profit
+      if (newStatus == 'Selesai') {
+        // Ambil data transaksi
+        final transaction = await txn.rawQuery('''
+        SELECT transaction_products, transaction_services 
+        FROM transactions 
+        WHERE transaction_id = ?
+      ''', [transactionId]);
+
+        if (transaction.isNotEmpty) {
+          int totalProfit = 0;
+
+          // Hitung profit dari produk
+          final productsJson =
+              transaction.first['transaction_products'] as String?;
+          if (productsJson != null) {
+            final products = jsonDecode(productsJson) as List<dynamic>;
+            for (var p in products) {
+              final product = await txn.rawQuery('''
+              SELECT product_sell_price, product_purchase_price 
+              FROM products 
+              WHERE product_id = ?
+            ''', [p['productId']]);
+
+              if (product.isNotEmpty) {
+                final sellPrice = product.first['product_sell_price'] as int;
+                final purchasePrice =
+                    product.first['product_purchase_price'] as int;
+                totalProfit +=
+                    (sellPrice - purchasePrice) * (p['quantity'] as int);
+              }
+            }
+          }
+
+          // Hitung profit dari services
+          final servicesJson =
+              transaction.first['transaction_services'] as String?;
+          if (servicesJson != null) {
+            final services = jsonDecode(servicesJson) as List<dynamic>;
+            for (var s in services) {
+              final service = await txn.rawQuery('''
+              SELECT service_price 
+              FROM services 
+              WHERE services_id = ?
+            ''', [s['servicesId']]);
+
+              if (service.isNotEmpty) {
+                totalProfit += (service.first['service_price'] as int) *
+                    (s['quantity'] as int);
+              }
+            }
+          }
+
+          // Update profit di transaksi
+          await txn.rawUpdate('''
+          UPDATE transactions 
+          SET transaction_profit = ?
+          WHERE transaction_id = ?
+        ''', [totalProfit, transactionId]);
+        }
+      }
+    });
   }
 
   Future<List<TransactionData>> getTransactionsByCashierAndStatus(
-      String cashierName) async {
+    String cashierName,
+  ) async {
     return await _dbLock.synchronized(() async {
       final db = await database;
       final data = await db.query(
@@ -1442,6 +1713,120 @@ class DatabaseService {
           transactionProduct: productList,
           transactionQueueNumber: e['transaction_queue_number'] as int,
           transactionProfit: e['transaction_profit'] as int,
+          transactionPegawaiName: e['transaction_pegawai_name'] as String,
+          transactionQuantityServices:
+              e['transaction_quantity_services'] as int,
+          transactionServices: [],
+        );
+      }).toList();
+    });
+  }
+
+  Future<List<TransactionData>> getTransactionsByPegawaiAndStatus(
+    String mekanikName,
+  ) async {
+    return await _dbLock.synchronized(() async {
+      final db = await database;
+      final data = await db.query(
+        _transactionTable,
+        where: '$_transactionPegawaiName = ?',
+        whereArgs: [mekanikName],
+      );
+
+      return data.map((e) {
+        List<Map<String, dynamic>> productList = [];
+        try {
+          productList = List<Map<String, dynamic>>.from(
+            jsonDecode(e['transaction_products'] as String),
+          );
+        } catch (error) {
+          print('Error decoding products: $error');
+        }
+
+        List<Map<String, dynamic>> servicesList = [];
+        try {
+          servicesList = List<Map<String, dynamic>>.from(
+            jsonDecode(e['transaction_products'] as String),
+          );
+        } catch (error) {
+          print('Error decoding products: $error');
+        }
+
+        return TransactionData(
+          transactionId: e['transaction_id'] as int,
+          transactionDate: e['transaction_date'] as String,
+          transactionTotal: e['transaction_total'] as int,
+          transactionPayAmount: e['transaction_pay_amount'] as int,
+          transactionPaymentMethod: e['transaction_method'] as String,
+          transactionCashier: e['transaction_cashier'] as String,
+          transactionCustomerName: e['transaction_customer_name'] as String,
+          transactionDiscount: e['transaction_discount'] as int,
+          transactionNote: e['transaction_note'] as String,
+          transactionTax: e['transaction_tax'] as int,
+          transactionStatus: e['transaction_status'] as String,
+          transactionQuantity: e['transaction_quantity'] as int,
+          transactionProduct: productList,
+          transactionQueueNumber: e['transaction_queue_number'] as int,
+          transactionProfit: e['transaction_profit'] as int,
+          transactionPegawaiName: e['transaction_pegawai_name'] as String,
+          transactionQuantityServices:
+              e['transaction_quantity_services'] as int,
+          transactionServices: servicesList,
+        );
+      }).toList();
+    });
+  }
+
+  Future<List<TransactionData>> getTransactionsByPelangganAndStatus(
+    String pelangganName,
+  ) async {
+    return await _dbLock.synchronized(() async {
+      final db = await database;
+      final data = await db.query(
+        _transactionTable,
+        where: '$_transactionCustomerName = ?',
+        whereArgs: [pelangganName],
+      );
+
+      return data.map((e) {
+        List<Map<String, dynamic>> productList = [];
+        try {
+          productList = List<Map<String, dynamic>>.from(
+            jsonDecode(e['transaction_products'] as String),
+          );
+        } catch (error) {
+          print('Error decoding products: $error');
+        }
+
+        List<Map<String, dynamic>> servicesList = [];
+        try {
+          servicesList = List<Map<String, dynamic>>.from(
+            jsonDecode(e['transaction_products'] as String),
+          );
+        } catch (error) {
+          print('Error decoding products: $error');
+        }
+
+        return TransactionData(
+          transactionId: e['transaction_id'] as int,
+          transactionDate: e['transaction_date'] as String,
+          transactionTotal: e['transaction_total'] as int,
+          transactionPayAmount: e['transaction_pay_amount'] as int,
+          transactionPaymentMethod: e['transaction_method'] as String,
+          transactionCashier: e['transaction_cashier'] as String,
+          transactionCustomerName: e['transaction_customer_name'] as String,
+          transactionDiscount: e['transaction_discount'] as int,
+          transactionNote: e['transaction_note'] as String,
+          transactionTax: e['transaction_tax'] as int,
+          transactionStatus: e['transaction_status'] as String,
+          transactionQuantity: e['transaction_quantity'] as int,
+          transactionProduct: productList,
+          transactionQueueNumber: e['transaction_queue_number'] as int,
+          transactionProfit: e['transaction_profit'] as int,
+          transactionPegawaiName: e['transaction_pegawai_name'] as String,
+          transactionQuantityServices:
+              e['transaction_quantity_services'] as int,
+          transactionServices: servicesList,
         );
       }).toList();
     });
@@ -1469,7 +1854,8 @@ class DatabaseService {
   }
 
   Future<List<TransactionData>> getTransactionsByStatus(
-      String statusTransaction) async {
+    String statusTransaction,
+  ) async {
     return await _dbLock.synchronized(() async {
       final db = await database;
       List<Map<String, dynamic>> data;
@@ -1494,6 +1880,15 @@ class DatabaseService {
           print('Error decoding products: $error');
         }
 
+        List<Map<String, dynamic>> servicesList = [];
+        try {
+          servicesList = List<Map<String, dynamic>>.from(
+            jsonDecode(e['transaction_services'] as String),
+          );
+        } catch (error) {
+          print('Error decoding products: $error');
+        }
+
         return TransactionData(
           transactionId: e['transaction_id'] as int,
           transactionDate: e['transaction_date'] as String,
@@ -1508,15 +1903,21 @@ class DatabaseService {
           transactionStatus: e['transaction_status'] as String,
           transactionQuantity: e['transaction_quantity'] as int,
           transactionProduct: productList,
+          transactionServices: servicesList,
           transactionQueueNumber: e['transaction_queue_number'] as int,
           transactionProfit: e['transaction_profit'] as int,
+          transactionPegawaiName: e['transaction_pegawai_name'] as String,
+          transactionQuantityServices:
+              e['transaction_quantity_services'] as int,
         );
       }).toList();
     });
   }
 
   Future<List<TransactionData>> getTransactionByDateRange(
-      String fromDate, String toDate) async {
+    String fromDate,
+    String toDate,
+  ) async {
     return await _dbLock.synchronized(() async {
       final db = await database;
       final data = await db.query(
@@ -1531,9 +1932,9 @@ class DatabaseService {
         List<Map<String, dynamic>> productList = [];
         try {
           final productJsonString = e['transaction_products'] as String;
-          productList =
-              List<Map<String, dynamic>>.from(jsonDecode(productJsonString))
-                  .map((product) {
+          productList = List<Map<String, dynamic>>.from(
+            jsonDecode(productJsonString),
+          ).map((product) {
             return product.map((key, value) {
               if (value is String && int.tryParse(value) != null) {
                 return MapEntry(key, int.parse(value));
@@ -1561,22 +1962,14 @@ class DatabaseService {
           transactionProduct: productList,
           transactionQueueNumber: e['transaction_queue_number'] as int,
           transactionProfit: e['transaction_profit'] as int,
+          transactionPegawaiName: e['transaction_pegawai_name'] as String,
+          transactionQuantityServices:
+              e['transaction_quantity_services'] as int,
+          transactionServices: [],
         ));
       }
 
       return transactions;
-    });
-  }
-
-  Future<Map<String, int>> getTodayTotalOmzet() async {
-    return await _dbLock.synchronized(() async {
-      final db = await database;
-      final result = await db.rawQuery(
-          'SELECT COALESCE(SUM($_transactionTotal), 0) as totalOmzet FROM $_transactionTable');
-
-      final totalOmzet = result.first['totalOmzet'] as int? ?? 0;
-
-      return {'totalOmzet': totalOmzet};
     });
   }
 
@@ -1808,22 +2201,62 @@ class DatabaseService {
 // Method untuk layanan
   Future<int> createService(Service service) async {
     final db = await database;
-    return await db.insert(_serviceTable, service.toMap());
+    return await db.insert(_serviceTable, service.toJson());
   }
 
   Future<List<Service>> getServices() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(_serviceTable);
-    return maps.map((map) => Service.fromMap(map)).toList();
+    try {
+      final db = await database;
+
+      // Pastikan semua kolom yang diperlukan di-select
+      final data = await db.rawQuery('''
+      SELECT 
+        $_serviceId AS service_id,
+        $_serviceName AS service_name,
+        $_servicePrice AS service_price,
+        $_serviceDateAdded AS service_date_added
+      FROM $_serviceTable 
+      ORDER BY $_serviceDateAdded DESC
+    ''');
+
+      // Debug print untuk melihat data mentah dari database
+      debugPrint('Raw service data: $data');
+
+      if (data.isEmpty) {
+        debugPrint('No service found in database');
+        return [];
+      }
+
+      List<Service> service = data.map((e) {
+        try {
+          return Service(
+            serviceId: e['service_id'] as int,
+            serviceName: e['service_name'] as String,
+            servicePrice: e['service_price'] as int,
+            dateAdded: e['service_date_added'] as String,
+          );
+        } catch (e) {
+          debugPrint('Error mapping service data: $e');
+          debugPrint('Problematic data row: $e');
+          throw Exception('Failed to map service data: $e');
+        }
+      }).toList();
+
+      debugPrint('Successfully mapped ${service.length} service');
+      return service;
+    } catch (e) {
+      debugPrint('Error in getservice(): $e');
+      throw Exception('Failed to fetch service: $e');
+    }
   }
 
   Future<int> updateService(Service service) async {
     final db = await database;
     return await db.update(
       _serviceTable,
-      service.toMap(),
+      service.toJson(),
       where: '$_serviceId = ?',
-      whereArgs: [service.id],
+      whereArgs: [service.serviceId],
     );
   }
 

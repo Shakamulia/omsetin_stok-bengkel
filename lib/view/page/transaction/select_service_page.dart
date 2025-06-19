@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/service.dart';
-import 'package:omsetin_stok/services/database_service.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
 
 class SelectServicePage extends StatefulWidget {
   final List<Service> selectedServices;
@@ -40,7 +40,7 @@ class _SelectServicePageState extends State<SelectServicePage> {
   void _filterServices(String query) {
     setState(() {
       filteredServices = services.where((service) {
-        final nameLower = service.name.toLowerCase();
+        final nameLower = service.serviceName.toLowerCase();
         final searchLower = query.toLowerCase();
         return nameLower.contains(searchLower);
       }).toList();
@@ -49,13 +49,14 @@ class _SelectServicePageState extends State<SelectServicePage> {
 
   bool _isServiceSelected(int? serviceId) {
     if (serviceId == null) return false;
-    return _tempSelectedServices.any((s) => s.id == serviceId);
+    return _tempSelectedServices.any((s) => s.serviceId == serviceId);
   }
 
   void _toggleServiceSelection(Service service) {
     setState(() {
-      if (_isServiceSelected(service.id)) {
-        _tempSelectedServices.removeWhere((s) => s.id == service.id);
+      if (_isServiceSelected(service.serviceId)) {
+        _tempSelectedServices
+            .removeWhere((s) => s.serviceId == service.serviceId);
       } else {
         _tempSelectedServices.add(service);
       }
@@ -98,15 +99,15 @@ class _SelectServicePageState extends State<SelectServicePage> {
               itemBuilder: (context, index) {
                 final service = filteredServices[index];
                 return CheckboxListTile(
-                  title: Text(service.name),
+                  title: Text(service.serviceName),
                   subtitle: Text(
                     NumberFormat.currency(
                       locale: 'id_ID',
                       symbol: 'Rp ',
                       decimalDigits: 0,
-                    ).format(service.price),
+                    ).format(service.servicePrice),
                   ),
-                  value: _isServiceSelected(service.id),
+                  value: _isServiceSelected(service.serviceId),
                   onChanged: (bool? value) {
                     _toggleServiceSelection(service);
                   },

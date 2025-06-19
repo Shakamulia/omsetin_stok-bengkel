@@ -4,9 +4,9 @@ import 'package:gap/gap.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ic.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/not_enough_stock_alert.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/not_enough_stock_alert.dart';
 import 'package:sizer/sizer.dart';
 
 class CardTransaction extends StatefulWidget {
@@ -134,8 +134,8 @@ class _CardTransactionState extends State<CardTransaction> {
                       ),
                       // Tombol Hapus
                       IconButton(
-                        icon:
-                            const Icon(Icons.cancel_outlined, color: Colors.red),
+                        icon: const Icon(Icons.cancel_outlined,
+                            color: Colors.red),
                         onPressed: widget.onDelete, // Panggil fungsi hapus
                       ),
                     ],

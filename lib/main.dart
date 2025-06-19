@@ -6,34 +6,40 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:omsetin_stok/controllers/connectivity_controlller.dart';
-import 'package:omsetin_stok/providers/appVersionProvider.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/providers/cashierProvider.dart';
-import 'package:omsetin_stok/providers/categoryProvider.dart';
-import 'package:omsetin_stok/providers/productProvider.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/providers/settingProvider.dart';
-import 'package:omsetin_stok/providers/userProvider.dart';
-import 'package:omsetin_stok/services/authService.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/page/home/home.dart';
-import 'package:omsetin_stok/view/page/login.dart';
-import 'package:omsetin_stok/view/page/splash_screen.dart';
+import 'package:omsetin_bengkel/controllers/connectivity_controlller.dart';
+import 'package:omsetin_bengkel/providers/appVersionProvider.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/providers/cashierProvider.dart';
+import 'package:omsetin_bengkel/providers/categoryProvider.dart';
+import 'package:omsetin_bengkel/providers/mekanikProvider.dart';
+import 'package:omsetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omsetin_bengkel/providers/productProvider.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/providers/settingProvider.dart';
+import 'package:omsetin_bengkel/providers/userProvider.dart';
+import 'package:omsetin_bengkel/services/authService.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/page/home/home.dart';
+import 'package:omsetin_bengkel/view/page/login.dart';
+import 'package:omsetin_bengkel/view/page/splash_screen.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:toastification/toastification.dart';
 
+import 'services/database_service.dart' show DatabaseService;
+
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
-void main() async {  // Remove the context parameter
+void main() async {
+  // Remove the context parameter
   //*  format tanggal Indonesia
   //*  seperti kamis, jumat dll
   //*  usage: DateFormat.EEEE()
   WidgetsFlutterBinding.ensureInitialized();
+  // await DatabaseService.instance.deleteOldDatabase();
 
   Get.put(ConnectivityController());
 
@@ -99,6 +105,8 @@ void main() async {  // Remove the context parameter
           ChangeNotifierProvider(create: (_) => SecurityProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => AppVersionProvider()),
+          ChangeNotifierProvider(create: (_) => Pelangganprovider()),
+          ChangeNotifierProvider(create: (_) => MekanikProvider()),
           Provider(create: (_) => AuthService()), // Add this line
         ],
         child: MainApp(),

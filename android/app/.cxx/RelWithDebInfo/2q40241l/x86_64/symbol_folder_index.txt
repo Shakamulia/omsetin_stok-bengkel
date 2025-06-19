@@ -1,1 +1,1 @@
-C:\Users\ADVAN WORKPRO\Documents\AERA\omsetin_stok\build\app\intermediates\cxx\RelWithDebInfo\2q40241l\obj\x86_64
+C:\Users\ADVAN WORKPRO\Documents\AERA\omsetin_bengkel\build\app\intermediates\cxx\RelWithDebInfo\2q40241l\obj\x86_64

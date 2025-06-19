@@ -1,2 +1,2 @@
-C:/aeratek/lariskas/omsetin_stok/android/app/.cxx/RelWithDebInfo/1v6t262c/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/aeratek/lariskas/omsetin_stok/android/app/.cxx/RelWithDebInfo/1v6t262c/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+C:/aeratek/lariskas/omsetin_bengkel/android/app/.cxx/RelWithDebInfo/1v6t262c/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/aeratek/lariskas/omsetin_bengkel/android/app/.cxx/RelWithDebInfo/1v6t262c/armeabi-v7a/CMakeFiles/rebuild_cache.dir

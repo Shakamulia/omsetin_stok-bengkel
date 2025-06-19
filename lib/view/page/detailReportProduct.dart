@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 
 class ReportProductDetailPage extends StatelessWidget {
   final String productName;
@@ -57,7 +57,7 @@ class ReportProductDetailPage extends StatelessWidget {
               ],
             ),
           ),
-      
+
           // Body
           Expanded(
             child: FutureBuilder<List<TransactionData>>(
@@ -68,7 +68,7 @@ class ReportProductDetailPage extends StatelessWidget {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('Tidak ada transaksi'));
                 }
-      
+
                 final filteredTransactions = snapshot.data!
                     .where((trx) =>
                         trx.transactionProduct.any((p) =>
@@ -79,24 +79,22 @@ class ReportProductDetailPage extends StatelessWidget {
                             trx.transactionStatus == "Belum Dibayar" ||
                             trx.transactionStatus == "Dibatalkan"))
                     .toList();
-      
+
                 if (filteredTransactions.isEmpty) {
                   return const Center(
                       child: Text('Tidak ada transaksi produk ini.'));
                 }
-      
+
                 return ListView.builder(
                   itemCount: filteredTransactions.length,
                   itemBuilder: (context, index) {
                     final trx = filteredTransactions[index];
                     final productDetails = trx.transactionProduct
                         .where((product) =>
-                            product['product_name']
-                                .toString()
-                                .toLowerCase() ==
+                            product['product_name'].toString().toLowerCase() ==
                             productName.toLowerCase())
                         .toList();
-      
+
                     return Card(
                         color: cardColor,
                         margin: const EdgeInsets.all(12),
@@ -180,7 +178,7 @@ class ReportProductDetailPage extends StatelessWidget {
                                   ),
                                 );
                               }).toList(),
-      
+
                               // Total Bayar
                               Row(
                                 mainAxisAlignment:

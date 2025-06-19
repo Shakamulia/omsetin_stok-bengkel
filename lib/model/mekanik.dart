@@ -18,6 +18,30 @@ class Mekanik {
     required this.alamat,
   });
 
+    factory Mekanik.fromJson(Map<String, dynamic> json) {
+    return Mekanik(
+      id: json['id'],
+      profileImage: json['profileImage'],
+      namaMekanik: json['namaMekanik'],
+      noHandphone: json['noHandphone'],
+      spesialis: json['spesialis'],
+      gender: json['gender'],
+      alamat: json['alamat'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'namaMekanik': namaMekanik,
+      'noHandphone': noHandphone,
+      'spesialis': spesialis,
+      'gender': gender,
+      'alamat': alamat,
+      'profileImage': profileImage, // Make sure this matches your column name
+    };
+  }
+
   // Convert to Map untuk database
   Map<String, dynamic> toMap() {
     return {

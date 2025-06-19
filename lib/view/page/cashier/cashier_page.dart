@@ -3,16 +3,16 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/uil.dart';
-import 'package:omsetin_stok/model/cashier.dart';
-import 'package:omsetin_stok/providers/cashierProvider.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/page/cashier/add_cashier_page.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/card_cashier.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/cashier.dart';
+import 'package:omsetin_bengkel/providers/cashierProvider.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/page/cashier/add_cashier_page.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/card_cashier.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 
 /// Halaman Manajemen Kasir
@@ -50,38 +50,39 @@ class _CashierPageState extends State<CashierPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
+        preferredSize:
+            Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
-          
           child: Container(
             decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            secondaryColor, // Warna akhir gradient
-            primaryColor, // Warna awal gradient
-          ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-        ),
-      ),
-            child: AppBar(
-                    title: Text(
-            'KELOLA KASIR',
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: SizeHelper.Fsize_normalTitle(context), // Perbesar font
-              color: bgColor,
+              gradient: LinearGradient(
+                colors: [
+                  secondaryColor, // Warna akhir gradient
+                  primaryColor, // Warna awal gradient
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-                    ),
-                    centerTitle: true,
-                    backgroundColor: Colors.transparent,
-                    leading: CustomBackButton(),
-                    elevation: 0,
-                    toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
+            child: AppBar(
+              title: Text(
+                'KELOLA KASIR',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize:
+                      SizeHelper.Fsize_normalTitle(context), // Perbesar font
+                  color: bgColor,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              leading: CustomBackButton(),
+              elevation: 0,
+              toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
             ),
           ),
         ),

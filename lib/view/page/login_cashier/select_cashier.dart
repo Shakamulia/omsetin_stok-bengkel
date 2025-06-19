@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/cashier.dart';
-import 'package:omsetin_stok/providers/cashierProvider.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/cashier.dart';
+import 'package:omsetin_bengkel/providers/cashierProvider.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 
 class SelectCashier extends StatefulWidget {
@@ -65,23 +65,22 @@ class _SelectCashierState extends State<SelectCashier> {
       backgroundColor: bgColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 20),
-        
         child: ClipRRect(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(20),
             bottomRight: Radius.circular(20),
           ),
           child: Container(
-                decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            secondaryColor, // Warna akhir gradient
-            primaryColor, // Warna awal gradient
-          ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-        ),
-      ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  secondaryColor, // Warna akhir gradient
+                  primaryColor, // Warna awal gradient
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
             child: AppBar(
               title: Text(
                 "PILIH KASIR",

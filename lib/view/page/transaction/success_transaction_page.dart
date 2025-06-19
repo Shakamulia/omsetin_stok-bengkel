@@ -4,23 +4,24 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/providers/bluetoothProvider.dart';
-import 'package:omsetin_stok/providers/securityProvider.dart';
-import 'package:omsetin_stok/utils/bluetoothAlert.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/pinModalWithAnimation.dart';
-import 'package:omsetin_stok/utils/printer_helper.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/page/home/home.dart';
-import 'package:omsetin_stok/view/page/transaction/share_struck_page.dart';
-import 'package:omsetin_stok/view/page/transaction/transactions_page.dart';
-import 'package:omsetin_stok/view/widget/pinModal.dart';
+import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omsetin_bengkel/providers/securityProvider.dart';
+import 'package:omsetin_bengkel/utils/bluetoothAlert.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omsetin_bengkel/utils/printer_helper.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/page/home/home.dart';
+import 'package:omsetin_bengkel/view/page/transaction/share_struck_page.dart';
+import 'package:omsetin_bengkel/view/page/transaction/transactions_page.dart';
+import 'package:omsetin_bengkel/view/widget/pinModal.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TransactionSuccessPage extends StatefulWidget {
   final List<Map<String, dynamic>>? products;
+  final List<Map<String, dynamic>>? services;
   final transactionId;
   final String? transactionDate;
   final totalPrice;
@@ -31,6 +32,7 @@ class TransactionSuccessPage extends StatefulWidget {
 
   TransactionSuccessPage({
     required this.products,
+    required this.services,
     required this.totalPrice,
     required this.amountPrice,
     this.discountAmount,
@@ -56,9 +58,9 @@ class _TransactionSuccessPageState extends State<TransactionSuccessPage> {
   }
 
   Future<void> _playSuccessSound() async {
-  final player = AudioPlayer();
-  await player.play(AssetSource('sounds/success-3.mp3')); 
-}
+    final player = AudioPlayer();
+    await player.play(AssetSource('sounds/success-3.mp3'));
+  }
 
   @override
   void initState() {
@@ -163,9 +165,11 @@ class _TransactionSuccessPageState extends State<TransactionSuccessPage> {
                         pinModal: PinModal(onTap: () {
                       if (bluetoothProvider.isConnected) {
                         PrinterHelper.printReceiptAndOpenDrawer(
-                            context, bluetoothProvider.connectedDevice!,
-                            products: widget.products ?? []);
-
+                          context,
+                          bluetoothProvider.connectedDevice!,
+                          products: widget.products ?? [],
+                          services: widget.services ?? [],
+                        );
                         showSuccessAlert(context,
                             "Berhasil mencetak, silahkan tunggu sebentar!.");
                       }
@@ -173,8 +177,11 @@ class _TransactionSuccessPageState extends State<TransactionSuccessPage> {
                   } else {
                     if (bluetoothProvider.isConnected) {
                       PrinterHelper.printReceiptAndOpenDrawer(
-                          context, bluetoothProvider.connectedDevice!,
-                          products: widget.products ?? []);
+                        context,
+                        bluetoothProvider.connectedDevice!,
+                        products: widget.products ?? [],
+                        services: widget.services ?? [],
+                      );
 
                       showSuccessAlert(context,
                           "Berhasil mencetak, silahkan tunggu sebentar!.");
@@ -218,8 +225,9 @@ class _TransactionSuccessPageState extends State<TransactionSuccessPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              TransaksiPage(selectedProducts: [])));
+                          builder: (context) => TransactionPage(
+                                selectedItems: [],
+                              )));
                 },
                 child: Text(
                   "Buat Transaksi Baru",

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/category.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/utils/search_utils.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/search.dart';
+import 'package:omsetin_bengkel/model/category.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/utils/search_utils.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/search.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-import 'package:omsetin_stok/utils/sort.dart';
+import 'package:omsetin_bengkel/utils/sort.dart';
 
 class SelectCategory extends StatefulWidget {
   const SelectCategory({super.key});
@@ -93,16 +93,11 @@ class _SelectCategoryState extends State<SelectCategory> {
             bottomRight: Radius.circular(20),
           ),
           child: Container(
-                        decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor,
-                  primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter
-              )
-            ),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              secondaryColor,
+              primaryColor,
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
             child: AppBar(
               title: Text(
                 "PILIH KATEGORI UNTUK PRODUK",

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 import 'package:sizer/sizer.dart';
 

@@ -1,1 +1,1 @@
-C:\aeratek\lariskas\omsetin_stok\build\app\intermediates\cxx\RelWithDebInfo\1v6t262c\obj\armeabi-v7a
+C:\aeratek\lariskas\omsetin_bengkel\build\app\intermediates\cxx\RelWithDebInfo\1v6t262c\obj\armeabi-v7a

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class CardSelectProduct extends StatelessWidget {
@@ -44,9 +44,8 @@ class CardSelectProduct extends StatelessWidget {
       child: ZoomTapAnimation(
         onTap: onSelect,
         child: Card(
-          color: isSelected
-              ? const Color.fromARGB(171, 46, 204, 112)
-              : cardColor,
+          color:
+              isSelected ? const Color.fromARGB(171, 46, 204, 112) : cardColor,
           elevation: 0,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -130,7 +129,7 @@ class CardSelectProduct extends StatelessWidget {
 
 // widget/select_product_card.dart
 // import 'package:flutter/material.dart';
-// import 'package:omsetin_stok/model/products.dart';
+// import 'package:omsetin_bengkel/model/products.dart';
 
 // class SelectProductCard extends StatelessWidget {
 //   final Produq product;

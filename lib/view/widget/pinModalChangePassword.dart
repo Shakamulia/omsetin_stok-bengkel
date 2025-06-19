@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/view/widget/pin_input.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/view/widget/pin_input.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PinModalChangePassword extends StatefulWidget {

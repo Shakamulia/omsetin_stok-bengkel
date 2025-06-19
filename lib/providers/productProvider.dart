@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/services/database_service.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
 
 class ProductProvider with ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;

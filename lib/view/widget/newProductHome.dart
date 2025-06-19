@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_stok/model/product.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/view/page/product/product.dart';
+import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/view/page/product/product.dart';
 
 class NewProductHome extends StatefulWidget {
   final Widget child;

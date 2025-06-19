@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/service.dart';
-import 'package:omsetin_stok/services/service_db_helper.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/formatters.dart';
-import 'package:omsetin_stok/utils/successAlert.dart';
-import 'package:omsetin_stok/view/widget/back_button.dart';
-import 'package:omsetin_stok/view/widget/expensiveFloatingButton.dart';
+import 'package:omsetin_bengkel/model/services.dart';
+import 'package:omsetin_bengkel/services/service_db_helper.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/formatters.dart';
+import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
 
 class UpdateServicePage extends StatefulWidget {
   final Service service;
@@ -29,9 +29,9 @@ class _UpdateServicePageState extends State<UpdateServicePage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.service.name);
+    _nameController = TextEditingController(text: widget.service.serviceName);
     _priceController = TextEditingController(
-      text: widget.service.price.toStringAsFixed(0).replaceAllMapped(
+      text: widget.service.servicePrice.toStringAsFixed(0).replaceAllMapped(
             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
             (Match m) => '${m[1]}.',
           ),
@@ -58,9 +58,9 @@ class _UpdateServicePageState extends State<UpdateServicePage> {
 
     try {
       final updatedService = Service(
-        id: widget.service.id,
-        name: _nameController.text.trim(),
-        price: double.parse(_priceController.text.replaceAll('.', '')),
+        serviceId: widget.service.serviceId,
+        serviceName: _nameController.text.trim(),
+        servicePrice: int.parse(_priceController.text.replaceAll('.', '')),
         dateAdded: widget.service.dateAdded,
       );
 

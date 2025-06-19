@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 
 class CardReportTransactions extends StatelessWidget {
   CardReportTransactions({
@@ -63,7 +63,7 @@ class CardReportTransactions extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                const SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       transaction.transactionDate,
                       style: GoogleFonts.poppins(
@@ -79,10 +79,10 @@ class CardReportTransactions extends StatelessWidget {
               thickness: 1,
               color: primaryColor,
             ),
-                Text(
-                  'Jumlah Pesanan : ${transaction.transactionQuantity}',
-                  style: GoogleFonts.poppins(fontSize: 12),
-                ),
+            Text(
+              'Jumlah Pesanan : ${transaction.transactionQuantity + transaction.transactionQuantityServices}',
+              style: GoogleFonts.poppins(fontSize: 12),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -90,10 +90,10 @@ class CardReportTransactions extends StatelessWidget {
                   'Total Harga : ${NumberFormat.currency(symbol: '', decimalDigits: 0).format(transaction.transactionTotal)}',
                   style: GoogleFonts.poppins(fontSize: 12),
                 ),
-            Text(
-              'Total Profit : ${NumberFormat.currency(symbol: 'Rp. ', decimalDigits: 0).format(transaction.transactionProfit)}',
-              style: GoogleFonts.poppins(fontSize: 12),
-            ),
+                Text(
+                  'Total Profit : ${NumberFormat.currency(symbol: 'Rp. ', decimalDigits: 0).format(transaction.transactionProfit)}',
+                  style: GoogleFonts.poppins(fontSize: 12),
+                ),
               ],
             ),
             SizedBox(height: 4),

@@ -24,7 +24,7 @@
   ],
   "kind": "codemodel",
   "paths": {
-    "build": "C:/aeratek/lariskas/omsetin_stok/android/app/.cxx/RelWithDebInfo/1v6t262c/armeabi-v7a",
+    "build": "C:/aeratek/lariskas/omsetin_bengkel/android/app/.cxx/RelWithDebInfo/1v6t262c/armeabi-v7a",
     "source": "C:/flutter/packages/flutter_tools/gradle/src/main/groovy"
   },
   "version": {

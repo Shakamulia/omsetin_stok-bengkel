@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/transaction.dart';
-import 'package:omsetin_stok/services/database_service.dart';
-import 'package:omsetin_stok/utils/colors.dart';
-import 'package:omsetin_stok/utils/responsif/fsize.dart';
-import 'package:omsetin_stok/view/widget/card_report_transaction.dart';
+import 'package:omsetin_bengkel/model/transaction.dart';
+import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omsetin_bengkel/view/widget/card_report_transaction.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_stok/view/widget/Notfound.dart';
-import 'package:omsetin_stok/view/widget/refresWidget.dart';
+import 'package:omsetin_bengkel/view/widget/Notfound.dart';
+import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
 import 'package:sizer/sizer.dart';
 
 class ReportTransaction extends StatefulWidget {
@@ -74,8 +74,8 @@ class _ReportTransactionState extends State<ReportTransaction> {
               children: [
                 AppBar(
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back_ios_rounded,
-                        color: Colors.white),
+                    icon:
+                        Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
                     onPressed: () => Navigator.pop(context),
                   ),
                   backgroundColor: Colors.transparent,
@@ -123,20 +123,19 @@ class _ReportTransactionState extends State<ReportTransaction> {
                     try {
                       String dateStr =
                           transaction.transactionDate.split(', ')[1];
-                      DateTime transactionDate =
-                          DateFormat("dd/MM/yyyy HH:mm")
-                              .parse(dateStr)
-                              .toLocal();
+                      DateTime transactionDate = DateFormat("dd/MM/yyyy HH:mm")
+                          .parse(dateStr)
+                          .toLocal();
                       DateTime startDate = DateTime(dateFrom.year,
                               dateFrom.month, dateFrom.day, 0, 0, 0)
                           .toLocal();
-                      DateTime endDate = DateTime(dateTo.year, dateTo.month,
-                              dateTo.day, 23, 59, 59)
+                      DateTime endDate = DateTime(
+                              dateTo.year, dateTo.month, dateTo.day, 23, 59, 59)
                           .toLocal();
 
-                      bool statusValid = transaction.transactionStatus ==
-                              "Selesai" ||
-                          transaction.transactionStatus == "Belum Lunas";
+                      bool statusValid =
+                          transaction.transactionStatus == "Selesai" ||
+                              transaction.transactionStatus == "Belum Lunas";
 
                       return statusValid &&
                           (transactionDate.isAfter(startDate) ||
@@ -177,8 +176,8 @@ class _ReportTransactionState extends State<ReportTransaction> {
                               return Column(children: [
                                 Gap(10),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
                                   child: CardReportTransactions(
                                       transaction: transaction),
                                 ),
@@ -352,9 +351,7 @@ class DateRangePickerButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.calendar_today, 
-                      size: 18, 
-                      color: primaryColor),
+                  Icon(Icons.calendar_today, size: 18, color: primaryColor),
                   const SizedBox(width: 8),
                   Text(
                     "Pilih Tanggal",

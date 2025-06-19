@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_stok/model/stock_addition.dart';
-import 'package:omsetin_stok/utils/colors.dart';
+import 'package:omsetin_bengkel/model/stock_addition.dart';
+import 'package:omsetin_bengkel/utils/colors.dart';
 
 class StockAdditionCard extends StatefulWidget {
   const StockAdditionCard({
@@ -42,7 +42,8 @@ class _StockAdditionCardState extends State<StockAdditionCard> {
                       color: primaryColor,
                       fontWeight: FontWeight.w700,
                     ),
-                  ),SizedBox(width: 4),
+                  ),
+                  SizedBox(width: 4),
                   Text(
                     widget.stock.stockAdditionName,
                     style: GoogleFonts.poppins(

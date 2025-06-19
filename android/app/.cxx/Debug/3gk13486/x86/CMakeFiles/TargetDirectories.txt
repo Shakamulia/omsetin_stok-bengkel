@@ -1,2 +1,2 @@
-C:/Users/ADVAN WORKPRO/Documents/AERA/omsetin_stok/android/app/.cxx/Debug/3gk13486/x86/CMakeFiles/edit_cache.dir
-C:/Users/ADVAN WORKPRO/Documents/AERA/omsetin_stok/android/app/.cxx/Debug/3gk13486/x86/CMakeFiles/rebuild_cache.dir
+C:/Users/ADVAN WORKPRO/Documents/AERA/omsetin_bengkel/android/app/.cxx/Debug/3gk13486/x86/CMakeFiles/edit_cache.dir
+C:/Users/ADVAN WORKPRO/Documents/AERA/omsetin_bengkel/android/app/.cxx/Debug/3gk13486/x86/CMakeFiles/rebuild_cache.dir

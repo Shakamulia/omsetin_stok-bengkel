@@ -6,6 +6,9 @@ class TransactionData {
   final String transactionPaymentMethod;
   final String transactionCashier;
   final String transactionCustomerName;
+  final String transactionPegawaiName;
+  final List<Map<String, dynamic>> transactionServices;
+  final int transactionQuantityServices;
   final int transactionDiscount;
   final String transactionNote;
   final int transactionTax;
@@ -23,6 +26,9 @@ class TransactionData {
       required this.transactionPaymentMethod,
       required this.transactionCashier,
       required this.transactionCustomerName,
+      required this.transactionPegawaiName,
+      required this.transactionQuantityServices,
+      required this.transactionServices,
       required this.transactionDiscount,
       required this.transactionNote,
       required this.transactionTax,
@@ -39,8 +45,11 @@ class TransactionData {
       transactionTotal: e['transaction_total'],
       transactionPayAmount: e['transaction_pay_amount'],
       transactionPaymentMethod: e['transaction_method'],
-      transactionCashier: e['transaction_cashier'] ?? 'User',
+      transactionCashier: e['transaction_user'],
       transactionCustomerName: e['transaction_customer_name'],
+      transactionPegawaiName: e['transaction_pegawai_name'],
+      transactionQuantityServices: e['transaction_quantity_services'],
+      transactionServices: e['transaction_services'],
       transactionDiscount: e['transaction_discount'],
       transactionNote: e['transaction_note'],
       transactionTax: e['transaction_tax'],
@@ -59,8 +68,11 @@ class TransactionData {
       'transaction_total': transactionTotal,
       'transaction_pay_amount': transactionPayAmount,
       'transaction_method': transactionPaymentMethod,
-      'transaction_cashier': transactionCashier,
+      'transaction_user': transactionCashier,
       'transaction_customer_name': transactionCustomerName,
+      'transaction_pegawai_name': transactionPegawaiName,
+      'transaction_quantity_services': transactionQuantityServices,
+      'transaction_services': transactionServices,
       'transaction_discount': transactionDiscount,
       'transaction_note': transactionNote,
       'transaction_tax': transactionTax,

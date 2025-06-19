@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:omsetin_stok/constants/apiConstants.dart';
-import 'package:omsetin_stok/providers/userProvider.dart';
-import 'package:omsetin_stok/utils/null_data_alert.dart';
-import 'package:omsetin_stok/utils/toast.dart';
-import 'package:omsetin_stok/view/page/login.dart';
-import 'package:omsetin_stok/view/page/splash_screen.dart';
+import 'package:omsetin_bengkel/constants/apiConstants.dart';
+import 'package:omsetin_bengkel/providers/userProvider.dart';
+import 'package:omsetin_bengkel/utils/null_data_alert.dart';
+import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omsetin_bengkel/view/page/login.dart';
+import 'package:omsetin_bengkel/view/page/splash_screen.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,27 +42,27 @@ class AuthService {
   }
 
 // Tambahkan di authService.dart
-Future<String> getCurrentUsername() async {
-  try {
-    final token = await storage.read(key: 'token');
-    if (token == null) return 'System';
+  Future<String> getCurrentUsername() async {
+    try {
+      final token = await storage.read(key: 'token');
+      if (token == null) return 'System';
 
-    final tokenParts = token.split('.');
-    if (tokenParts.length != 3) return 'System';
+      final tokenParts = token.split('.');
+      if (tokenParts.length != 3) return 'System';
 
-    final payload = jsonDecode(
-      utf8.decode(base64Url.decode(base64Url.normalize(tokenParts[1]))));
-    
-    // Cek beberapa kemungkinan field yang mungkin berisi username
-    return payload['name'] ?? 
-           payload['username'] ?? 
-           payload['serialNumber'] ?? 
-           'System';
-  } catch (e) {
-    debugPrint('Error getting username: $e');
-    return 'System';
+      final payload = jsonDecode(
+          utf8.decode(base64Url.decode(base64Url.normalize(tokenParts[1]))));
+
+      // Cek beberapa kemungkinan field yang mungkin berisi username
+      return payload['name'] ??
+          payload['username'] ??
+          payload['serialNumber'] ??
+          'System';
+    } catch (e) {
+      debugPrint('Error getting username: $e');
+      return 'System';
+    }
   }
-}
 
   Future<void> logout(BuildContext context) async {
     try {
@@ -105,13 +105,13 @@ Future<String> getCurrentUsername() async {
       if (response.statusCode == 200) {
         print("Fetched from $api");
         final data = jsonDecode(response.body);
-         final token = data['token'];
+        final token = data['token'];
 
         await storage.write(key: 'token', value: token);
 
-            // Debug log
-      final username = await getCurrentUsername();
-      debugPrint('Login berhasil. Username: $username');
+        // Debug log
+        final username = await getCurrentUsername();
+        debugPrint('Login berhasil. Username: $username');
 
         await secure.write(key: 'remember_serial', value: serialNumber);
         await secure.write(key: 'remember_pass', value: password);
@@ -119,8 +119,6 @@ Future<String> getCurrentUsername() async {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         await userProvider.fetchAndDecodeToken();
         await userProvider.getSerialNumberAsUser(context);
-
-
 
         final tokenParts = data['token'].split('.');
         if (tokenParts.length == 3) {
