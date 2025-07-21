@@ -1,26 +1,18 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/report_sold_product.dart';
-import 'package:omsetin_bengkel/model/report_sold_services.dart';
-import 'package:omsetin_bengkel/model/transaction.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/page/detailReportProduct.dart';
-import 'package:omsetin_bengkel/view/page/detailReportServices.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/floating_button.dart';
-import 'package:omsetin_bengkel/view/widget/modal_status.dart';
-import 'package:omsetin_bengkel/view/widget/modals.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
-import 'package:omsetin_bengkel/view/widget/search.dart';
-import 'package:sizer/sizer.dart';
+import 'package:omzetin_bengkel/model/report_sold_services.dart';
+import 'package:omzetin_bengkel/model/transaction.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/page/detailReportServices.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/modals.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/view/widget/search.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class ReportService extends StatefulWidget {
@@ -31,41 +23,118 @@ class ReportService extends StatefulWidget {
 }
 
 class _ReportServiceState extends State<ReportService> {
-  late Future<List<TransactionData>> Dateproductterjual;
   final DatabaseService _databaseService = DatabaseService.instance;
-  DateTime fromDate = DateTime.now();
+  DateTime fromDate = DateTime.now().subtract(const Duration(days: 7));
   DateTime toDate = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
-
-  Future<List<TransactionData>> _getTransactions() async {
-    try {
-      return await _databaseService.getTransaction();
-    } catch (e) {
-      print('Error fetching transactions: $e');
-      return [];
-    }
-  }
-
-  List<TransactionData> _filterTransactions(
-      List<TransactionData> transactions) {
-    String query = _searchController.text.toLowerCase();
-    if (query.isEmpty) {
-      return transactions;
-    } else {
-      return transactions.where((transaction) {
-        return transaction.transactionServices.any((services) {
-          return services['services_name'].toLowerCase().contains(query);
-        });
-      }).toList();
-    }
-  }
+  List<ReportSoldServices> reportSoldServices = [];
+  String mostPopularService = "Tidak ada";
+  int mostPopularQuantity = 0;
 
   @override
   void initState() {
     super.initState();
-    Dateproductterjual = DatabaseService.instance.getServicesSell();
-    _searchController.addListener(() {
-      setState(() {});
+    _loadData();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final transactions = await _databaseService.getTransaction();
+    _filterAndGenerateReport(transactions);
+  }
+
+  void _filterAndGenerateReport(List<TransactionData> transactions) {
+    final searchFiltered = _filterTransactionsBySearch(transactions);
+    final dateFiltered = _filterTransactionsByDate(searchFiltered);
+    _generateReportData(dateFiltered);
+  }
+
+  List<TransactionData> _filterTransactionsBySearch(
+      List<TransactionData> transactions) {
+    String query = _searchController.text.toLowerCase();
+    if (query.isEmpty) return transactions;
+
+    return transactions.where((transaction) {
+      return transaction.transactionServices.any((service) {
+        return service['services_name'].toLowerCase().contains(query);
+      });
+    }).toList();
+  }
+
+  List<TransactionData> _filterTransactionsByDate(
+      List<TransactionData> transactions) {
+    return transactions.where((transaction) {
+      try {
+        String dateStr = transaction.transactionDate.split(', ')[1];
+        DateTime transactionDate =
+            DateFormat("dd/MM/yyyy HH:mm").parse(dateStr);
+        DateTime startDate =
+            DateTime(fromDate.year, fromDate.month, fromDate.day);
+        DateTime endDate =
+            DateTime(toDate.year, toDate.month, toDate.day, 23, 59, 59);
+        return transactionDate.isAfter(startDate) &&
+            transactionDate.isBefore(endDate);
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+  }
+
+  void _generateReportData(List<TransactionData> filteredTransactions) {
+    Map<String, int> servicesQuantity = {};
+
+    for (var transaction in filteredTransactions) {
+      for (var service in transaction.transactionServices) {
+        servicesQuantity.update(
+          service['services_name'],
+          (value) => value + (service['quantity'] as int),
+          ifAbsent: () => service['quantity'] ?? 0,
+        );
+      }
+    }
+
+    List<MapEntry<String, int>> sortedServicesQuantity =
+        servicesQuantity.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+
+    setState(() {
+      reportSoldServices = sortedServicesQuantity.map((entry) {
+        int servicesId = 0;
+        for (var transaction in filteredTransactions) {
+          for (var service in transaction.transactionServices) {
+            if (service['services_name'] == entry.key) {
+              servicesId = service['services_id'] ?? 0;
+              break;
+            }
+          }
+          if (servicesId != 0) break;
+        }
+        return ReportSoldServices(
+          servicesId: servicesId,
+          servicesName: entry.key,
+          servicesSold: entry.value,
+          dateRange:
+              '${DateFormat('dd/MM/yyyy').format(fromDate)} - ${DateFormat('dd/MM/yyyy').format(toDate)}',
+        );
+      }).toList();
+
+      mostPopularService = sortedServicesQuantity.isNotEmpty
+          ? sortedServicesQuantity.first.key
+          : "Tidak ada";
+      mostPopularQuantity = sortedServicesQuantity.isNotEmpty
+          ? sortedServicesQuantity.first.value
+          : 0;
     });
   }
 
@@ -84,15 +153,14 @@ class _ReportServiceState extends State<ReportService> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(20),
-                  ),
+                  borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(20)),
                 ),
                 child: Column(
                   children: [
                     AppBar(
                       leading: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_rounded,
+                        icon: const Icon(Icons.arrow_back_ios_rounded,
                             color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
@@ -108,7 +176,6 @@ class _ReportServiceState extends State<ReportService> {
                         ),
                       ),
                     ),
-                    // Changed Date Picker Widget
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       child: DateRangePickerButton(
@@ -118,6 +185,7 @@ class _ReportServiceState extends State<ReportService> {
                           setState(() {
                             fromDate = startDate;
                             toDate = endDate;
+                            _loadData();
                           });
                         },
                       ),
@@ -140,294 +208,197 @@ class _ReportServiceState extends State<ReportService> {
               ),
               Expanded(
                 child: CustomRefreshWidget(
-                  child: FutureBuilder<List<TransactionData>>(
-                    future: _getTransactions(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(
+                  onRefresh: _loadData,
+                  child: reportSoldServices.isEmpty
+                      ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.search_off_outlined,
+                              const Icon(Icons.search_off_outlined,
                                   size: 60, color: Colors.black),
-                              Text('Tidak ada transaksi!',
+                              Text('Tidak ada layanan terjual!',
                                   style: GoogleFonts.poppins(
                                       fontSize: 16, color: Colors.black)),
                             ],
                           ),
-                        );
-                      } else {
-                        final transactions = snapshot.data!;
-                        final filteredTransactions =
-                            _filterTransactions(transactions)
-                                .where((transaction) {
-                          try {
-                            String dateStr =
-                                transaction.transactionDate.split(', ')[1];
-                            DateTime transactionDate =
-                                DateFormat("dd/MM/yyyy HH:mm")
-                                    .parse(dateStr)
-                                    .toLocal();
-                            DateTime startDate = DateTime(fromDate.year,
-                                    fromDate.month, fromDate.day, 0, 0, 0)
-                                .toLocal();
-                            DateTime endDate = DateTime(toDate.year,
-                                    toDate.month, toDate.day, 23, 59, 59)
-                                .toLocal();
-
-                            return (transactionDate.isAfter(startDate) ||
-                                    transactionDate
-                                        .isAtSameMomentAs(startDate)) &&
-                                (transactionDate.isBefore(endDate) ||
-                                    transactionDate.isAtSameMomentAs(endDate));
-                          } catch (e) {
-                            print(
-                                "Error parsing date: ${transaction.transactionDate}, Error: $e");
-                            return false;
-                          }
-                        }).toList();
-
-                        Map<String, int> servicesQuantity = {};
-
-                        for (var transaction in filteredTransactions) {
-                          for (var services
-                              in transaction.transactionServices) {
-                            servicesQuantity.update(
-                              services['services_name'],
-                              (value) => value + (services['quantity'] as int),
-                              ifAbsent: () => services['quantity'] ?? 0,
-                            );
-                          }
-                        }
-
-                        List<MapEntry<String, int>> sortedServicesQuantity =
-                            servicesQuantity.entries.toList()
-                              ..sort((a, b) => b.value.compareTo(a.value));
-
-                        List<ReportSoldServices> reportSoldServices =
-                            sortedServicesQuantity.map((entry) {
-                          int servicesId = 0;
-                          for (var transaction in filteredTransactions) {
-                            for (var services
-                                in transaction.transactionServices) {
-                              if (services['services_name'] == entry.key) {
-                                servicesId = services['services_id'] ?? 0;
-                                break;
-                              }
-                            }
-                            if (servicesId != 0) break;
-                          }
-                          return ReportSoldServices(
-                            servicesId: servicesId,
-                            servicesName: entry.key,
-                            servicesSold: entry.value,
-                            dateRange:
-                                DateFormat('dd/MM/yyyy').format(fromDate) +
-                                    ' - ' +
-                                    DateFormat('dd/MM/yyyy').format(toDate),
-                          );
-                        }).toList();
-
-                        if (filteredTransactions.isEmpty) {
-                          return Center(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              NotFoundPage(
-                                title: 'Tidak ada transaksi!',
-                              ),
-                            ],
-                          ));
-                        }
-                        return Stack(
+                        )
+                      : Column(
                           children: [
                             Expanded(
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: reportSoldServices.length,
-                                      itemBuilder: (context, index) {
-                                        final report =
-                                            reportSoldServices[index];
-                                        return Column(children: [
-                                          ZoomTapAnimation(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ReportDetailServicesPage(
-                                                            servicesName: report
-                                                                .servicesName,
-                                                          )));
-                                            },
+                              child: ListView.builder(
+                                itemCount: reportSoldServices.length,
+                                itemBuilder: (context, index) {
+                                  final report = reportSoldServices[index];
+                                  return Column(
+                                    children: [
+                                      ZoomTapAnimation(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ReportDetailServicesPage(
+                                                servicesName:
+                                                    report.servicesName,
+                                                fromDate: fromDate,
+                                                toDate: toDate,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(15)),
+                                            color: cardColor,
+                                            elevation: 1,
                                             child: Padding(
                                               padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: cardmain(
-                                                product: report.servicesName,
-                                                total: report.servicesSold,
+                                                  const EdgeInsets.all(10.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        child: Image.asset(
+                                                          'assets/products/no-image.png',
+                                                          width: 60,
+                                                          height: 60,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 10),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            report.servicesName,
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                              fontSize: SizeHelper
+                                                                  .Fsize_mainTextCard(
+                                                                      context),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    report.servicesSold
+                                                        .toString(),
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: SizeHelper
+                                                          .Fsize_mainTextCard(
+                                                              context),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
-                                        ]);
-                                      },
-                                    ),
+                                        ),
+                                      ),
+                                      const Gap(5),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 25),
+                              width: double.infinity,
+                              decoration: BoxDecoration(color: primaryColor),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Layanan Terlaris:',
+                                        style: GoogleFonts.poppins(
+                                          color: whiteMerona,
+                                          fontSize: SizeHelper.Fsize_textdate(
+                                              context),
+                                        ),
+                                      ),
+                                      Text(
+                                        mostPopularService.length > 15
+                                            ? "${mostPopularService.substring(0, 15)}..."
+                                            : mostPopularService,
+                                        style: GoogleFonts.poppins(
+                                          color: whiteMerona,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: SizeHelper.Fsize_textdate(
+                                              context),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  services_terlarisCard(
-                                    context,
-                                    sortedServicesQuantity.isNotEmpty
-                                        ? sortedServicesQuantity.first.key
-                                        : "Tidak ada",
-                                    sortedServicesQuantity.isNotEmpty
-                                        ? sortedServicesQuantity.first.value
-                                        : 0,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Jumlah Terjual:',
+                                        style: GoogleFonts.poppins(
+                                          color: whiteMerona,
+                                          fontSize: SizeHelper.Fsize_textdate(
+                                              context),
+                                        ),
+                                      ),
+                                      Text(
+                                        mostPopularQuantity.toString(),
+                                        style: GoogleFonts.poppins(
+                                          color: whiteMerona,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: SizeHelper.Fsize_textdate(
+                                              context),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                            ExpensiveFloatingButton(
-                              bottom: 100,
-                              left: 20,
-                              right: 20,
-                              text: 'Export',
-                              onPressed: () async {
-                                CustomModals.modalExportSoldServices(
-                                    context, reportSoldServices);
-                              },
-                            ),
                           ],
-                        );
-                      }
-                    },
-                  ),
+                        ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Container services_terlarisCard(
-      BuildContext context, String servicesName, int quantity) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: primaryColor,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Produk Terlaris:',
-                style: GoogleFonts.poppins(
-                  color: whiteMerona,
-                  fontSize: SizeHelper.Fsize_textdate(context),
-                ),
-              ),
-              Text(
-                '${servicesName.length > 15 ? servicesName.substring(0, 15) + "..." : servicesName}',
-                style: GoogleFonts.poppins(
-                  color: whiteMerona,
-                  fontWeight: FontWeight.bold,
-                  fontSize: SizeHelper.Fsize_textdate(context),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Jumlah Terjual:',
-                style: GoogleFonts.poppins(
-                  color: whiteMerona,
-                  fontSize: SizeHelper.Fsize_textdate(context),
-                ),
-              ),
-              Text(
-                quantity.toString(),
-                style: GoogleFonts.poppins(
-                  color: whiteMerona,
-                  fontWeight: FontWeight.bold,
-                  fontSize: SizeHelper.Fsize_textdate(context),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class cardmain extends StatelessWidget {
-  final product;
-  final int total;
-
-  const cardmain({
-    super.key,
-    required this.product,
-    required this.total,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: cardColor,
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      'assets/products/no-image.png',
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    )),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.toString(),
-                      style: GoogleFonts.poppins(
-                        fontSize: SizeHelper.Fsize_mainTextCard(context),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+          if (reportSoldServices.isNotEmpty)
+            ExpensiveFloatingButton(
+              bottom: 100,
+              left: 20,
+              right: 20,
+              text: 'Export',
+              onPressed: () {
+                CustomModals.modalExportSoldServices(
+                    context, reportSoldServices);
+              },
             ),
-            Text(
-              total.toString(),
-              style: GoogleFonts.poppins(
-                fontSize: SizeHelper.Fsize_mainTextCard(context),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -457,7 +428,6 @@ class DateRangePickerButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Date display
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -480,7 +450,6 @@ class DateRangePickerButton extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Date picker button
           SizedBox(
             height: 48,
             child: ElevatedButton(

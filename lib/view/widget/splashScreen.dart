@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_bengkel/services/authService.dart';
-// import 'package:omsetin_bengkel/view/page/home.dart';
-import 'package:omsetin_bengkel/view/page/home/home.dart';
+import 'package:omzetin_bengkel/services/authService.dart';
+// import 'package:omzetin_bengkel/view/page/home.dart';
+import 'package:omzetin_bengkel/view/page/home/home.dart';
 
 class SplashScreenSTF extends StatefulWidget {
   const SplashScreenSTF({super.key});

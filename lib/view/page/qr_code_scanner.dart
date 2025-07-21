@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class QrCodeScanner extends StatefulWidget {

@@ -1,2 +1,2 @@
-C:/Penyimpanan Utama/Documents/omsetin_bengkel-main/android/app/.cxx/Debug/5vq394k6/x86_64/CMakeFiles/edit_cache.dir
-C:/Penyimpanan Utama/Documents/omsetin_bengkel-main/android/app/.cxx/Debug/5vq394k6/x86_64/CMakeFiles/rebuild_cache.dir
+C:/Penyimpanan Utama/Documents/omzetin_bengkel-main/android/app/.cxx/Debug/5vq394k6/x86_64/CMakeFiles/edit_cache.dir
+C:/Penyimpanan Utama/Documents/omzetin_bengkel-main/android/app/.cxx/Debug/5vq394k6/x86_64/CMakeFiles/rebuild_cache.dir

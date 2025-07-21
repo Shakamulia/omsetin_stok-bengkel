@@ -1,7 +1,7 @@
 // Model untuk Mekanik
 class Mekanik {
   int? id;
-  String? profileImage;
+  String profileImage;
   String namaMekanik;
   String spesialis;
   String noHandphone;
@@ -10,7 +10,7 @@ class Mekanik {
 
   Mekanik({
     this.id,
-    this.profileImage,
+    required this.profileImage,
     required this.namaMekanik,
     required this.spesialis,
     required this.noHandphone,

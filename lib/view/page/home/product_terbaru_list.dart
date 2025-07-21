@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/view/widget/formatter/Rupiah.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/view/widget/formatter/Rupiah.dart';
 import 'package:sizer/sizer.dart';
 
 class ProductTerbaruList extends StatefulWidget {

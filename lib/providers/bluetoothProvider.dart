@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:omsetin_bengkel/utils/toast.dart';
+import 'package:omzetin_bengkel/utils/toast.dart';
 
 class BluetoothProvider with ChangeNotifier {
   BluetoothDevice? _connectedDevice;

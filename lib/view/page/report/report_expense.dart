@@ -3,17 +3,17 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/expenceModel.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/expense_card.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/floating_button.dart';
-import 'package:omsetin_bengkel/view/widget/formatter/Rupiah.dart';
-import 'package:omsetin_bengkel/view/widget/modals.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/model/expenceModel.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/expense_card.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/floating_button.dart';
+import 'package:omzetin_bengkel/view/widget/formatter/Rupiah.dart';
+import 'package:omzetin_bengkel/view/widget/modals.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
 import 'package:sizer/sizer.dart';
 
 class ReportExpense extends StatefulWidget {
@@ -152,90 +152,82 @@ class _ReportExpenseState extends State<ReportExpense> {
                     ));
                   }
 
-                  return Column(
+                  return Stack(
                     children: [
-                      Gap(20),
-                      Expanded(
-                        child: CustomRefreshWidget(
-                          child: ListView.builder(
-                            itemCount: filteredExpenses.length,
-                            itemBuilder: (context, index) {
-                              final expense = filteredExpenses[index];
-                              return Column(
-                                children: [
-                                  CardPengeluaran(
-                                    title: expense.name ?? '',
-                                    date: expense.date.toString(),
-                                    amount: expense.amount ?? 0,
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: ExpensiveFloatingButton(
-                                left: 12,
-                                right: 12,
-                                text: 'Export',
-                                onPressed: () async {
-                                  CustomModals.modalExportExpenseData(
-                                      context, filteredExpenses);
+                      Column(
+                        children: [
+                          Gap(20),
+                          Expanded(
+                            child: CustomRefreshWidget(
+                              child: ListView.builder(
+                                itemCount: filteredExpenses.length,
+                                itemBuilder: (context, index) {
+                                  final expense = filteredExpenses[index];
+                                  return Column(
+                                    children: [
+                                      CardPengeluaran(
+                                        title: expense.name ?? '',
+                                        date: expense.date.toString(),
+                                        amount: expense.amount ?? 0,
+                                      ),
+                                    ],
+                                  );
                                 },
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      Gap(10),
-                      Container(
-                        width: double.infinity,
-                        height: 10.h,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: primaryColor,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
+                          ),
+                          Gap(10),
+                          Container(
+                            width: double.infinity,
+                            height: 10.h,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: primaryColor,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    "Total Pengeluaran:",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 50),
-                                  Text(
-                                    CurrencyFormat.convertToIdr(
-                                        totalExpense, 0),
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Total Pengeluaran:",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 50),
+                                      Text(
+                                        CurrencyFormat.convertToIdr(
+                                            totalExpense, 0),
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
+                      ExpensiveFloatingButton(
+                        bottom: 100,
+                        left: 20,
+                        right: 20,
+                        text: 'Export',
+                        onPressed: () async {
+                          CustomModals.modalExportExpenseData(
+                              context, filteredExpenses);
+                        },
                       ),
                     ],
                   );

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/expense.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/formatters.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
-import 'package:omsetin_bengkel/view/widget/expense_card.dart';
+import 'package:omzetin_bengkel/model/expense.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/formatters.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omzetin_bengkel/view/widget/expense_card.dart';
 
 class ExpenseDetailPage extends StatefulWidget {
   final Expense? expense;

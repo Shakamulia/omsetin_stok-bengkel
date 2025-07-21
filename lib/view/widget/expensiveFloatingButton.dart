@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
 
 class ExpensiveFloatingButton extends StatelessWidget {
   final String? text;

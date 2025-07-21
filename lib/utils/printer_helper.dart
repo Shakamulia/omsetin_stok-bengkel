@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:image/image.dart' as img;
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/transaction.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/model/transaction.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrinterHelper {

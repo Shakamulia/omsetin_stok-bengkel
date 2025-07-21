@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/app_bar_stock.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/search.dart';
-import 'package:omsetin_bengkel/view/widget/select_product_stock.dart'; // Import halaman baru
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/app_bar_stock.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/search.dart';
+import 'package:omzetin_bengkel/view/widget/select_product_stock.dart'; // Import halaman baru
 
 class SelectProduct extends StatefulWidget {
   final List<Product>? selectedProductStock;

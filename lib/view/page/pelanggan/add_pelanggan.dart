@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/providers/pelangganProvider.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:provider/provider.dart';
-import 'package:omsetin_bengkel/model/cashierImageProfile.dart'; // Make sure this import is correct
+import 'package:omzetin_bengkel/model/cashierImageProfile.dart'; // Make sure this import is correct
 
 class AddPelangganPage extends StatefulWidget {
   final Pelanggan? pelanggan;
@@ -165,12 +166,25 @@ class _AddPelangganPageState extends State<AddPelangganPage> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
+    if (_nameController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Nama Tidak Boleh Kosong');
+      return;
+    }
+    if (_noHpController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'No Handphone Tidak Boleh Kosong');
+      return;
+    }
     // Validate email is not empty
     if (_emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email tidak boleh kosong')),
-      );
+      showNullDataAlert(context, message: 'Email Tidak Boleh Kosong');
+      return;
+    }
+    if (_gender.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Gender Tidak Boleh Kosong');
+      return;
+    }
+    if (_alamatController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Alamat Tidak Boleh Kosong');
       return;
     }
 
@@ -181,8 +195,8 @@ class _AddPelangganPageState extends State<AddPelangganPage> {
           Provider.of<Pelangganprovider>(context, listen: false);
 
       final pelangganData = {
-        'kode': widget.pelanggan?.kode ??
-            pelangganProvider.generateKodePelanggan(),
+        'kode':
+            widget.pelanggan?.kode ?? pelangganProvider.generateKodePelanggan(),
         'namaPelanggan': _nameController.text.trim(),
         'noHandphone': _noHpController.text.trim(),
         'email': _emailController.text.trim(),
@@ -196,26 +210,26 @@ class _AddPelangganPageState extends State<AddPelangganPage> {
 
       debugPrint('Data Map: $pelangganData');
 
-if (widget.pelanggan == null) {
-  await pelangganProvider.addPelanggan(pelangganData);
-  if (mounted) {
-    showSuccessAlert(
-      context,
-      'Pelanggan baru telah ditambahkan.',
-    );
-  }
-} else {
-  await pelangganProvider.updatePelanggan(
-    widget.pelanggan!.id!, 
-    pelangganData,
-  );
-  if (mounted) {
-    showSuccessAlert(
-      context,
-      'Perubahan telah disimpan.',
-    );
-  }
-}
+      if (widget.pelanggan == null) {
+        await pelangganProvider.addPelanggan(pelangganData);
+        if (mounted) {
+          showSuccessAlert(
+            context,
+            'Pelanggan baru telah ditambahkan.',
+          );
+        }
+      } else {
+        await pelangganProvider.updatePelanggan(
+          widget.pelanggan!.id!,
+          pelangganData,
+        );
+        if (mounted) {
+          showSuccessAlert(
+            context,
+            'Perubahan telah disimpan.',
+          );
+        }
+      }
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -230,7 +244,9 @@ if (widget.pelanggan == null) {
 
   Widget _buildProfileImage() {
     return GestureDetector(
-      onTap: _pickImage,
+      onTap: () {
+        _selectProfileImage();
+      },
       child: Container(
         width: 70,
         height: 70,

@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-// import 'package:omsetin_bengkel/utils/colors.dart';
+// import 'package:omzetin_bengkel/utils/colors.dart';
 
 // class PrimaryButton extends StatelessWidget {
 //   final String text;
@@ -41,7 +41,7 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;

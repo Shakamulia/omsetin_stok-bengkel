@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
-import 'package:omsetin_bengkel/services/authService.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/utils/toast.dart';
-import 'package:omsetin_bengkel/view/page/home/home.dart';
-import 'package:omsetin_bengkel/view/page/login.dart';
-import 'package:omsetin_bengkel/main.dart';
+import 'package:omzetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omzetin_bengkel/services/authService.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/utils/toast.dart';
+import 'package:omzetin_bengkel/view/page/home/home.dart';
+import 'package:omzetin_bengkel/view/page/login.dart';
+import 'package:omzetin_bengkel/main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart'; // Import main.dart to access scaffoldMessengerKey
@@ -47,48 +47,6 @@ class _SplashScreenState extends State<SplashScreen> {
     // _autoReconnectBluetooth();
     // _checkInternetConnection();
   }
-
-  // void checkTokenAndNavigate(BuildContext context) async {
-  //   final authService = AuthService();
-  //   final token = await authService.getToken();
-
-  //   if (token != null && !authService.isTokenExpired(context, token)) {
-  //     // Token valid, lanjutkan ke halaman utama
-  //     Navigator.pushReplacement(
-  //         context, MaterialPageRoute(builder: (_) => Home()));
-  //   } else {
-  //     // Token expired atau tidak ada, logout
-  //     if (!_hasAttemptedCheck) {
-  //       _hasAttemptedCheck = true;
-  //       await authService.logout(context);
-  //     }
-  //   }
-  // }
-
-  // void checkTokenAndNavigate(BuildContext context) async {
-  //   if (_hasNavigated) return; // Jika sudah navigasi, hentikan
-
-  //   final authService = AuthService();
-  //   final token = await authService.getToken();
-
-  //   if (token != null && !authService.isTokenExpired(context, token)) {
-  //       _navigateToHome();
-  //   } else {
-  //       await authService.logout(context);
-  //         _navigateToLogin();
-  //   }
-  // }
-
-  // Future<void> _checkToken() async {
-  //   final authService = AuthService();
-
-  //   String? token = await _authService.getToken();
-//   if (token == null || !authService.isTokenExpired(context, token)) {
-  //     _navigateToLogin();
-  //   } else {
-  //     _navigateToHome();
-  //   }
-  // }
 
   Future<void> _checkTokenAndNavigate() async {
     if (_isCheckingToken) return;
@@ -168,27 +126,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (bluetoothProvider.isConnected) {
         _hasAttemptedReconnect = true;
-        // print('Bluetooth reconnected successfully');
-        // connectionToast(
-        //   context,
-        //   "Koneksi Bluetooth Berhasil!",
-        //   "Berhasil terhubung ke perangkat Bluetooth.",
-        //   isConnected: true,
-        // );
-      } else {
-        //   _hasAttemptedReconnect = true;
-
-        //   print('Bluetooth reconnection attempt failed');
-      }
+      } 
     } catch (e) {
-      // _hasAttemptedReconnect = true;
-      // print('Error during Bluetooth reconnection: $e');
-      // connectionToast(
-      //   context,
-      //   "Koneksi Bluetooth Error!",
-      //   "Terjadi kesalahan saat mencoba menghubungkan ke perangkat Bluetooth.",
-      //   isConnected: false,
-      // );
     }
   }
 
@@ -301,9 +240,11 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           gradient: LinearGradient(
             colors: [
-              const Color(0xff6bbeaa), // turquoise green
-              const Color(0xffa4d9b7), // turquoise green
-              const Color(0xff6bbeaa), // turquoise green
+const Color(0xFF0747AE), // navy gelap (atas)
+const Color(0xFF91CEFF), // navy terang (tengah)
+const Color(0xFF0747AE), // navy gelap (bawah)
+
+
             ],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,

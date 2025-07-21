@@ -6,13 +6,13 @@ import 'dart:convert';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:omsetin_bengkel/constants/apiConstants.dart';
-import 'package:omsetin_bengkel/model/serialNumberPayload.dart';
-import 'package:omsetin_bengkel/model/tokenPayload.dart';
-import 'package:omsetin_bengkel/providers/userProvider.dart';
-import 'package:omsetin_bengkel/utils/loadingAlert.dart';
-import 'package:omsetin_bengkel/utils/null_data_alert.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/constants/apiConstants.dart';
+import 'package:omzetin_bengkel/model/serialNumberPayload.dart';
+import 'package:omzetin_bengkel/model/tokenPayload.dart';
+import 'package:omzetin_bengkel/providers/userProvider.dart';
+import 'package:omzetin_bengkel/utils/loadingAlert.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
 import 'package:provider/provider.dart';
 
 class UserService {

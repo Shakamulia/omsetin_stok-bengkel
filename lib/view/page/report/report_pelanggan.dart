@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/report_pelanggan_data.dart';
+import 'package:omzetin_bengkel/model/report_pelanggan_data.dart';
 
-import 'package:omsetin_bengkel/model/transaction.dart';
-import 'package:omsetin_bengkel/providers/pelangganProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/modals.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/model/transaction.dart';
+import 'package:omzetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/modals.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
 import 'package:provider/provider.dart';
 
 class ReportPelanggan extends StatefulWidget {

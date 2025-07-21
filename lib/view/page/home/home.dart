@@ -1,58 +1,58 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:omsetin_bengkel/view/page/home/history_page.dart';
-import 'package:omsetin_bengkel/view/page/mekanik/mekanik_page.dart';
-import 'package:omsetin_bengkel/view/page/percent_profit.dart';
-import 'package:omsetin_bengkel/view/page/service/service_page.dart';
-import 'package:omsetin_bengkel/view/page/settings/profilToko.dart';
-import 'package:omsetin_bengkel/view/page/settings/scanDevicePrinter.dart';
+import 'package:omzetin_bengkel/view/page/home/history_page.dart';
+import 'package:omzetin_bengkel/view/page/mekanik/mekanik_page.dart';
+import 'package:omzetin_bengkel/view/page/percent_profit.dart';
+import 'package:omzetin_bengkel/view/page/service/service_page.dart';
+import 'package:omzetin_bengkel/view/page/settings/profilToko.dart';
+import 'package:omzetin_bengkel/view/page/settings/scanDevicePrinter.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/cashier.dart';
-import 'package:omsetin_bengkel/model/transaction.dart';
-import 'package:omsetin_bengkel/providers/cashierProvider.dart';
-import 'package:omsetin_bengkel/providers/securityProvider.dart';
-import 'package:omsetin_bengkel/providers/settingProvider.dart';
-import 'package:omsetin_bengkel/providers/userProvider.dart';
-import 'package:omsetin_bengkel/services/authService.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
-import 'package:omsetin_bengkel/utils/toast.dart';
-import 'package:omsetin_bengkel/view/page/History_transaksi.dart';
-import 'package:omsetin_bengkel/view/page/aboutapplication/applicationAbout.dart';
-import 'package:omsetin_bengkel/view/page/addStockProduct/add_stock_product.dart';
-import 'package:omsetin_bengkel/view/page/full_icon_page.dart';
-import 'package:omsetin_bengkel/view/page/cashier/cashier_page.dart';
-import 'package:omsetin_bengkel/view/page/cashier/update_cashier_from_home_page.dart';
-import 'package:omsetin_bengkel/view/page/change_password/changePassword.dart';
-import 'package:omsetin_bengkel/view/page/expense/expense_page.dart';
-import 'package:omsetin_bengkel/view/page/home/product_terbaru_list.dart';
-import 'package:omsetin_bengkel/view/page/home/riwayat_transaksi.dart'
+import 'package:omzetin_bengkel/model/cashier.dart';
+import 'package:omzetin_bengkel/model/transaction.dart';
+import 'package:omzetin_bengkel/providers/cashierProvider.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
+import 'package:omzetin_bengkel/providers/settingProvider.dart';
+import 'package:omzetin_bengkel/providers/userProvider.dart';
+import 'package:omzetin_bengkel/services/authService.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omzetin_bengkel/utils/toast.dart';
+import 'package:omzetin_bengkel/view/page/History_transaksi.dart';
+import 'package:omzetin_bengkel/view/page/aboutapplication/applicationAbout.dart';
+import 'package:omzetin_bengkel/view/page/addStockProduct/add_stock_product.dart';
+import 'package:omzetin_bengkel/view/page/full_icon_page.dart';
+import 'package:omzetin_bengkel/view/page/cashier/cashier_page.dart';
+import 'package:omzetin_bengkel/view/page/cashier/update_cashier_from_home_page.dart';
+import 'package:omzetin_bengkel/view/page/change_password/changePassword.dart';
+import 'package:omzetin_bengkel/view/page/expense/expense_page.dart';
+import 'package:omzetin_bengkel/view/page/home/product_terbaru_list.dart';
+import 'package:omzetin_bengkel/view/page/home/riwayat_transaksi.dart'
     hide RiwayatTransaksi;
-import 'package:omsetin_bengkel/view/page/income/income_page.dart';
-import 'package:omsetin_bengkel/view/page/dummy/dummy.dart';
-import 'package:omsetin_bengkel/view/page/login_cashier/login_cashier.dart';
-import 'package:omsetin_bengkel/view/page/print_resi/input_resi.dart';
-import 'package:omsetin_bengkel/view/page/product/product.dart';
-import 'package:omsetin_bengkel/view/page/report/report_page.dart';
-import 'package:omsetin_bengkel/view/page/settings/securityPage.dart';
-import 'package:omsetin_bengkel/view/page/settings/setting.dart';
-import 'package:omsetin_bengkel/view/page/transaction/transactions_page.dart';
-import 'package:omsetin_bengkel/view/page/usersProfile/usersProfile.dart';
-import 'package:omsetin_bengkel/view/widget/menu_card.dart';
-import 'package:omsetin_bengkel/view/widget/modals.dart';
-import 'package:omsetin_bengkel/view/widget/pinModal.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
-import 'package:omsetin_bengkel/view/widget/sidebar_list_tile.dart';
+import 'package:omzetin_bengkel/view/page/income/income_page.dart';
+import 'package:omzetin_bengkel/view/page/dummy/dummy.dart';
+import 'package:omzetin_bengkel/view/page/login_cashier/login_cashier.dart';
+import 'package:omzetin_bengkel/view/page/print_resi/input_resi.dart';
+import 'package:omzetin_bengkel/view/page/product/product.dart';
+import 'package:omzetin_bengkel/view/page/report/report_page.dart';
+import 'package:omzetin_bengkel/view/page/settings/securityPage.dart';
+import 'package:omzetin_bengkel/view/page/settings/setting.dart';
+import 'package:omzetin_bengkel/view/page/transaction/transactions_page.dart';
+import 'package:omzetin_bengkel/view/page/usersProfile/usersProfile.dart';
+import 'package:omzetin_bengkel/view/widget/menu_card.dart';
+import 'package:omzetin_bengkel/view/widget/modals.dart';
+import 'package:omzetin_bengkel/view/widget/pinModal.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/view/widget/sidebar_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:omsetin_bengkel/view/page/pelanggan/pelanggan_page.dart';
+import 'package:omzetin_bengkel/view/page/pelanggan/pelanggan_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -917,24 +917,7 @@ class _HomeState extends State<Home> {
                                               builder: (_) => ProductPage()));
                                     }
                                   },
-                                  title: "Spare Part\n",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/produk.png',
-                                ),
-                                MainCard(
-                                  onTap: () {
-                                    if (securityProvider.kunciServices) {
-                                      showPinModalWithAnimation(context,
-                                          pinModal: PinModal(
-                                              destination: ServicePage()));
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) => ServicePage()));
-                                    }
-                                  },
-                                  title: "Layanan\n",
+                                  title: "Spare Part &\n Layanan",
                                   color: Colors.black,
                                   imagePath: 'assets/images/produk.png',
                                 ),
@@ -949,6 +932,26 @@ class _HomeState extends State<Home> {
                                   title: "Tambah\nStok Spare Part",
                                   color: Colors.black,
                                   imagePath: 'assets/images/add-produk.png',
+                                ),
+
+                                MainCard(
+                                  onTap: () {
+                                    if (securityProvider
+                                        .kunciRiwayatTransaksi) {
+                                      showPinModalWithAnimation(context,
+                                          pinModal: PinModal(
+                                              destination: RiwayatTransaksi()));
+                                    } else {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  RiwayatTransaksi()));
+                                    }
+                                  },
+                                  title: "Riwayat\nTransaksi",
+                                  color: Colors.black,
+                                  imagePath: 'assets/images/riwayat.png',
                                 ),
 
                                 // Baris 2
@@ -969,10 +972,10 @@ class _HomeState extends State<Home> {
                                   color: Colors.black,
                                   imagePath: 'assets/images/expense.png',
                                 ),
+
                                 MainCard(
                                   onTap: () {
-                                  if (securityProvider
-                                        .kunciPegawai) {
+                                    if (securityProvider.kunciPegawai) {
                                       showPinModalWithAnimation(context,
                                           pinModal: PinModal(
                                               destination: mekanikPage()));
@@ -980,33 +983,25 @@ class _HomeState extends State<Home> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) =>
-                                                  mekanikPage()));
+                                              builder: (_) => mekanikPage()));
                                     }
                                   },
                                   title: "Mekanik\n",
                                   color: Colors.black,
                                   imagePath: 'assets/images/income.png',
                                 ),
+
                                 MainCard(
-                                  onTap: () {
-                                    if (securityProvider
-                                        .kunciRiwayatTransaksi) {
-                                      showPinModalWithAnimation(context,
-                                          pinModal: PinModal(
-                                              destination: RiwayatTransaksi()));
-                                    } else {
+                                    onTap: () {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) =>
-                                                  RiwayatTransaksi()));
-                                    }
-                                  },
-                                  title: "Riwayat\nTransaksi",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/riwayat.png',
-                                ),
+                                              builder: (_) => CashierPage()));
+                                    },
+                                    title: "Kasir\n",
+                                    color: Colors.black,
+                                    imagePath: 'assets/images/kasir.png'),
+
                                 // Baris 3
                                 MainCard(
                                   onTap: () {
@@ -1020,6 +1015,7 @@ class _HomeState extends State<Home> {
                                   color: Colors.black,
                                   imagePath: 'assets/images/expense.png',
                                 ),
+
                                 MainCard(
                                   onTap: () {
                                     Navigator.push(
@@ -1032,86 +1028,19 @@ class _HomeState extends State<Home> {
                                   color: Colors.black,
                                   imagePath: 'assets/images/income.png',
                                 ),
+
+                                MainCard(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => ProfitPercent()));
+                                  },
+                                  title: "Setting Profit\n",
+                                  color: Colors.black,
+                                  imagePath: 'assets/images/setprofit.png',
+                                ),
                               ],
-                            ),
-
-                            const Gap(
-                                20), // Jarak antara grid utama dengan menu owner
-
-                            // MENU KHUSUS OWNER (Terpisah dari grid utama)
-                            Consumer<CashierProvider>(
-                              builder: (context, cashierProvider, child) {
-                                if (cashierProvider
-                                        .cashierData?['cashierName'] ==
-                                    "Owner") {
-                                  return Column(
-                                    children: [
-                                      Text(
-                                        "Menu Owner",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      const Gap(10),
-
-                                      // Grid 3x1 untuk menu owner
-                                      GridView.count(
-                                        crossAxisCount: 3,
-                                        crossAxisSpacing: 10,
-                                        mainAxisSpacing: 10,
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        children: [
-                                          MainCard(
-                                            onTap: () => Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        SettingPage())),
-                                            title: "Pengaturan\n",
-                                            color: Colors.black,
-                                            imagePath:
-                                                'assets/images/setting.png',
-                                          ),
-                                          MainCard(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          ProfitPercent()));
-                                            },
-                                            title: "Setting Profit\n",
-                                            color: Colors.black,
-                                            imagePath:
-                                                'assets/images/setprofit.png',
-                                          ),
-                                          MainCard(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      CashierPage()
-                                                )
-                                              );
-                                            },
-                                              title: "Kasir\n",
-                                              color: Colors.black,
-                                              imagePath:
-                                                  'assets/images/kasir.png'
-                                          ),
-                                          // Slot kosong atau tambah menu lain
-                                          Container(), // Kotak kosong
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                }
-                                return SizedBox.shrink();
-                              },
                             ),
                           ],
                         ),

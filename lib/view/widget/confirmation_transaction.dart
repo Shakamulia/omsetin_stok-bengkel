@@ -3,17 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/cashier.dart';
-import 'package:omsetin_bengkel/model/mekanik.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/providers/cashierProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/alert.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/page/detail_history_transaction.dart';
-import 'package:omsetin_bengkel/view/page/transaction/success_transaction_page.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/model/cashier.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/providers/cashierProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/alert.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/page/detail_history_transaction.dart';
+import 'package:omzetin_bengkel/view/page/transaction/success_transaction_page.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -291,20 +291,34 @@ void showModalKonfirmasi(
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),
                           child: Card(
+                            color: Colors.white,
                             margin: EdgeInsets.only(bottom: 8),
                             child: Padding(
                               padding: EdgeInsets.all(12),
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundImage:
-                                        selectedCustomer.profileImage != null
-                                            ? FileImage(File(
-                                                selectedCustomer.profileImage!))
-                                            : null,
-                                    child: selectedCustomer.profileImage == null
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors
+                                          .white, // Changed from grey[200] to white
+                                      image:
+                                          selectedCustomer.profileImage != null
+                                              ? _buildImageDecoration(
+                                                  selectedCustomer)
+                                              : null,
+                                    ),
+                                    child: selectedCustomer.profileImage ==
+                                                null ||
+                                            selectedCustomer
+                                                .profileImage!.isEmpty
                                         ? Text(
-                                            selectedCustomer.namaPelanggan[0])
+                                            selectedCustomer.namaPelanggan[0],
+                                            style: TextStyle(
+                                                color: Colors.grey[600]),
+                                          )
                                         : null,
                                   ),
                                   SizedBox(width: 12),
@@ -330,193 +344,6 @@ void showModalKonfirmasi(
                             ),
                           ),
                         ),
-                      SizedBox(height: 10),
-
-                      // Item List
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              // Products section
-                              if (products.isNotEmpty) ...[
-                                Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      "Produk:",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                ...products
-                                    .map((product) => Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.0, vertical: 4.0),
-                                          child: Card(
-                                            child: Padding(
-                                              padding: EdgeInsets.all(12),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 40,
-                                                    height: 40,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.green[50],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.shopping_bag,
-                                                      color: Colors.green,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          product[
-                                                              'product_name'],
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                            "${product['quantity']} x ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(product['product_sell_price'])}"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    NumberFormat.currency(
-                                                            locale: 'id_ID',
-                                                            symbol: 'Rp.',
-                                                            decimalDigits: 0)
-                                                        .format(product[
-                                                                'product_sell_price'] *
-                                                            product[
-                                                                'quantity']),
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ))
-                                    .toList(),
-                              ],
-
-                              // Services section
-                              if (services.isNotEmpty) ...[
-                                Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      "Layanan:",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                ...services
-                                    .map((service) => Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.0, vertical: 4.0),
-                                          child: Card(
-                                            child: Padding(
-                                              padding: EdgeInsets.all(12),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 40,
-                                                    height: 40,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.blue[50],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.medical_services,
-                                                      color: Colors.blue,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          service[
-                                                              'services_name'],
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                            "${service['quantity']} x ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(service['services_price'])}"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    NumberFormat.currency(
-                                                            locale: 'id_ID',
-                                                            symbol: 'Rp.',
-                                                            decimalDigits: 0)
-                                                        .format(service[
-                                                                'services_price'] *
-                                                            service[
-                                                                'quantity']),
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ))
-                                    .toList(),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Summary section
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Column(
-                          children: [
-                            _buildSummaryRow("Subtotal:", totalPrice),
-                            _buildSummaryRow("Diskon:", discountAmount),
-                            Divider(),
-                            _buildSummaryRow(
-                              "Total:",
-                              totalPrice - discountAmount,
-                              isTotal: true,
-                            ),
-                          ],
-                        ),
-                      ),
                       SizedBox(height: 10),
 
                       // Payment Input
@@ -577,54 +404,11 @@ void showModalKonfirmasi(
                         ),
                       ),
                       SizedBox(height: 8),
-
-                      // Payment Method
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Card(
-                          child: Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Metode Pembayaran",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 8),
-                                DropdownButton<String>(
-                                  value: selectedPaymentMethod,
-                                  isExpanded: true,
-                                  items: [
-                                    DropdownMenuItem(
-                                        value: "Cash", child: Text("Cash")),
-                                    DropdownMenuItem(
-                                        value: "Transfer",
-                                        child: Text("Transfer")),
-                                    DropdownMenuItem(
-                                        value: "Debit", child: Text("Debit")),
-                                    DropdownMenuItem(
-                                        value: "Credit", child: Text("Credit")),
-                                  ],
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        selectedPaymentMethod = value;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-
                       // Transaction Date
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Card(
+                          color: Colors.white,
                           child: Padding(
                             padding: EdgeInsets.all(12),
                             child: Row(
@@ -823,4 +607,42 @@ Widget _buildSummaryRow(String label, int amount, {bool isTotal = false}) {
       ],
     ),
   );
+}
+
+DecorationImage? _buildImageDecoration(dynamic data) {
+  try {
+    String? imagePath;
+
+    if (data is Pelanggan) {
+      imagePath = data.profileImage;
+    } else if (data is Mekanik) {
+      imagePath = data.profileImage;
+    } else {
+      return null;
+    }
+
+    if (imagePath == null || imagePath.isEmpty) return null;
+
+    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+      return DecorationImage(
+        image: NetworkImage(imagePath),
+        fit: BoxFit.cover,
+        onError: (exception, stackTrace) => null,
+      );
+    } else if (imagePath.startsWith('assets/')) {
+      return DecorationImage(
+        image: AssetImage(imagePath),
+        fit: BoxFit.cover,
+        onError: (exception, stackTrace) => null,
+      );
+    } else {
+      return DecorationImage(
+        image: FileImage(File(imagePath)),
+        fit: BoxFit.cover,
+        onError: (exception, stackTrace) => null,
+      );
+    }
+  } catch (e) {
+    return null;
+  }
 }

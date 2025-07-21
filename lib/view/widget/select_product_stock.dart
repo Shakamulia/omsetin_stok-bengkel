@@ -5,9 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
 
 class SelectStockProductCard extends StatefulWidget {
   final bool isSelected;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
 
 class SettingProvider with ChangeNotifier {
   String? settingName;

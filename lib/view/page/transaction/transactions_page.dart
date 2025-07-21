@@ -3,26 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/model/mekanik.dart';
-import 'package:omsetin_bengkel/providers/mekanikProvider.dart';
-import 'package:omsetin_bengkel/providers/pelangganprovider.dart';
-import 'package:omsetin_bengkel/providers/mekanikProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/alert.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/null_data_alert.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/page/transaction/checkout_page.dart';
-import 'package:omsetin_bengkel/view/page/transaction/select_product_page.dart';
-import 'package:omsetin_bengkel/view/page/transaction/select_customer_page.dart';
-import 'package:omsetin_bengkel/view/widget/antrian.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/card_transaction.dart';
-import 'package:omsetin_bengkel/view/widget/card_transaction_services.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
+import 'package:omzetin_bengkel/providers/mekanikProvider.dart';
+import 'package:omzetin_bengkel/providers/pelangganprovider.dart';
+import 'package:omzetin_bengkel/providers/mekanikProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/alert.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/page/transaction/checkout_page.dart';
+import 'package:omzetin_bengkel/view/page/transaction/select_mekanik_page.dart';
+import 'package:omzetin_bengkel/view/page/transaction/select_product_page.dart';
+import 'package:omzetin_bengkel/view/page/transaction/select_customer_page.dart';
+import 'package:omzetin_bengkel/view/widget/antrian.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/card_transaction.dart';
+import 'package:omzetin_bengkel/view/widget/card_transaction_services.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +63,7 @@ class _TransactionPageState extends State<TransactionPage> {
   Mekanik? _selectedEmployee;
   DateTime? lastTransactionDate;
   bool _isLoadingEmployee = false;
+  bool _isLoadingCustomer = false;
 
   List<Product> get selectedProducts =>
       widget.selectedItems.whereType<Product>().toList();
@@ -107,12 +109,12 @@ class _TransactionPageState extends State<TransactionPage> {
             _productQuantities[item.productId] = initialQty;
             showWarningDialog(
               context,
-              "Stok produk ${item.productName} sekarang kurang dari jumlah transaksi sebelumnya. Tetap edit?",
+              "Stok Spare Part ${item.productName} sekarang kurang dari jumlah transaksi sebelumnya. Tetap edit?",
             );
           } else {
             showErrorDialog(
               context,
-              "Stok produk ${item.productName} tidak mencukupi!",
+              "Stok Spare Part ${item.productName} tidak mencukupi!",
             );
           }
         }
@@ -189,79 +191,17 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   Future<void> _selectEmployee() async {
-    try {
-      setState(() => _isLoadingEmployee = true);
-      final mekanikProvider =
-          Provider.of<MekanikProvider>(context, listen: false);
-      final mekanikList = await mekanikProvider.getMekanikList();
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectMechanicPage(
+          selectedEmployee: _selectedEmployee,
+        ),
+      ),
+    );
 
-      if (mekanikList.isEmpty) {
-        showInfoDialog(context, "Tidak ada data mekanik tersedia");
-        return;
-      }
-
-      final result = await showModalBottomSheet<Mekanik>(
-        context: context,
-        isScrollControlled: true,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.8,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  'Pilih Mekanik',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: mekanikList.length,
-                    itemBuilder: (context, index) {
-                      final mekanik = mekanikList[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: mekanik.profileImage != null &&
-                                  mekanik.profileImage!.isNotEmpty
-                              ? AssetImage(mekanik.profileImage!)
-                              : null,
-                          child: mekanik.profileImage == null ||
-                                  mekanik.profileImage!.isEmpty
-                              ? Text(mekanik.namaMekanik[0])
-                              : null,
-                        ),
-                        title: Text(mekanik.namaMekanik),
-                        subtitle: Text(mekanik.spesialis),
-                        trailing: _selectedEmployee?.id == mekanik.id
-                            ? Icon(Icons.check, color: Colors.green)
-                            : null,
-                        onTap: () => Navigator.pop(context, mekanik),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-
-      if (result != null && mounted) {
-        setState(() => _selectedEmployee = result);
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorDialog(context, "Gagal memilih mekanik: ${e.toString()}");
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingEmployee = false);
-      }
+    if (result != null && mounted) {
+      setState(() => _selectedEmployee = result);
     }
   }
 
@@ -406,10 +346,10 @@ class _TransactionPageState extends State<TransactionPage> {
             children: [
               _buildCustomerAndEmployeeSection(),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 100),
-                  child: _buildCombinedItemList(),
-                ),
+                child: _buildCombinedItemList(),
+              ),
+              SizedBox(
+                height: 80,
               ),
               Container(
                 padding: const EdgeInsets.all(20),
@@ -469,16 +409,12 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
             ],
           ),
-          Positioned(
-            bottom: 110,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ExpensiveFloatingButton(
-                onPressed: _navigateToSelectProductPage,
-                text: 'PILIH ITEM',
-              ),
-            ),
+          ExpensiveFloatingButton(
+            left: 20,
+            right: 20,
+            bottom: 100,
+            onPressed: _navigateToSelectProductPage,
+            text: 'PILIH ITEM',
           ),
         ],
       ),
@@ -492,6 +428,7 @@ class _TransactionPageState extends State<TransactionPage> {
         children: [
           // Customer Selection Card
           Card(
+            color: Colors.white,
             margin: const EdgeInsets.only(bottom: 8),
             child: InkWell(
               onTap: _selectCustomer,
@@ -500,35 +437,91 @@ class _TransactionPageState extends State<TransactionPage> {
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.grey[200],
-                      child: Icon(Icons.person, color: Colors.grey[600]),
-                    ),
+                    if (_isLoadingCustomer)
+                      const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(),
+                      ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _selectedCustomer?.namaPelanggan ??
-                                "Pilih Pelanggan",
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _selectCustomer,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          if (_selectedCustomer != null)
-                            Text(
-                              _selectedCustomer!.noHandphone,
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey[600],
-                                fontSize: 12,
+                          child: Row(
+                            children: [
+                              // Avatar Gradient with image
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: _selectedCustomer != null
+                                        ? [Colors.teal, Colors.tealAccent]
+                                        : [
+                                            Colors.grey[400]!,
+                                            Colors.grey[300]!
+                                          ],
+                                  ),
+                                  image: _selectedCustomer != null
+                                      ? _buildImageDecoration(
+                                          _selectedCustomer!)
+                                      : null,
+                                ),
+                                child: _selectedCustomer == null ||
+                                        _selectedCustomer!.profileImage ==
+                                            null ||
+                                        _selectedCustomer!.profileImage!.isEmpty
+                                    ? Icon(Icons.person,
+                                        color: Colors.white, size: 24)
+                                    : null,
                               ),
-                            ),
-                        ],
+                              const SizedBox(width: 14),
+                              // Text
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _selectedCustomer?.namaPelanggan ??
+                                        "Belum ada pelanggan dipilih",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: _selectedCustomer != null
+                                          ? Colors.black87
+                                          : Colors.grey[600],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _selectedCustomer?.noHandphone ??
+                                        "Tap untuk memilih pelanggan",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 13,
+                                      color: Colors.grey[500],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    if (_selectedCustomer != null)
+                    if (_selectedCustomer != null && !_isLoadingCustomer)
                       IconButton(
                         icon: const Icon(Icons.close, color: Colors.red),
                         onPressed: () =>
@@ -540,11 +533,12 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
           ),
 
-          // Employee Selection Card
+// Employee Selection Card
           Card(
+            color: Colors.white,
             margin: const EdgeInsets.only(bottom: 8),
             child: InkWell(
-              onTap: _isLoadingEmployee ? null : _selectEmployee,
+              onTap: _selectEmployee,
               borderRadius: BorderRadius.circular(8),
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -555,33 +549,86 @@ class _TransactionPageState extends State<TransactionPage> {
                         width: 40,
                         height: 40,
                         child: CircularProgressIndicator(),
-                      )
-                    else
-                      CircleAvatar(
-                        backgroundColor: Colors.grey[200],
-                        child: Icon(Icons.badge, color: Colors.grey[600]),
                       ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _selectedEmployee?.namaMekanik ?? "Pilih mekanik",
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _selectEmployee,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          if (_selectedEmployee != null)
-                            Text(
-                              _selectedEmployee!.spesialis,
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey[600],
-                                fontSize: 12,
+                          child: Row(
+                            children: [
+                              // Avatar Gradient with image
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: _selectedEmployee != null
+                                        ? [
+                                            Colors.blueAccent,
+                                            Colors.lightBlueAccent
+                                          ]
+                                        : [
+                                            Colors.grey[400]!,
+                                            Colors.grey[300]!
+                                          ],
+                                  ),
+                                  image: _selectedEmployee != null
+                                      ? _buildImageDecoration(
+                                          _selectedEmployee!)
+                                      : null,
+                                ),
+                                child: _selectedEmployee == null ||
+                                        _selectedEmployee!.profileImage ==
+                                            null ||
+                                        _selectedEmployee!.profileImage!.isEmpty
+                                    ? Icon(Icons.badge,
+                                        color: Colors.white, size: 24)
+                                    : null,
                               ),
-                            ),
-                        ],
+                              const SizedBox(width: 14),
+                              // Text
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _selectedEmployee?.namaMekanik ??
+                                        "Belum ada pegawai dipilih",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: _selectedEmployee != null
+                                          ? Colors.black87
+                                          : Colors.grey[600],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _selectedEmployee?.spesialis ??
+                                        "Tap untuk memilih pegawai",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 13,
+                                      color: Colors.grey[500],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     if (_selectedEmployee != null && !_isLoadingEmployee)
@@ -607,7 +654,7 @@ class _TransactionPageState extends State<TransactionPage> {
     return ListView(
       children: [
         if (selectedProducts.isNotEmpty) ...[
-          _buildSectionHeader('Produk'),
+          _buildSectionHeader('Spare Part'),
           ...selectedProducts
               .map((product) => _buildProductItem(product))
               .toList(),
@@ -666,6 +713,44 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 
+  DecorationImage? _buildImageDecoration(dynamic data) {
+    try {
+      String? imagePath;
+
+      if (data is Pelanggan) {
+        imagePath = data.profileImage;
+      } else if (data is Mekanik) {
+        imagePath = data.profileImage;
+      } else {
+        return null;
+      }
+
+      if (imagePath == null || imagePath.isEmpty) return null;
+
+      if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+        return DecorationImage(
+          image: NetworkImage(imagePath),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      } else if (imagePath.startsWith('assets/')) {
+        return DecorationImage(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      } else {
+        return DecorationImage(
+          image: FileImage(File(imagePath)),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -687,7 +772,7 @@ class _TransactionPageState extends State<TransactionPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tambahkan produk atau layanan untuk memulai transaksi',
+            'Tambahkan Spare Part atau layanan untuk memulai transaksi',
             style: GoogleFonts.poppins(
               fontSize: 12,
               color: Colors.grey[400],

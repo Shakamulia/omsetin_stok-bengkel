@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_bengkel/model/cashier.dart';
-import 'package:omsetin_bengkel/providers/cashierProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
-import 'package:omsetin_bengkel/view/widget/search.dart';
+import 'package:omzetin_bengkel/model/cashier.dart';
+import 'package:omzetin_bengkel/providers/cashierProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 
 class SelectCashier extends StatefulWidget {

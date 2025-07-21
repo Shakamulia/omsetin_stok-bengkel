@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ic.dart';
+import 'package:flutter/services.dart';
+
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:sizer/sizer.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class CardTransactionService extends StatefulWidget {
   final Service service;
@@ -30,17 +28,45 @@ class CardTransactionService extends StatefulWidget {
 
 class _CardTransactionServiceState extends State<CardTransactionService> {
   late int quantity;
+  late TextEditingController _quantityController;
+  final FocusNode _quantityFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     quantity = widget.initialQuantity;
+    _quantityController = TextEditingController(text: quantity.toString());
+    _quantityFocusNode.addListener(_handleFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _quantityFocusNode.removeListener(_handleFocusChange);
+    _quantityFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleFocusChange() {
+    if (!_quantityFocusNode.hasFocus) {
+      _updateQuantityFromText();
+    }
+  }
+
+  void _updateQuantityFromText() {
+    final newQuantity = int.tryParse(_quantityController.text) ?? 1;
+    setState(() {
+      quantity = newQuantity < 1 ? 1 : newQuantity;
+      _quantityController.text = quantity.toString();
+      widget.onQuantityChanged?.call(quantity);
+    });
   }
 
   void decrement() {
     if (quantity > 1) {
       setState(() {
         quantity--;
+        _quantityController.text = quantity.toString();
         widget.onQuantityChanged?.call(quantity);
       });
     }
@@ -49,209 +75,159 @@ class _CardTransactionServiceState extends State<CardTransactionService> {
   void increment() {
     setState(() {
       quantity++;
+      _quantityController.text = quantity.toString();
       widget.onQuantityChanged?.call(quantity);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
-
     final formatter =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
-    return AspectRatio(
-      aspectRatio: isSmallScreen ? 3 / 1.5 : 3 / 1.2,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          double totalHarga =
-              (widget.service.servicePrice.toDouble() * quantity);
-          final formattedTotalHarga = formatter.format(totalHarga);
-          double hargaService = widget.service.servicePrice.toDouble();
-          final formattedHargaService = formatter.format(hargaService);
+    double totalHarga = widget.service.servicePrice.toDouble() * quantity;
+    final formattedTotalHarga = formatter.format(totalHarga);
+    final formattedHargaService =
+        formatter.format(widget.service.servicePrice.toDouble());
 
-          return Card(
-            color: Colors.white,
-            margin: EdgeInsets.symmetric(horizontal: 2.h, vertical: 1.w),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: 0.18,
+        children: [
+          CustomSlidableAction(
+            onPressed: (_) => widget.onDelete?.call(),
+            backgroundColor: Colors.transparent,
+            autoClose: true,
+            padding: EdgeInsets.zero,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade400,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
             ),
-            elevation: 5,
-            child: Padding(
-              padding: EdgeInsets.all(isSmallScreen ? 10 : 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Row(
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: widget.onChange,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 1,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Icon Layanan (bukan gambar produk)
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
+                      Text(
+                        widget.service.serviceName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        child: const Icon(
-                          Icons.medical_services,
-                          size: 30,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '1 × $formattedHargaService',
+                        style: const TextStyle(
+                          fontSize: 12,
                           color: Colors.grey,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.service.serviceName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: isSmallScreen ? 12 : 14,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              formattedHargaService,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: isSmallScreen ? 12 : 14,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 4),
+                      Text(
+                        formattedTotalHarga,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: greenColor,
+                          fontSize: 14,
                         ),
-                      ),
-                      // Tombol Hapus
-                      IconButton(
-                        icon: const Icon(Icons.cancel_outlined,
-                            color: Colors.red),
-                        onPressed: widget.onDelete,
                       ),
                     ],
                   ),
-                  const Gap(10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: secondaryColor,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          minimumSize: const Size(60, 40),
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        onPressed: widget.onChange,
-                        child: Text(
-                          'Ubah',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: cardColor,
-                            fontSize: isSmallScreen ? 12 : 14,
-                          ),
+                      GestureDetector(
+                        onTap: decrement,
+                        child: const Icon(
+                          Icons.remove,
+                          size: 16,
+                          color: Colors.white,
                         ),
                       ),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: decrement,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: redColor,
-                              minimumSize: const Size(30, 30),
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: const Iconify(
-                              Ic.outline_minus,
-                              color: Colors.white,
-                              size: 14,
-                            ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 30,
+                        child: TextField(
+                          controller: _quantityController,
+                          focusNode: _quantityFocusNode,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
                           ),
-                          SizedBox(
-                            width: 40,
-                            child: TextField(
-                              controller: TextEditingController.fromValue(
-                                TextEditingValue(
-                                  text: quantity.toString(),
-                                  selection: TextSelection.collapsed(
-                                      offset: quantity.toString().length),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: isSmallScreen ? 12 : 14,
-                              ),
-                              onChanged: (value) {
-                                final newQuantity =
-                                    int.tryParse(value) ?? quantity;
-                                if (newQuantity > 0) {
-                                  setState(() {
-                                    quantity = newQuantity;
-                                    widget.onQuantityChanged?.call(quantity);
-                                  });
-                                }
-                              },
-                            ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(3),
+                          ],
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
                           ),
-                          ElevatedButton(
-                            onPressed: increment,
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(30, 30),
-                              padding: EdgeInsets.zero,
-                              backgroundColor: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: const Iconify(
-                              Ic.outline_plus,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                          ),
-                        ],
+                          onSubmitted: (value) => _updateQuantityFromText(),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: increment,
+                        child: const Icon(
+                          Icons.add,
+                          size: 16,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
-                  const Gap(10),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.blueGrey[100],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Total :',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: isSmallScreen ? 12 : 14,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            formattedTotalHarga,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: isSmallScreen ? 12 : 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

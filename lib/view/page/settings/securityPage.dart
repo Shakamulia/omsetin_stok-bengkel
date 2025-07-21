@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_bengkel/providers/securityProvider.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/pinModal.dart';
-import 'package:omsetin_bengkel/view/widget/pinModalChangePassword.dart';
-import 'package:omsetin_bengkel/view/widget/primary_button.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/pinModal.dart';
+import 'package:omzetin_bengkel/view/widget/pinModalChangePassword.dart';
+import 'package:omzetin_bengkel/view/widget/primary_button.dart';
 
-import 'package:omsetin_bengkel/services/sharedPrefences.dart';
+import 'package:omzetin_bengkel/services/sharedPrefences.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:omsetin_bengkel/providers/securityProviderMekanik.dart';
-import 'package:omsetin_bengkel/providers/securityProviderLayanan.dart';
-import 'package:omsetin_bengkel/providers/securityProviderPelanggan.dart';
+import 'package:omzetin_bengkel/providers/securityProviderMekanik.dart';
+import 'package:omzetin_bengkel/providers/securityProviderLayanan.dart';
+import 'package:omzetin_bengkel/providers/securityProviderPelanggan.dart';
 
 class SecuritySettingsPage extends StatefulWidget {
   const SecuritySettingsPage({super.key});
@@ -71,7 +71,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   bool _kunciAddPelanggan = false;
   bool _kunciUpdatePelanggan = false;
   bool _kunciDeletePelanggan = false;
-  bool _kunciPegawai = false; 
+  bool _kunciPegawai = false;
   bool _kunciAddPegawai = false;
   bool _kunciUpdatePegawai = false;
   bool _kunciDeletePegawai = false;
@@ -488,7 +488,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     //     ),
                     //   ),
                     // ),
-                     Card(
+                    Card(
                       color: Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
@@ -496,71 +496,28 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                           children: [
                             _buildSettingSection('Pelanggan', [
                               Divider(color: primaryColor, thickness: 2),
-                              _buildSettingItem('Kunci Pelanggan', _kunciPelanggan,
-                                  (value) {
+                              _buildSettingItem(
+                                  'Kunci Pelanggan', _kunciPelanggan, (value) {
                                 setState(() {
                                   _kunciPelanggan = value;
                                 });
                               }),
-                              _buildSettingItem(
-                                  'Sembunyikan Tambah Pelanggan', _kunciAddPelanggan,
-                                  (value) {
+                              _buildSettingItem('Sembunyikan Tambah Pelanggan',
+                                  _kunciAddPelanggan, (value) {
                                 setState(() {
                                   _kunciAddPelanggan = value;
                                 });
                               }),
-                              _buildSettingItem(
-                                  'Nonaktifkan Edit Pelanggan', _kunciUpdatePelanggan,
-                                  (value) {
+                              _buildSettingItem('Nonaktifkan Edit Pelanggan',
+                                  _kunciUpdatePelanggan, (value) {
                                 setState(() {
                                   _kunciUpdatePelanggan = value;
                                 });
                               }),
-                              _buildSettingItem(
-                                  'Sembunyikan Hapus Pelanggan', _kunciDeletePelanggan,
-                                  (value) {
+                              _buildSettingItem('Sembunyikan Hapus Pelanggan',
+                                  _kunciDeletePelanggan, (value) {
                                 setState(() {
                                   _kunciDeletePelanggan = value;
-                                });
-                              }),
-                            ]),
-                          ],
-                        ),
-                      ),
-                    ),
-                     Card(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          children: [
-                            _buildSettingSection('Mekanik', [
-                              Divider(color: primaryColor, thickness: 2),
-                              _buildSettingItem('Kunci Mekanik', _kunciPegawai,
-                                  (value) {
-                                setState(() {
-                                  _kunciPegawai = value;
-                                });
-                              }),
-                              _buildSettingItem(
-                                  'Sembunyikan Tambah Mekanik', _kunciAddPegawai,
-                                  (value) {
-                                setState(() {
-                                  _kunciAddPegawai = value;
-                                });
-                              }),
-                              _buildSettingItem(
-                                  'Nonaktifkan Edit Mekanik', _kunciUpdatePegawai,
-                                  (value) {
-                                setState(() {
-                                  _kunciUpdatePegawai = value;
-                                });
-                              }),
-                              _buildSettingItem(
-                                  'Sembunyikan Hapus Pegawai', _kunciDeletePegawai,
-                                  (value) {
-                                setState(() {
-                                  _kunciDeletePegawai = value;
                                 });
                               }),
                             ]),
@@ -574,46 +531,30 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
                           children: [
-                            _buildSettingSection('Spare Part', [
+                            _buildSettingSection('Mekanik', [
                               Divider(color: primaryColor, thickness: 2),
-                              _buildSettingItem(
-                                  'Kunci Spare Part', _kunciProduk, (value) {
-                                setState(() {
-                                  _kunciProduk = value;
-                                });
-                              }),
-                              _buildSettingItem('Sembunyikan Tambah Spare Part',
-                                  _tambahProduk, (value) {
-                                setState(() {
-                                  _tambahProduk = value;
-                                });
-                              }),
-                              _buildSettingItem(
-                                  'Tambah Stok Spare Part', _tambahStokProduk,
+                              _buildSettingItem('Kunci Mekanik', _kunciPegawai,
                                   (value) {
                                 setState(() {
-                                  _tambahStokProduk = value;
+                                  _kunciPegawai = value;
                                 });
                               }),
-                              _buildSettingItem(
-                                  'Hapus Stok Spare Part', _hapusStokProduk,
-                                  (value) {
+                              _buildSettingItem('Sembunyikan Tambah Mekanik',
+                                  _kunciAddPegawai, (value) {
                                 setState(() {
-                                  _hapusStokProduk = value;
+                                  _kunciAddPegawai = value;
                                 });
                               }),
-                              _buildSettingItem(
-                                  'Nonaktifkan Edit Spare Part', _editProduk,
-                                  (value) {
+                              _buildSettingItem('Nonaktifkan Edit Mekanik',
+                                  _kunciUpdatePegawai, (value) {
                                 setState(() {
-                                  _editProduk = value;
+                                  _kunciUpdatePegawai = value;
                                 });
                               }),
-                              _buildSettingItem(
-                                  'Sembunyikan Hapus Spare Part', _hapusProduk,
-                                  (value) {
+                              _buildSettingItem('Sembunyikan Hapus Pegawai',
+                                  _kunciDeletePegawai, (value) {
                                 setState(() {
-                                  _hapusProduk = value;
+                                  _kunciDeletePegawai = value;
                                 });
                               }),
                             ]),
@@ -621,6 +562,59 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                         ),
                       ),
                     ),
+                    // Card(
+                    //   color: Colors.white,
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.all(12.0),
+                    //     child: Column(
+                    //       children: [
+                    //         _buildSettingSection('Spare Part', [
+                    //           Divider(color: primaryColor, thickness: 2),
+                    //           _buildSettingItem(
+                    //               'Kunci Spare Part', _kunciProduk, (value) {
+                    //             setState(() {
+                    //               _kunciProduk = value;
+                    //             });
+                    //           }),
+                    //           _buildSettingItem('Sembunyikan Tambah Spare Part',
+                    //               _tambahProduk, (value) {
+                    //             setState(() {
+                    //               _tambahProduk = value;
+                    //             });
+                    //           }),
+                    //           _buildSettingItem(
+                    //               'Tambah Stok Spare Part', _tambahStokProduk,
+                    //               (value) {
+                    //             setState(() {
+                    //               _tambahStokProduk = value;
+                    //             });
+                    //           }),
+                    //           _buildSettingItem(
+                    //               'Hapus Stok Spare Part', _hapusStokProduk,
+                    //               (value) {
+                    //             setState(() {
+                    //               _hapusStokProduk = value;
+                    //             });
+                    //           }),
+                    //           _buildSettingItem(
+                    //               'Nonaktifkan Edit Spare Part', _editProduk,
+                    //               (value) {
+                    //             setState(() {
+                    //               _editProduk = value;
+                    //             });
+                    //           }),
+                    //           _buildSettingItem(
+                    //               'Sembunyikan Hapus Spare Part', _hapusProduk,
+                    //               (value) {
+                    //             setState(() {
+                    //               _hapusProduk = value;
+                    //             });
+                    //           }),
+                    //         ]),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                     // Kategori
                     // Card(
                     //   color: Colors.white,

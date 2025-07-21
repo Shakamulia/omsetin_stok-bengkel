@@ -2,13 +2,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/providers/pelangganProvider.dart';
-import 'package:omsetin_bengkel/utils/alert.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/search.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omzetin_bengkel/utils/alert.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/page/pelanggan/add_pelanggan.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 
 class SelectCustomerPage extends StatefulWidget {
@@ -81,131 +85,190 @@ class _SelectCustomerPageState extends State<SelectCustomerPage> {
         ),
       ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: SearchTextField(
-                prefixIcon: const Icon(Icons.search, size: 24),
-                obscureText: false,
-                hintText: "Cari pelanggan...",
-                controller: _searchController,
-                maxLines: 1,
-                suffixIcon: null,
-                color: cardColor,
-              ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: SearchTextField(
+                    prefixIcon: const Icon(Icons.search, size: 24),
+                    obscureText: false,
+                    hintText: "Cari pelanggan...",
+                    controller: _searchController,
+                    maxLines: 1,
+                    suffixIcon: null,
+                    color: cardColor,
+                  ),
+                ),
+                Expanded(
+                  child: _buildPelangganGridView(),
+                ),
+              ],
             ),
-            Expanded(
-              child: _buildCustomerList(),
+            // Replace FloatingActionButton with Positioned widget
+            Positioned(
+              bottom: 20,
+              left: 20,
+              right: 20,
+              child: ExpensiveFloatingButton(
+                text:
+                    "TAMBAH PELANGGAN", // Changed from "TAMBAH PEGAWAI" to match your navigation function
+                onPressed: () => _navigateToAddPelangganPage(),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: Icon(Icons.add, color: Colors.white),
-        onPressed: () => _showAddCustomerDialog(context),
-      ),
     );
+// Remove the floatingActionButton property completely
   }
 
-  Widget _buildCustomerList() {
-    final pelangganProvider = Provider.of<Pelangganprovider>(context);
-
-    return FutureBuilder<List<Pelanggan>>(
-      future: pelangganProvider.getPelangganList(
-        query: _searchController.text,
-        sortOrder: _sortOrder,
-      ),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error loading customers'));
-        }
-
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.people_outline, size: 50, color: Colors.grey),
-                SizedBox(height: 10),
-                Text(
-                  _searchController.text.isEmpty
-                      ? 'Tidak ada pelanggan'
-                      : 'Tidak ditemukan pelanggan',
-                  style: GoogleFonts.poppins(color: Colors.grey),
+  Widget _buildPelangganGridView() {
+    return Consumer<Pelangganprovider>(
+      builder: (context, pelangganProvider, child) {
+        return FutureBuilder<List<Pelanggan>>(
+          future: pelangganProvider.getPelangganList(
+              query: _searchController.text, sortOrder: _sortOrder),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                  child: NotFoundPage(
+                title: _searchController.text == ""
+                    ? "Tidak ada pelanggan yang ditemukan"
+                    : 'Tidak ada pelanggan dengan nama "${_searchController.text}"',
+              ));
+            } else {
+              final pelangganList = snapshot.data!;
+              return GridView.builder(
+                padding: EdgeInsets.all(8),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.8,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
                 ),
-                if (_searchController.text.isNotEmpty)
-                  TextButton(
-                    onPressed: () {
-                      _showAddCustomerDialog(context,
-                          name: _searchController.text);
-                    },
-                    child: Text(
-                      'Tambah "${_searchController.text}"',
-                      style: GoogleFonts.poppins(color: primaryColor),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        }
-
-        return ListView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          itemCount: snapshot.data!.length,
-          itemBuilder: (context, index) {
-            final customer = snapshot.data![index];
-            return Card(
-              margin: EdgeInsets.only(bottom: 10),
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: primaryColor.withOpacity(0.2),
-                  backgroundImage: customer.profileImage != null
-                      ? AssetImage(customer.profileImage!)
-                      : null,
-                  child: customer.profileImage == null
-                      ? Text(
-                          customer.namaPelanggan[0],
-                          style: GoogleFonts.poppins(
-                            color: primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      : null,
-                ),
-                title: Text(
-                  customer.namaPelanggan,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(customer.noHandphone),
-                    if (customer.email != null && customer.email!.isNotEmpty)
-                      Text(customer.email!),
-                  ],
-                ),
-                trailing: widget.selectedCustomer?.id == customer.id
-                    ? Icon(Icons.check_circle, color: Colors.green)
-                    : null,
-                onTap: () => Navigator.pop(context, customer),
-              ),
-            );
+                itemCount: pelangganList.length,
+                itemBuilder: (context, index) {
+                  final pelanggan = pelangganList[index];
+                  return _buildPelangganCard(pelanggan);
+                },
+              );
+            }
           },
         );
       },
     );
+  }
+
+  Widget _buildPelangganCard(Pelanggan pelanggan) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context, pelanggan),
+      child: Card(
+        elevation: 0,
+        color: cardColor,
+        margin: EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color.fromARGB(255, 221, 227, 224),
+                    image: _buildImageDecoration(pelanggan),
+                  ),
+                  child: _buildImageDecoration(pelanggan) == null
+                      ? Icon(Icons.person, size: 40, color: Colors.blueGrey)
+                      : null,
+                ),
+              ),
+              const Gap(12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        pelanggan.namaPelanggan,
+                        style: GoogleFonts.poppins(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.phone, size: 14, color: primaryColor),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      pelanggan.noHandphone ?? '-',
+                      style:
+                          GoogleFonts.poppins(fontSize: 15, color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              if (widget.selectedCustomer?.id == pelanggan.id)
+                const Padding(
+                  padding: EdgeInsets.only(top: 12),
+                  child: Center(
+                    child: Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  DecorationImage? _buildImageDecoration(Pelanggan pelanggan) {
+    try {
+      if (pelanggan.profileImage == null || pelanggan.profileImage!.isEmpty) {
+        return null;
+      }
+
+      if (pelanggan.profileImage!.startsWith('http') ||
+          pelanggan.profileImage!.startsWith('https')) {
+        return DecorationImage(
+          image: NetworkImage(pelanggan.profileImage!),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      } else {
+        return DecorationImage(
+          image: AssetImage(pelanggan.profileImage!),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      }
+    } catch (e) {
+      return null;
+    }
   }
 
   void _showSortOptions() {
@@ -254,6 +317,31 @@ class _SelectCustomerPageState extends State<SelectCustomerPage> {
         );
       },
     );
+  }
+
+  void _navigateToAddPelangganPage() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            AddPelangganPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween<Offset>(begin: begin, end: end)
+              .chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+        transitionDuration: Duration(milliseconds: 300),
+      ),
+    ).then((_) => setState(() {}));
   }
 
   void _showAddCustomerDialog(BuildContext context, {String? name}) async {

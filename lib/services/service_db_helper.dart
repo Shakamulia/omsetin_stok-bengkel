@@ -1,6 +1,6 @@
 // lib/services/service_database_helper.dart
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
 
 class ServiceDatabaseHelper {
   static const String _tableName = 'services';

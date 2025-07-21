@@ -1,199 +1,227 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/services/service_db_helper.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/formatters.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/failedAlert.dart';
+import 'package:omzetin_bengkel/utils/formatters.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:gap/gap.dart';
 
-class UpdateServicePage extends StatefulWidget {
-  final Service service;
+class UpdateServicesPage extends StatefulWidget {
+  final Service services;
 
-  const UpdateServicePage({super.key, required this.service});
+  const UpdateServicesPage({super.key, required this.services});
 
   @override
-  State<UpdateServicePage> createState() => _UpdateServicePageState();
+  State<UpdateServicesPage> createState() => _UpdateServicesPageState();
 }
 
-class _UpdateServicePageState extends State<UpdateServicePage> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _priceController;
-  final _serviceHelper = ServiceDatabaseHelper();
-  bool _isLoading = false;
+class _UpdateServicesPageState extends State<UpdateServicesPage> {
+  late TextEditingController _servicesNameController;
+  late TextEditingController _servicesPriceController;
+  final DatabaseService _databaseService = DatabaseService.instance;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.service.serviceName);
-    _priceController = TextEditingController(
-      text: widget.service.servicePrice.toStringAsFixed(0).replaceAllMapped(
-            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-            (Match m) => '${m[1]}.',
-          ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _updateService() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_nameController.text.isEmpty || _priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Semua field harus diisi!")),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      final updatedService = Service(
-        serviceId: widget.service.serviceId,
-        serviceName: _nameController.text.trim(),
-        servicePrice: int.parse(_priceController.text.replaceAll('.', '')),
-        dateAdded: widget.service.dateAdded,
-      );
-
-      await _serviceHelper.updateService(updatedService);
-
-      if (!mounted) return;
-      showSuccessAlert(context, "Layanan berhasil diperbarui!");
-      Navigator.pop(context, true);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal memperbarui layanan: ${e.toString()}")),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Nama layanan harus diisi';
-    }
-    return null;
-  }
-
-  String? _validatePrice(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Harga harus diisi';
-    }
-    if (double.tryParse(value.replaceAll('.', '')) == null) {
-      return 'Harga tidak valid';
-    }
-    return null;
+    _servicesNameController =
+        TextEditingController(text: widget.services.serviceName);
+    _servicesPriceController =
+        TextEditingController(text: widget.services.servicePrice.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + 20),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-          child: Container(
-            decoration: const BoxDecoration(
+        backgroundColor: bgColor,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight + 20),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    colors: [secondaryColor, primaryColor],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              titleSpacing: 0,
-              scrolledUnderElevation: 0,
-              toolbarHeight: kToolbarHeight + 20,
-              leading: const CustomBackButton(),
-              title: Text(
-                'EDIT DATA LAYANAN',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: bgColor,
+                  colors: [secondaryColor, primaryColor],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
-              centerTitle: true,
+              child: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                toolbarHeight: kToolbarHeight + 20,
+                scrolledUnderElevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                titleSpacing: 0,
+                leading: const CustomBackButton(),
+                title: Text(
+                  'UBAH LAYANAN',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    fontSize: SizeHelper.Fsize_normalTitle(context),
+                    color: bgColor,
+                  ),
+                ),
+                centerTitle: true,
+              ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: cardColor,
-                  labelText: "Nama Layanan",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return SingleChildScrollView(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight,
+                              ),
+                              child: IntrinsicHeight(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Gap(25),
+                                    const Text(
+                                      "Nama Layanan",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Poppins',
+                                      ),
+                                    ),
+                                    const Gap(10),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: cardColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: TextField(
+                                        controller: _servicesNameController,
+                                        decoration: InputDecoration(
+                                          hintText: "Nama Layanan",
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 16,
+                                          ),
+                                          prefixIcon:
+                                              const Icon(Icons.design_services),
+                                        ),
+                                      ),
+                                    ),
+                                    const Gap(15),
+                                    const Text(
+                                      "Harga Layanan",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Poppins',
+                                      ),
+                                    ),
+                                    const Gap(10),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: cardColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: TextField(
+                                        controller: _servicesPriceController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          hintText: "Harga Layanan",
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 16,
+                                          ),
+                                          prefixIcon:
+                                              const Icon(Icons.attach_money),
+                                        ),
+                                      ),
+                                    ),
+                                    const Gap(20),
+                                    // Add extra space if needed
+                                    const Spacer(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // Fixed button at the bottom
+                  ],
                 ),
-                validator: _validateName,
-              ),
-              const Gap(20),
-              TextFormField(
-                controller: _priceController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: cardColor,
-                  labelText: "Harga Layanan",
-                  prefixText: "Rp ",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
+                ExpensiveFloatingButton(
+                  left: 20,
+                  right: 20,
+                  text: "SIMPAN",
+                  onPressed: () async {
+                    final name = _servicesNameController.text;
+                    final price =
+                        int.tryParse(_servicesPriceController.text) ?? 0;
+
+                    if (name.isEmpty) {
+                      showNullDataAlert(context,
+                          message: "Nama layanan tidak boleh kosong");
+                      return;
+                    }
+
+                    if (price <= 0) {
+                      showNullDataAlert(context,
+                          message: "Harga layanan tidak valid");
+                      return;
+                    }
+
+                    try {
+                      final updatedService = Service(
+                        serviceId: widget.services.serviceId,
+                        serviceName: name,
+                        servicePrice: price,
+                        dateAdded: widget.services.dateAdded,
+                      );
+
+                      await _databaseService.updateService(updatedService);
+
+                      showSuccessAlert(
+                          context, 'Layanan "$name" berhasil diperbarui!');
+                      Navigator.pop(context, true);
+                    } catch (e) {
+                      showFailedAlert(context,
+                          message: "Gagal memperbarui layanan: $e");
+                    }
+                  },
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  currencyInputFormatter(),
-                ],
-                validator: _validatePrice,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
-        child: ExpensiveFloatingButton(
-          text: 'SIMPAN',
-          onPressed: () => _updateService(),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
+        ));
+  }
+
+  @override
+  void dispose() {
+    _servicesNameController.dispose();
+    _servicesPriceController.dispose();
+    super.dispose();
   }
 }

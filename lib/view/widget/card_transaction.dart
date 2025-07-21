@@ -1,21 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ic.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/not_enough_stock_alert.dart';
-import 'package:sizer/sizer.dart';
+import 'package:flutter/services.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/not_enough_stock_alert.dart';
 
 class CardTransaction extends StatefulWidget {
   final Product product;
   final int initialQuantity;
   final Function(int)? onQuantityChanged;
   final VoidCallback? onDelete;
-  final Function(Product)? onEdit; // Fungsi baru untuk memicu edit
-  final VoidCallback? onChange; // Fungsi baru untuk memicu perubahan
+  final Function(Product)? onEdit;
+  final VoidCallback? onChange;
 
   const CardTransaction({
     super.key,
@@ -23,8 +21,8 @@ class CardTransaction extends StatefulWidget {
     this.initialQuantity = 1,
     this.onQuantityChanged,
     this.onDelete,
+    this.onEdit,
     this.onChange,
-    this.onEdit, // Menambahkan parameter onEdit
   });
 
   @override
@@ -33,17 +31,52 @@ class CardTransaction extends StatefulWidget {
 
 class _CardTransactionState extends State<CardTransaction> {
   late int quantity;
+  late TextEditingController _quantityController;
+  final FocusNode _quantityFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     quantity = widget.initialQuantity;
+    _quantityController = TextEditingController(text: quantity.toString());
+    _quantityFocusNode.addListener(_handleFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _quantityFocusNode.removeListener(_handleFocusChange);
+    _quantityFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleFocusChange() {
+    if (!_quantityFocusNode.hasFocus) {
+      _updateQuantityFromText();
+    }
+  }
+
+  void _updateQuantityFromText() {
+    final newQuantity = int.tryParse(_quantityController.text) ?? 1;
+    setState(() {
+      if (newQuantity < 1) {
+        quantity = 1;
+      } else if (newQuantity > widget.product.productStock) {
+        quantity = widget.product.productStock;
+        showNotEnoughStock(context);
+      } else {
+        quantity = newQuantity;
+      }
+      _quantityController.text = quantity.toString();
+      widget.onQuantityChanged?.call(quantity);
+    });
   }
 
   void decrement() {
     if (quantity > 1) {
       setState(() {
         quantity--;
+        _quantityController.text = quantity.toString();
         widget.onQuantityChanged?.call(quantity);
       });
     }
@@ -52,223 +85,182 @@ class _CardTransactionState extends State<CardTransaction> {
   void increment() {
     setState(() {
       quantity++;
-      widget.onQuantityChanged?.call(quantity);
       if (quantity > widget.product.productStock) {
-        // Menampilkan pesan peringatan
+        quantity = widget.product.productStock;
         showNotEnoughStock(context);
-        return decrement();
       }
+      _quantityController.text = quantity.toString();
+      widget.onQuantityChanged?.call(quantity);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Dapatkan ukuran layar dan responsif
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
-
     final formatter =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
-    return AspectRatio(
-      aspectRatio: isSmallScreen ? 3 / 1.5 : 3 / 1.2,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          double totalHarga =
-              (widget.product.productSellPrice.toDouble() * quantity);
-          final formattedTotalHarga = formatter.format(totalHarga);
-          double hargaProduk = (widget.product.productSellPrice.toDouble());
-          final formattedHargaProduk = formatter.format(hargaProduk);
-          return Card(
-            color: Colors.white,
-            margin: EdgeInsets.symmetric(horizontal: 2.h, vertical: 1.w),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            elevation: 5,
-            child: Padding(
-              padding: EdgeInsets.all(isSmallScreen ? 10 : 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Row(
-                    children: [
-                      // Gambar Produk
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          File(widget.product.productImage.toString()),
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              "assets/products/no-image.png",
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.product.productName,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: isSmallScreen ? 12 : 14),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              formattedHargaProduk,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: isSmallScreen ? 12 : 14),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Tombol Hapus
-                      IconButton(
-                        icon: const Icon(Icons.cancel_outlined,
-                            color: Colors.red),
-                        onPressed: widget.onDelete, // Panggil fungsi hapus
-                      ),
-                    ],
-                  ),
-                  Gap(10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          minimumSize: const Size(60, 40),
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        // Panggil fungsi untuk memilih produk baru
-                        onPressed: () {
-                          widget.onChange?.call();
-                        },
-                        child: Text(
-                          'Ubah',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: cardColor,
-                            fontSize: isSmallScreen ? 12 : 14,
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: decrement,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: redColor,
-                              minimumSize: const Size(30, 30),
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: const Iconify(
-                              Ic.outline_minus,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 40,
-                            child: TextField(
-                              controller: TextEditingController.fromValue(
-                                TextEditingValue(
-                                  text: quantity.toString(),
-                                  selection: TextSelection.collapsed(
-                                      offset: quantity.toString().length),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: isSmallScreen ? 12 : 14,
-                              ),
-                              onChanged: (value) {
-                                final newQuantity =
-                                    int.tryParse(value) ?? quantity;
-                                if (newQuantity > 0 &&
-                                    newQuantity <=
-                                        widget.product.productStock) {
-                                  setState(() {
-                                    quantity = newQuantity;
-                                    widget.onQuantityChanged?.call(quantity);
-                                  });
-                                } else {
-                                  // Handle invalid input or stock limit
-                                  debugPrint(
-                                      "Invalid quantity or exceeds stock limit");
-                                }
-                              },
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: increment,
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(30, 30),
-                              padding: EdgeInsets.zero,
-                              backgroundColor: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: const Iconify(
-                              Ic.outline_plus,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Gap(10),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.blueGrey[100],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Total :',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: isSmallScreen ? 12 : 14),
-                          ),
-                          const Spacer(),
-                          Text(
-                            formattedTotalHarga,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: isSmallScreen ? 12 : 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+    double totalHarga = widget.product.productSellPrice.toDouble() * quantity;
+    final formattedTotalHarga = formatter.format(totalHarga);
+    final formattedHargaProduk =
+        formatter.format(widget.product.productSellPrice.toDouble());
+
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: 0.18,
+        children: [
+          CustomSlidableAction(
+            onPressed: (_) => widget.onDelete?.call(),
+            backgroundColor: Colors.transparent,
+            autoClose: true,
+            padding: EdgeInsets.zero,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade400,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.white,
+                size: 28,
               ),
             ),
-          );
-        },
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: widget.onChange,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 1,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        File(widget.product.productImage ?? ''),
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Image.asset(
+                          'assets/products/no-image.png',
+                          width: 60,
+                          height: 60,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.product.productName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '1 ${widget.product.productUnit} × $formattedHargaProduk',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            formattedTotalHarga,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: greenColor,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: decrement,
+                            child: const Icon(
+                              Icons.remove,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 30,
+                            child: TextField(
+                              controller: _quantityController,
+                              focusNode: _quantityFocusNode,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(3),
+                              ],
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                                isDense: true,
+                              ),
+                              onSubmitted: (value) => _updateQuantityFromText(),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: increment,
+                            child: const Icon(
+                              Icons.add,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

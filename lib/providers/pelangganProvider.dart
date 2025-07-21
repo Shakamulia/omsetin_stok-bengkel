@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/mekanik.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
 
 class Pelangganprovider with ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
@@ -44,7 +44,8 @@ class Pelangganprovider with ChangeNotifier {
       }
 
       // Tampilkan data pelanggan di debugPrint
-      debugPrint('Data pelanggan: ${pelangganList.map((e) => e.toJson()).toList()}');
+      debugPrint(
+          'Data pelanggan: ${pelangganList.map((e) => e.toJson()).toList()}');
 
       return pelangganList;
     } catch (e) {
@@ -114,7 +115,7 @@ class Pelangganprovider with ChangeNotifier {
       debugPrint('Data sebelum insert: $dataToInsert');
 
       _isLoading = true;
-      
+
       notifyListeners();
 
       // Mapping data ke format kolom database

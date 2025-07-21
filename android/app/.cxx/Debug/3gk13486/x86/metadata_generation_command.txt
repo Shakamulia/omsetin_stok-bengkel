@@ -9,10 +9,10 @@
 -DCMAKE_ANDROID_NDK=C:\Android\sdk\ndk\25.1.8937393
 -DCMAKE_TOOLCHAIN_FILE=C:\Android\sdk\ndk\25.1.8937393\build\cmake\android.toolchain.cmake
 -DCMAKE_MAKE_PROGRAM=C:\Android\sdk\cmake\3.22.1\bin\ninja.exe
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\ADVAN WORKPRO\Documents\AERA\omsetin_bengkel\build\app\intermediates\cxx\Debug\3gk13486\obj\x86
--DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\Users\ADVAN WORKPRO\Documents\AERA\omsetin_bengkel\build\app\intermediates\cxx\Debug\3gk13486\obj\x86
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\ADVAN WORKPRO\Documents\AERA\omzetin_bengkel\build\app\intermediates\cxx\Debug\3gk13486\obj\x86
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\Users\ADVAN WORKPRO\Documents\AERA\omzetin_bengkel\build\app\intermediates\cxx\Debug\3gk13486\obj\x86
 -DCMAKE_BUILD_TYPE=Debug
--BC:\Users\ADVAN WORKPRO\Documents\AERA\omsetin_bengkel\android\app\.cxx\Debug\3gk13486\x86
+-BC:\Users\ADVAN WORKPRO\Documents\AERA\omzetin_bengkel\android\app\.cxx\Debug\3gk13486\x86
 -GNinja
 -Wno-dev
 --no-warn-unused-cli

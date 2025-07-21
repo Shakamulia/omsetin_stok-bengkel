@@ -9,27 +9,27 @@ import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi_light.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/code.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
-import 'package:omsetin_bengkel/providers/securityProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/bluetoothAlert.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/failedAlert.dart';
-import 'package:omsetin_bengkel/utils/formatters.dart';
-import 'package:omsetin_bengkel/utils/image.dart';
-import 'package:omsetin_bengkel/utils/null_data_alert.dart';
-import 'package:omsetin_bengkel/utils/printer_helper.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/utils/toast.dart';
-import 'package:omsetin_bengkel/view/page/product/select_category.dart';
-import 'package:omsetin_bengkel/view/page/qr_code_scanner.dart';
-import 'package:omsetin_bengkel/view/widget/add_category_modal.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/model/code.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/bluetoothAlert.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/failedAlert.dart';
+import 'package:omzetin_bengkel/utils/formatters.dart';
+import 'package:omzetin_bengkel/utils/image.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/printer_helper.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/utils/toast.dart';
+import 'package:omzetin_bengkel/view/page/product/select_category.dart';
+import 'package:omzetin_bengkel/view/page/qr_code_scanner.dart';
+import 'package:omzetin_bengkel/view/widget/add_category_modal.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -702,7 +702,7 @@ class _UpdateProductPageState extends State<UpdateProductPage> {
               toolbarHeight: kToolbarHeight + 20,
               title: Text(
                 image != null
-                    ? 'LIHAT Spare part ${widget.product!.productName}'
+                    ? 'Edit Spare part ${widget.product!.productName}'
                     : 'LIHAT Spare part ${widget.product!.productName}',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,

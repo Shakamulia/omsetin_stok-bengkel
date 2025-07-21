@@ -1,1 +1,1 @@
-C:\aeratek\lariskas\omsetin_bengkel\build\app\intermediates\cxx\Debug\226k656z\obj\x86
+C:\aeratek\lariskas\omzetin_bengkel\build\app\intermediates\cxx\Debug\226k656z\obj\x86

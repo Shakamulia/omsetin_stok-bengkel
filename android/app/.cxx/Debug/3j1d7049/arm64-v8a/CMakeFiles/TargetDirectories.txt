@@ -1,2 +1,2 @@
-F:/omsetin_bengkel-main/android/app/.cxx/Debug/3j1d7049/arm64-v8a/CMakeFiles/edit_cache.dir
-F:/omsetin_bengkel-main/android/app/.cxx/Debug/3j1d7049/arm64-v8a/CMakeFiles/rebuild_cache.dir
+F:/omzetin_bengkel-main/android/app/.cxx/Debug/3j1d7049/arm64-v8a/CMakeFiles/edit_cache.dir
+F:/omzetin_bengkel-main/android/app/.cxx/Debug/3j1d7049/arm64-v8a/CMakeFiles/rebuild_cache.dir

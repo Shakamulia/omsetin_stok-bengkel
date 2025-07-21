@@ -9,24 +9,24 @@ import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi_light.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/code.dart';
-import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/bluetoothAlert.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/failedAlert.dart';
-import 'package:omsetin_bengkel/utils/formatters.dart';
-import 'package:omsetin_bengkel/utils/image.dart';
-import 'package:omsetin_bengkel/utils/null_data_alert.dart';
-import 'package:omsetin_bengkel/utils/printer_helper.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/page/product/select_category.dart';
-import 'package:omsetin_bengkel/view/page/qr_code_scanner.dart';
-import 'package:omsetin_bengkel/view/widget/add_category_modal.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/model/code.dart';
+import 'package:omzetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/bluetoothAlert.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/failedAlert.dart';
+import 'package:omzetin_bengkel/utils/formatters.dart';
+import 'package:omzetin_bengkel/utils/image.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/printer_helper.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/page/product/select_category.dart';
+import 'package:omzetin_bengkel/view/page/qr_code_scanner.dart';
+import 'package:omzetin_bengkel/view/widget/add_category_modal.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -474,68 +474,6 @@ class _AddProductPageState extends State<AddProductPage> {
     }
   }
 
-//   void _createNewProduct() async {
-//   final productName = _productNameController.text;
-//   final productImage = image?.path ?? '';
-//   final productBarcode = _productBarcodeController.text;
-//   final productBarcodeType = _productBarcodeTypeController.text;
-//   final productStock = _productStockController.text;
-//   final productHargaBeli = _productHargaBeliController.text;
-//   final productHargaJual = _productHargaJualController.text;
-//   final productCategory = _productCategoryController.text;
-//   final productSold = _productSoldController.text;
-
-//   if (productName.isEmpty ||
-//       productStock.isEmpty ||
-//       productHargaBeli.isEmpty ||
-//       productHargaJual.isEmpty ||
-//       productCategory.isEmpty) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text("Semua field harus diisi!")),
-//     );
-//     return;
-//   }
-
-//   try {
-//     final stock = int.parse(productStock);
-//     final hargaBeli = int.parse(productHargaBeli.replaceAll('.', ''));
-//     final hargaJual = int.parse(productHargaJual.replaceAll('.', ''));
-//     final sold = int.parse(productSold);
-
-//     print("Product Name: $productName");
-//     print("Product Image: $productImage");
-//     print("Product Barcode: $productBarcode");
-//     print("Product Barcode Type: $productBarcodeType");
-//     print("Product Stock: $stock");
-//     print("Product Harga Beli: $hargaBeli");
-//     print("Product Harga Jual: $hargaJual");
-//     print("Product Category: $productCategory");
-
-//     _databaseService.addProducts(
-//       productName,
-//       productImage,
-//       productBarcode,
-//       productBarcodeType,
-//       stock,
-//       hargaBeli,
-//       hargaJual,
-//       sold,
-//       productCategory,
-//       DateTime.now().toIso8601String(),
-//     );
-
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text("Spare Part berhasil ditambahkan!")),
-//     );
-//     Navigator.pop(context);
-//   } catch (e) {
-//     print("Error: $e");
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text("Input tidak valid!")),
-//     );
-//   }
-// }
-
   Future<void> _createNewProduct() async {
     String productImage;
 
@@ -601,12 +539,6 @@ class _AddProductPageState extends State<AddProductPage> {
     }
   }
 
-  // productPurchasePrice: int.parse(_productHargaBeliController.text.replaceAll('.', '')),
-  // productSellPrice: int.parse(_productHargaJualController.text.replaceAll('.', '')),
-  // categoryId: selectedCategoryId, // Pastikan Anda memiliki ID kategori yang dipilih
-  // productImage: image?.path ?? '', // Pastikan Anda memiliki gambar Spare Part
-  // dateAdded: DateTime.now().toIso8601String(),
-
   @override
   Widget build(BuildContext context) {
     var bluetoothProvider = Provider.of<BluetoothProvider>(context);
@@ -639,7 +571,7 @@ class _AddProductPageState extends State<AddProductPage> {
               titleSpacing: 0,
               leading: const CustomBackButton(),
               title: Text(
-                'TAMBAH Spare Part',
+                'TAMBAH SPARE PART',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: SizeHelper.Fsize_normalTitle(context),
@@ -709,13 +641,6 @@ class _AddProductPageState extends State<AddProductPage> {
                                     ),
                                     onPressed: () {
                                       image = null;
-                                      // hanya variable image yang akan di kosongkan, tidak ada yang lain
-                                      // jawaban: tidak, setState hanya digunakan untuk mengubah UI, tidak untuk mengisi variable. Kalau ingin mengisi variable, maka kita perlu mengisi variable nya secara langsung seperti di atas ini.
-                                      // setState(() {
-                                      //   image = null;
-                                      //   _imageController.text = '';
-                                      // });
-
                                       setState(() {});
                                     },
                                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/mekanik.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
 
 class MekanikProvider with ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
@@ -52,18 +52,13 @@ class MekanikProvider with ChangeNotifier {
 
       // Mapping data ke format kolom database
       final mekanik = {
-        'namaMekanik':
-            mekanikData['namaMekanik'] ?? mekanikData['namaMekanik'],
+        'namaMekanik': mekanikData['namaMekanik'] ?? mekanikData['namaMekanik'],
         'profileImage':
             mekanikData['profileImage'] ?? mekanikData['profileImage'],
-        'spesialis':
-            mekanikData['spesialis'] ?? mekanikData['spesialis'],
-        'noHandphone':
-            mekanikData['noHandphone'] ?? mekanikData['noHandphone'],
-        'gender':
-            mekanikData['gender'] ?? mekanikData['gender'],
-        'alamat':
-            mekanikData['alamat'] ?? mekanikData['alamat'],
+        'spesialis': mekanikData['spesialis'] ?? mekanikData['spesialis'],
+        'noHandphone': mekanikData['noHandphone'] ?? mekanikData['noHandphone'],
+        'gender': mekanikData['gender'] ?? mekanikData['gender'],
+        'alamat': mekanikData['alamat'] ?? mekanikData['alamat'],
       };
 
       await _databaseService.addMekanik(mekanik);
@@ -95,18 +90,13 @@ class MekanikProvider with ChangeNotifier {
 
       // Mapping data ke format kolom database
       final mekanik = {
-        'namaMekanik':
-            mekanikData['namaMekanik'] ?? mekanikData['namaMekanik'],
+        'namaMekanik': mekanikData['namaMekanik'] ?? mekanikData['namaMekanik'],
         'profileImage':
             mekanikData['profileImage'] ?? mekanikData['profileImage'],
-        'spesialis':
-            mekanikData['spesialis'] ?? mekanikData['spesialis'],
-        'noHandphone':
-            mekanikData['noHandphone'] ?? mekanikData['noHandphone'],
-        'gender':
-            mekanikData['gender'] ?? mekanikData['gender'],
-        'alamat':
-            mekanikData['alamat'] ?? mekanikData['alamat'],
+        'spesialis': mekanikData['spesialis'] ?? mekanikData['spesialis'],
+        'noHandphone': mekanikData['noHandphone'] ?? mekanikData['noHandphone'],
+        'gender': mekanikData['gender'] ?? mekanikData['gender'],
+        'alamat': mekanikData['alamat'] ?? mekanikData['alamat'],
       };
 
       await _databaseService.updateMekanik(id, mekanik);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
 
 class SelectServicePage extends StatefulWidget {
   final List<Service> selectedServices;

@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/mekanik.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/providers/cashierProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/alert.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/confirmation_transaction.dart';
-import 'package:omsetin_bengkel/view/widget/modals.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/providers/cashierProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/alert.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/confirmation_transaction.dart';
+import 'package:omzetin_bengkel/view/widget/modals.dart';
 import 'package:provider/provider.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -238,42 +238,48 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCustomerAndEmployeeSection(),
-                Expanded(
-                  child: ListView(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildCustomerAndEmployeeSection(),
+                    if (widget.selectedProducts.isNotEmpty) ...[
+                      _buildSectionHeader("Produk"),
+                      ...widget.selectedProducts.map(_buildProductItem),
+                    ],
+                    if (widget.selectedServices.isNotEmpty) ...[
+                      _buildSectionHeader("Layanan"),
+                      ...widget.selectedServices.map(_buildServiceItem),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildSubtotalCard(currencyFormat),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Container(
+                  color: bgColor,
+                  child: Column(
                     children: [
-                      if (widget.selectedProducts.isNotEmpty) ...[
-                        _buildSectionHeader("Produk"),
-                        ...widget.selectedProducts.map(_buildProductItem),
-                      ],
-                      if (widget.selectedServices.isNotEmpty) ...[
-                        _buildSectionHeader("Layanan"),
-                        ...widget.selectedServices.map(_buildServiceItem),
-                      ],
-                      const SizedBox(height: 12),
-                      _buildSubtotalCard(currencyFormat),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                       _buildPaymentMethodSection(),
-                      const SizedBox(height: 16),
+                      // const SizedBox(height: 8),
                       _buildDiscountSection(),
-                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Container(
+                  color: bgColor,
+                  child: _buildBottomPaymentButton(
+                      currencyFormat, cashierProvider)),
+            ],
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildBottomPaymentButton(currencyFormat, cashierProvider),
-          ),
+          // Fixe
         ],
       ),
     );
@@ -284,37 +290,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
       children: [
         if (widget.selectedCustomer != null)
           Card(
-            margin: const EdgeInsets.only(bottom: 8),
+            color: Colors.white,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
-              leading: CircleAvatar(
-                backgroundImage: widget.selectedCustomer!.profileImage != null
-                    ? FileImage(File(widget.selectedCustomer!.profileImage!))
-                    : null,
-                child: widget.selectedCustomer!.profileImage == null
-                    ? Text(widget.selectedCustomer!.namaPelanggan[0])
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[200], // Fallback color
+                  image: widget.selectedCustomer!.profileImage != null
+                      ? _buildImageDecoration(widget.selectedCustomer!)
+                      : null,
+                ),
+                child: widget.selectedCustomer == null ||
+                        widget.selectedCustomer!.profileImage == null ||
+                        widget.selectedCustomer!.profileImage!.isEmpty
+                    ? Text(
+                        widget.selectedCustomer?.namaPelanggan[0] ?? 'E',
+                        style: TextStyle(color: Colors.grey[600]),
+                      )
                     : null,
               ),
               title: Text(widget.selectedCustomer!.namaPelanggan),
               subtitle: Text(widget.selectedCustomer!.noHandphone),
             ),
           ),
-        if (widget.selectedEmployee != null)
+        if (widget.selectedCustomer != null)
           Card(
-            margin: const EdgeInsets.only(bottom: 8),
+            color: Colors.white,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
-              leading: CircleAvatar(
-                backgroundImage: widget.selectedEmployee!.profileImage !=
-                            null &&
-                        widget.selectedEmployee!.profileImage!.isNotEmpty
-                    ? FileImage(File(widget.selectedEmployee!.profileImage!))
-                    : null,
-                child: widget.selectedEmployee!.profileImage == null ||
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[200], // Warna fallback
+                  image: widget.selectedEmployee != null
+                      ? _buildImageDecoration(widget.selectedEmployee!)
+                      : null,
+                ),
+                child: widget.selectedEmployee == null ||
+                        widget.selectedEmployee!.profileImage == null ||
                         widget.selectedEmployee!.profileImage!.isEmpty
-                    ? Text(widget.selectedEmployee!.namaMekanik[0])
+                    ? Text(
+                        widget.selectedEmployee?.namaMekanik[0] ?? 'E',
+                        style: TextStyle(color: Colors.grey[600]),
+                      )
                     : null,
               ),
-              title: Text(widget.selectedEmployee!.namaMekanik),
-              subtitle: Text(widget.selectedEmployee!.spesialis),
+              title: Text(widget.selectedEmployee?.namaMekanik ??
+                  'Belum ada pegawai dipilih'),
+              subtitle: Text(widget.selectedEmployee?.spesialis ??
+                  'Tap untuk memilih pegawai'),
             ),
           ),
       ],
@@ -323,7 +352,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
         style: GoogleFonts.poppins(
@@ -335,13 +364,51 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
+  DecorationImage? _buildImageDecoration(dynamic data) {
+    try {
+      String? imagePath;
+
+      if (data is Pelanggan) {
+        imagePath = data.profileImage;
+      } else if (data is Mekanik) {
+        imagePath = data.profileImage;
+      } else {
+        return null;
+      }
+
+      if (imagePath == null || imagePath.isEmpty) return null;
+
+      if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+        return DecorationImage(
+          image: NetworkImage(imagePath),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      } else if (imagePath.startsWith('assets/')) {
+        return DecorationImage(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      } else {
+        return DecorationImage(
+          image: FileImage(File(imagePath)),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) => null,
+        );
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   Widget _buildProductItem(Product product) {
     final quantity = widget.productQuantities[product.productId] ?? 1;
     return Container(
       padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -350,8 +417,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]),
             child: product.productImage.isNotEmpty
                 ? Image.file(
                     File(product.productImage),
@@ -379,7 +453,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 Text(
                   "SubTotal ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(product.productSellPrice * quantity)}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.green),
                 ),
               ],
             ),
@@ -402,22 +477,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final quantity = widget.serviceQuantities[service.serviceId] ?? 1;
     return Container(
       padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ]),
       child: Row(
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.blue.withOpacity(0.1),
-            ),
-            child: const Icon(Icons.medical_services, color: Colors.blue),
-          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -432,8 +505,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   style: TextStyle(color: Colors.grey),
                 ),
                 Text(
-                  "SubTotal ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(service.servicePrice * quantity)}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  "Total ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0).format(service.servicePrice * quantity)}",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.green),
                 ),
               ],
             ),
@@ -446,6 +520,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget _buildSubtotalCard(NumberFormat currencyFormat) {
     return Container(
       padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: greenColor,
         borderRadius: BorderRadius.circular(8),

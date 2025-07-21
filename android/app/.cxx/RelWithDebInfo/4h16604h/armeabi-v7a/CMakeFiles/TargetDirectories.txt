@@ -1,0 +1,2 @@
+C:/Penyimpanan Utama/Documents/_Works/omsetin_stok-bengkel/android/app/.cxx/RelWithDebInfo/4h16604h/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Penyimpanan Utama/Documents/_Works/omsetin_stok-bengkel/android/app/.cxx/RelWithDebInfo/4h16604h/armeabi-v7a/CMakeFiles/rebuild_cache.dir

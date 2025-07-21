@@ -1,4 +1,4 @@
-package com.example.omsetin_bengkel
+package com.example.omzetin_bengkel
 
 import io.flutter.embedding.android.FlutterActivity
 

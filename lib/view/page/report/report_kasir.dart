@@ -3,17 +3,17 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/report_cashier.dart';
-import 'package:omsetin_bengkel/model/transaction.dart';
-import 'package:omsetin_bengkel/providers/cashierProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/floating_button.dart';
-import 'package:omsetin_bengkel/view/widget/modals.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/model/report_cashier.dart';
+import 'package:omzetin_bengkel/model/transaction.dart';
+import 'package:omzetin_bengkel/providers/cashierProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/floating_button.dart';
+import 'package:omzetin_bengkel/view/widget/modals.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
 import 'package:provider/provider.dart';
 
 class ReportKasir extends StatefulWidget {
@@ -27,181 +27,293 @@ class _ReportKasirState extends State<ReportKasir> {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
 
+  Future<List<TransactionData>> fetchTransactions(String cashierName) async {
+    try {
+      return await DatabaseService.instance
+          .getTransactionsByCashierAndStatus(cashierName);
+    } catch (e) {
+      print('Error fetching transactions: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header Section
-            Container(
-              padding: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [secondaryColor, primaryColor],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(20),
-                ),
+      body: Column(
+        children: [
+          // Header Section
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [secondaryColor, primaryColor],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppBar(
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_rounded,
-                          color: Colors.white, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    centerTitle: true,
-                    title: Text(
-                      "LAPORAN KASIR",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: SizeHelper.Fsize_normalTitle(context),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: DateRangePickerButton(
-                      initialStartDate: startDate,
-                      initialEndDate: endDate,
-                      onDateRangeChanged: (startDate, endDate) {
-                        setState(() {
-                          this.startDate = startDate;
-                          this.endDate = endDate;
-                        });
-                      },
-                    ),
-                  ),
-                ],
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(20),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
+            child: Column(
+              children: [
+                // AppBar with back button and title
+                AppBar(
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_rounded,
+                        color: Colors.white, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  centerTitle: true,
+                  title: Text(
+                    "LAPORAN KASIR",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: SizeHelper.Fsize_normalTitle(context),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                // Date Picker
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: DateRangePickerButton(
+                    initialStartDate: startDate,
+                    initialEndDate: endDate,
+                    onDateRangeChanged: (startDate, endDate) {
+                      setState(() {
+                        this.startDate = startDate;
+                        this.endDate = endDate;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-            // Main Content
-            Expanded(
-              child: CustomRefreshWidget(
-                child: FutureBuilder<List<ReportCashierData>>(
-                  future: _fetchReportData(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(
-                        child: NotFoundPage(
-                          title: 'Tidak ada data kasir yang ditemukan',
-                        ),
-                      );
+          // Main Content
+          Expanded(
+            child: CustomRefreshWidget(
+              child: FutureBuilder<List<ReportCashierData>>(
+                future: Provider.of<CashierProvider>(context, listen: false)
+                    .fetchCashiers()
+                    .then((cashiers) async {
+                  List<ReportCashierData> reportDataList = [];
+                  for (var cashierName in cashiers) {
+                    final transactions = await fetchTransactions(cashierName);
+                    final filteredTransactions = transactions.where((t) {
+                      try {
+                        String dateStr = t.transactionDate.split(', ')[1];
+                        DateTime transactionDate =
+                            DateFormat("dd/MM/yyyy HH:mm")
+                                .parse(dateStr)
+                                .toLocal();
+                        DateTime startDateLocal = DateTime(startDate.year,
+                                startDate.month, startDate.day, 0, 0, 0)
+                            .toLocal();
+                        DateTime endDateLocal = DateTime(endDate.year,
+                                endDate.month, endDate.day, 23, 59, 59)
+                            .toLocal();
+
+                        return (transactionDate.isAfter(startDateLocal) ||
+                                transactionDate
+                                    .isAtSameMomentAs(startDateLocal)) &&
+                            (transactionDate.isBefore(endDateLocal) ||
+                                transactionDate.isAtSameMomentAs(endDateLocal));
+                      } catch (e) {
+                        print(
+                            "Error parsing date: ${t.transactionDate}, Error: $e");
+                        return false;
+                      }
+                    }).toList();
+
+                    if (filteredTransactions.isNotEmpty) {
+                      final selesaiCount = filteredTransactions
+                          .where((t) => t.transactionStatus == 'Selesai')
+                          .length;
+                      final prosesCount = filteredTransactions
+                          .where((t) => t.transactionStatus == 'Belum Lunas')
+                          .length;
+                      final pendingCount = filteredTransactions
+                          .where((t) => t.transactionStatus == 'Belum Dibayar')
+                          .length;
+                      final batalCount = filteredTransactions
+                          .where((t) => t.transactionStatus == 'Dibatalkan')
+                          .length;
+
+                      reportDataList.add(ReportCashierData(
+                        cashierId: 0,
+                        cashierName: cashierName,
+                        selesai: selesaiCount,
+                        proses: prosesCount,
+                        pending: pendingCount,
+                        batal: batalCount,
+                        cashierTotalTransactionMoney: filteredTransactions.fold(
+                            0, (sum, t) => sum! + t.transactionTotal),
+                        cashierTotalTransaction: filteredTransactions.length,
+                        transactionProfit: filteredTransactions.fold(
+                            0, (sum, t) => sum + t.transactionProfit),
+                      ));
                     }
-                    return _buildReportList(snapshot.data!);
-                  },
-                ),
-              ),
-            ),
+                  }
+                  return reportDataList;
+                }),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: NotFoundPage(
+                        title: 'Tidak ada data kasir yang ditemukan',
+                      ),
+                    );
+                  } else {
+                    return Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: ListView.separated(
+                            itemCount: snapshot.data!.length,
+                            separatorBuilder: (context, index) => const Gap(12),
+                            itemBuilder: (context, index) {
+                              final data = snapshot.data![index];
+                              return CashierReportCard(
+                                cashierData: data,
+                              );
+                            },
+                          ),
+                        ),
+                        ExpensiveFloatingButton(
+                          bottom: 20,
+                          left: 20,
+                          right: 20,
+                          text: 'Export',
+                          onPressed: () async {
+                            final reportDataList =
+                                await Provider.of<CashierProvider>(context,
+                                        listen: false)
+                                    .fetchCashiers()
+                                    .then((cashiers) async {
+                              List<ReportCashierData> reportDataList = [];
+                              for (var cashierName in cashiers) {
+                                final transactions =
+                                    await fetchTransactions(cashierName);
+                                final filteredTransactions =
+                                    transactions.where((t) {
+                                  try {
+                                    String dateStr =
+                                        t.transactionDate.split(', ')[1];
+                                    DateTime transactionDate =
+                                        DateFormat("dd/MM/yyyy HH:mm")
+                                            .parse(dateStr)
+                                            .toLocal();
+                                    DateTime startDateLocal = DateTime(
+                                            startDate.year,
+                                            startDate.month,
+                                            startDate.day,
+                                            0,
+                                            0,
+                                            0)
+                                        .toLocal();
+                                    DateTime endDateLocal = DateTime(
+                                            endDate.year,
+                                            endDate.month,
+                                            endDate.day,
+                                            23,
+                                            59,
+                                            59)
+                                        .toLocal();
 
-            // Export Button
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom,
-                left: 16,
-                right: 16,
-              ),
-              child: ExpensiveFloatingButton(
-                text: 'Export',
-                onPressed: () => _exportReportData(context),
+                                    return (transactionDate
+                                                .isAfter(startDateLocal) ||
+                                            transactionDate.isAtSameMomentAs(
+                                                startDateLocal)) &&
+                                        (transactionDate
+                                                .isBefore(endDateLocal) ||
+                                            transactionDate.isAtSameMomentAs(
+                                                endDateLocal));
+                                  } catch (e) {
+                                    print(
+                                        "Error parsing date: ${t.transactionDate}, Error: $e");
+                                    return false;
+                                  }
+                                }).toList();
+
+                                if (filteredTransactions.isNotEmpty) {
+                                  final selesaiCount = filteredTransactions
+                                      .where((t) =>
+                                          t.transactionStatus == 'Selesai')
+                                      .length;
+                                  final prosesCount = filteredTransactions
+                                      .where((t) =>
+                                          t.transactionStatus == 'Belum Lunas')
+                                      .length;
+                                  final pendingCount = filteredTransactions
+                                      .where((t) =>
+                                          t.transactionStatus ==
+                                          'Belum Dibayar')
+                                      .length;
+                                  final batalCount = filteredTransactions
+                                      .where((t) =>
+                                          t.transactionStatus == 'Dibatalkan')
+                                      .length;
+
+                                  reportDataList.add(ReportCashierData(
+                                    cashierId:
+                                        cashiers.indexOf(cashierName) + 1,
+                                    cashierName: cashierName,
+                                    selesai: selesaiCount,
+                                    proses: prosesCount,
+                                    pending: pendingCount,
+                                    batal: batalCount,
+                                    cashierTotalTransactionMoney:
+                                        filteredTransactions.fold(
+                                            0,
+                                            (sum, t) =>
+                                                sum! + t.transactionTotal),
+                                    cashierTotalTransaction:
+                                        filteredTransactions.length,
+                                    transactionProfit:
+                                        filteredTransactions.fold(
+                                            0,
+                                            (sum, t) =>
+                                                sum + t.transactionProfit),
+                                    transactionDateRange:
+                                        '${DateFormat("dd/MM/yyyy").format(startDate.toLocal())} - ${DateFormat("dd/MM/yyyy").format(endDate.toLocal())}',
+                                  ));
+                                }
+                              }
+                              return reportDataList;
+                            });
+
+                            CustomModals.modalExportCashierDataExcel(
+                                context, reportDataList);
+                          },
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Export Button
+        ],
       ),
     );
-  }
-
-  Future<List<ReportCashierData>> _fetchReportData() async {
-    final cashiers = await Provider.of<CashierProvider>(context, listen: false)
-        .fetchCashiers();
-
-    List<ReportCashierData> reportDataList = [];
-
-    for (var cashierName in cashiers) {
-      final transactions = await DatabaseService.instance
-          .getTransactionsByCashierAndStatus(cashierName);
-
-      final filteredTransactions = transactions.where((t) {
-        try {
-          final dateStr = t.transactionDate.split(', ')[1];
-          final transactionDate =
-              DateFormat("dd/MM/yyyy HH:mm").parse(dateStr).toLocal();
-          final startDateLocal =
-              DateTime(startDate.year, startDate.month, startDate.day);
-          final endDateLocal =
-              DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
-
-          return transactionDate.isAfter(startDateLocal) &&
-              transactionDate.isBefore(endDateLocal);
-        } catch (e) {
-          print("Error parsing date: ${t.transactionDate}, Error: $e");
-          return false;
-        }
-      }).toList();
-
-      if (filteredTransactions.isNotEmpty) {
-        reportDataList
-            .add(_createReportData(cashierName, filteredTransactions));
-      }
-    }
-
-    return reportDataList;
-  }
-
-  ReportCashierData _createReportData(
-      String cashierName, List<TransactionData> transactions) {
-    return ReportCashierData(
-      cashierId: 0,
-      cashierName: cashierName,
-      selesai:
-          transactions.where((t) => t.transactionStatus == 'Selesai').length,
-      proses: transactions
-          .where((t) => t.transactionStatus == 'Belum Lunas')
-          .length,
-      pending: transactions
-          .where((t) => t.transactionStatus == 'Belum Dibayar')
-          .length,
-      batal:
-          transactions.where((t) => t.transactionStatus == 'Dibatalkan').length,
-      cashierTotalTransactionMoney:
-          transactions.fold(0, (sum, t) => sum! + t.transactionTotal),
-      cashierTotalTransaction: transactions.length,
-      transactionProfit:
-          transactions.fold(0, (sum, t) => sum + t.transactionProfit),
-    );
-  }
-
-  Widget _buildReportList(List<ReportCashierData> data) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: data.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: CashierReportCard(cashierData: data[index]),
-        );
-      },
-    );
-  }
-
-  Future<void> _exportReportData(BuildContext context) async {
-    final reportDataList = await _fetchReportData();
-    CustomModals.modalExportCashierDataExcel(context, reportDataList);
   }
 }
 
@@ -213,9 +325,6 @@ class CashierReportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.35,
-      ),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -229,7 +338,6 @@ class CashierReportCard extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Cashier Name
@@ -251,23 +359,21 @@ class CashierReportCard extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
-                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // Status Grid
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
-            childAspectRatio: 3.5, // Increased aspect ratio
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-            padding: EdgeInsets.zero,
+            childAspectRatio: 3,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
             children: [
               _StatusItem(
                 title: 'Selesai',
@@ -291,53 +397,55 @@ class CashierReportCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // Total Transactions
-          _buildSummaryRow(
-            'Total Transaksi:',
-            '${cashierData.cashierTotalTransaction ?? 0}',
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Transaksi:',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '${cashierData.cashierTotalTransaction ?? 0}',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
           // Total Amount
-          _buildSummaryRow(
-            'Total Nilai:',
-            NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0)
-                .format(cashierData.cashierTotalTransactionMoney ?? 0),
-            isAmount: true,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Nilai:',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                NumberFormat.currency(
+                        locale: 'id', symbol: 'Rp ', decimalDigits: 0)
+                    .format(cashierData.cashierTotalTransactionMoney ?? 0),
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+            ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSummaryRow(String label, String value, {bool isAmount = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          child: Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        Flexible(
-          child: Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: isAmount ? primaryColor : null,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -356,10 +464,11 @@ class _StatusItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Row(
         children: [
@@ -378,18 +487,15 @@ class _StatusItem extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: color,
               ),
-              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Text(
             '$count',
             style: GoogleFonts.poppins(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: color,
             ),
           ),
         ],
@@ -407,61 +513,106 @@ class DateRangePickerButton extends StatelessWidget {
     required this.initialStartDate,
     required this.initialEndDate,
     required this.onDateRangeChanged,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(8),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // Date display
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
-                  "${DateFormat('dd MMM').format(initialStartDate)} - ${DateFormat('dd MMM yyyy').format(initialEndDate)}",
+                  "${DateFormat('dd MMM yyyy').format(initialStartDate)} - ${DateFormat('dd MMM yyyy').format(initialEndDate)}",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
-                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
+          // Date picker button
           SizedBox(
-            height: 40,
+            height: 48,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                elevation: 2,
               ),
-              onPressed: () => _showDatePicker(context),
+              onPressed: () async {
+                final DateTimeRange? picked = await showDateRangePicker(
+                  context: context,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  initialDateRange: DateTimeRange(
+                    start: initialStartDate,
+                    end: initialEndDate,
+                  ),
+                  builder: (context, child) {
+                    return Dialog(
+                      insetPadding: const EdgeInsets.all(20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width - 40,
+                          maxHeight: MediaQuery.of(context).size.height * 0.7,
+                        ),
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                              primary: primaryColor,
+                              onPrimary: Colors.white,
+                              surface: Colors.white,
+                              onSurface: Colors.black,
+                            ),
+                            dialogBackgroundColor: Colors.white,
+                          ),
+                          child: child!,
+                        ),
+                      ),
+                    );
+                  },
+                );
+                if (picked != null) {
+                  onDateRangeChanged(picked.start, picked.end);
+                }
+              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.calendar_today, size: 16, color: primaryColor),
-                  const SizedBox(width: 4),
+                  Icon(Icons.calendar_today, size: 18, color: primaryColor),
+                  const SizedBox(width: 8),
                   Text(
-                    "Pilih",
+                    "Pilih Tanggal",
                     style: GoogleFonts.poppins(
                       color: primaryColor,
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -472,46 +623,5 @@ class DateRangePickerButton extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _showDatePicker(BuildContext context) async {
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      initialDateRange: DateTimeRange(
-        start: initialStartDate,
-        end: initialEndDate,
-      ),
-      builder: (context, child) {
-        return Dialog(
-          insetPadding: const EdgeInsets.all(20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width - 40,
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
-            ),
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: primaryColor,
-                  onPrimary: Colors.white,
-                  surface: Colors.white,
-                  onSurface: Colors.black,
-                ),
-              ),
-              child: child!,
-            ),
-          ),
-        );
-      },
-    );
-
-    if (picked != null) {
-      onDateRangeChanged(picked.start, picked.end);
-    }
   }
 }

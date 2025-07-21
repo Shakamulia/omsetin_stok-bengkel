@@ -1,35 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/providers/pelangganProvider.dart';
-import 'package:omsetin_bengkel/providers/securityProvider.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/page/pelanggan/add_pelanggan.dart';
-import 'package:omsetin_bengkel/view/page/pelanggan/update_pelanggan.dart';
-import 'package:omsetin_bengkel/view/widget/confirm_delete_dialog.dart';
-import 'package:omsetin_bengkel/view/widget/pinModal.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/page/pelanggan/add_pelanggan.dart';
+import 'package:omzetin_bengkel/view/page/pelanggan/update_pelanggan.dart';
+import 'package:omzetin_bengkel/view/widget/confirm_delete_dialog.dart';
+import 'package:omzetin_bengkel/view/widget/pinModal.dart';
 import 'package:provider/provider.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
-class CardPelanggan extends StatelessWidget {
+class CardPelanggan extends StatefulWidget {
   final Pelanggan pelanggan;
   final VoidCallback onDeleted;
 
   const CardPelanggan({
+    super.key,
     required this.pelanggan,
     required this.onDeleted,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
+  State<CardPelanggan> createState() => _CardPelangganState();
+}
+
+class _CardPelangganState extends State<CardPelanggan> {
+  @override
   Widget build(BuildContext context) {
+    final securityProvider =
+        Provider.of<SecurityProvider>(context, listen: false);
+    final imageDecoration = _buildImageDecoration();
+
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.45,
       child: ZoomTapAnimation(
         onTap: () {
-          final securityProvider = Provider.of<SecurityProvider>(context, listen: false);
           if (securityProvider.kunciUpdatePelanggan) {
             showPinModalWithAnimation(
               context,
@@ -37,7 +45,8 @@ class CardPelanggan extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddPelangganPage(pelanggan: pelanggan,),
+                    builder: (context) =>
+                        AddPelangganPage(pelanggan: widget.pelanggan),
                   ),
                 );
               }),
@@ -46,7 +55,8 @@ class CardPelanggan extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AddPelangganPage(pelanggan: pelanggan,),
+                builder: (context) =>
+                    AddPelangganPage(pelanggan: widget.pelanggan),
               ),
             );
           }
@@ -69,9 +79,12 @@ class CardPelanggan extends StatelessWidget {
                     height: 60,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.green,
-                      image: _buildImageDecoration(),
+                      color: const Color.fromARGB(255, 221, 227, 224),
+                      image: imageDecoration,
                     ),
+                    child: imageDecoration == null
+                        ? Icon(Icons.person, size: 40, color: Colors.blueGrey)
+                        : null,
                   ),
                 ),
                 Gap(12),
@@ -80,10 +93,9 @@ class CardPelanggan extends StatelessWidget {
                     Expanded(
                       child: Center(
                         child: Text(
-                          pelanggan.namaPelanggan,
+                          widget.pelanggan.namaPelanggan,
                           style: TextStyle(
-                              fontSize: 16, 
-                              fontWeight: FontWeight.bold),
+                              fontSize: 16, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -96,11 +108,11 @@ class CardPelanggan extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.work, size: 14, color: primaryColor),
+                    Icon(Icons.phone, size: 14, color: primaryColor),
                     SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        pelanggan.noHandphone,
+                        widget.pelanggan.noHandphone,
                         style: TextStyle(fontSize: 15, color: Colors.grey),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -109,49 +121,45 @@ class CardPelanggan extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 12),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Builder(
-                      builder: (context) {
-                        final securityProvider = Provider.of<SecurityProvider>(context, listen: false);
-                        return GestureDetector(
-                          onTap: () {
-                            if (securityProvider.kunciDeletePelanggan) {
-                              showPinModalWithAnimation(
-                                context,
-                                pinModal: PinModal(onTap: () {
-                                  _showDeleteDialog(context);
-                                }),
-                              );
-                            } else {
-                              _showDeleteDialog(context);
-                            }
-                          },
-                          child: 
-                          securityProvider.kunciDeletePelanggan
-                          ? SizedBox.shrink()
-                          : Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              "Hapus",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                if (widget.pelanggan.namaPelanggan != "Owner")
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (securityProvider.kunciDeletePelanggan) {
+                            showPinModalWithAnimation(
+                              context,
+                              pinModal: PinModal(onTap: () {
+                                _showDeleteDialog(context);
+                              }),
+                            );
+                          } else {
+                            _showDeleteDialog(context);
+                          }
+                        },
+                        child: securityProvider.kunciDeletePelanggan
+                            ? SizedBox.shrink()
+                            : Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  "Hapus",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -162,19 +170,21 @@ class CardPelanggan extends StatelessWidget {
 
   DecorationImage? _buildImageDecoration() {
     try {
-      if (pelanggan.profileImage == null || pelanggan.profileImage!.isEmpty)
+      if (widget.pelanggan.profileImage == null ||
+          widget.pelanggan.profileImage!.isEmpty) {
         return null;
+      }
 
-      if (pelanggan.profileImage!.startsWith('http') ||
-          pelanggan.profileImage!.startsWith('https')) {
+      if (widget.pelanggan.profileImage!.startsWith('http') ||
+          widget.pelanggan.profileImage!.startsWith('https')) {
         return DecorationImage(
-          image: NetworkImage(pelanggan.profileImage!),
+          image: NetworkImage(widget.pelanggan.profileImage!),
           fit: BoxFit.cover,
           onError: (exception, stackTrace) => null,
         );
       } else {
         return DecorationImage(
-          image: AssetImage(pelanggan.profileImage!),
+          image: AssetImage(widget.pelanggan.profileImage!),
           fit: BoxFit.cover,
           onError: (exception, stackTrace) => null,
         );
@@ -188,13 +198,13 @@ class CardPelanggan extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => ConfirmDeleteDialog(
-        message: 'Yakin ingin menghapus pegawai ${pelanggan.namaPelanggan}?',
+        message:
+            'Yakin ingin menghapus Pelanggan ${widget.pelanggan.namaPelanggan}?',
         onConfirm: () async {
-          final navigator = Navigator.of(context);
           await Provider.of<Pelangganprovider>(context, listen: false)
-              .deletePelanggan(pelanggan.id!);
-          onDeleted();
-          navigator.pop();
+              .deletePelanggan(widget.pelanggan.id!);
+          widget.onDeleted();
+          Navigator.of(context).pop();
           showSuccessAlert(context, 'Pelanggan berhasil dihapus');
         },
       ),

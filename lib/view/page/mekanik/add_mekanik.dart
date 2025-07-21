@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:omsetin_bengkel/model/mekanik.dart';
-import 'package:omsetin_bengkel/providers/mekanikProvider.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/custom_textfield.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
+import 'package:omzetin_bengkel/providers/mekanikProvider.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/null_data_alert.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:provider/provider.dart';
-import 'package:omsetin_bengkel/model/cashierImageProfile.dart'; // Make sure this import is correct
+import 'package:omzetin_bengkel/model/cashierImageProfile.dart'; // Make sure this import is correct
 
 class AddPegawaiPage extends StatefulWidget {
   final Mekanik? pegawai;
@@ -117,34 +118,34 @@ class _AddPegawaiPageState extends State<AddPegawaiPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Pilih dari Gallery'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  try {
-                    final XFile? pickedFile = await _picker.pickImage(
-                      source: ImageSource.gallery,
-                      maxWidth: 800,
-                      maxHeight: 800,
-                      imageQuality: 85,
-                    );
-                    if (pickedFile != null) {
-                      setState(() {
-                        _imageFile = File(pickedFile.path);
-                        _selectedImagePath = pickedFile.path; // Store file path
-                      });
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Gagal memilih gambar: ${e.toString()}'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
+              // ListTile(
+              //   leading: Icon(Icons.photo_library),
+              //   title: Text('Pilih dari Gallery'),
+              //   onTap: () async {
+              //     Navigator.pop(context);
+              //     try {
+              //       final XFile? pickedFile = await _picker.pickImage(
+              //         source: ImageSource.gallery,
+              //         maxWidth: 800,
+              //         maxHeight: 800,
+              //         imageQuality: 85,
+              //       );
+              //       if (pickedFile != null) {
+              //         setState(() {
+              //           _imageFile = File(pickedFile.path);
+              //           _selectedImagePath = pickedFile.path; // Store file path
+              //         });
+              //       }
+              //     } catch (e) {
+              //       ScaffoldMessenger.of(context).showSnackBar(
+              //         SnackBar(
+              //           content: Text('Gagal memilih gambar: ${e.toString()}'),
+              //           backgroundColor: Colors.red,
+              //         ),
+              //       );
+              //     }
+              //   },
+              // ),
               ListTile(
                 leading: Icon(Icons.face),
                 title: Text('Pilih Profil Bawaan'),
@@ -162,6 +163,28 @@ class _AddPegawaiPageState extends State<AddPegawaiPage> {
 
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_nameController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Nama Tidak Boleh Kosong');
+      return;
+    }
+    if (_spesialisController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Spesialis Tidak Boleh Kosong');
+      return;
+    }
+    if (_gender.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Gender Tidak Boleh Kosong');
+      return;
+    }
+    // Validate email is not empty
+    if (_noHpController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Nomor Handphone Tidak Boleh Kosong');
+      return;
+    }
+    if (_alamatController.text.trim().isEmpty) {
+      showNullDataAlert(context, message: 'Alamat Tidak Boleh Kosong');
       return;
     }
 
@@ -217,7 +240,9 @@ class _AddPegawaiPageState extends State<AddPegawaiPage> {
 
   Widget _buildProfileImage() {
     return GestureDetector(
-      onTap: _pickImage,
+      onTap: () {
+        _selectProfileImage();
+      },
       child: Container(
         width: 70,
         height: 70,

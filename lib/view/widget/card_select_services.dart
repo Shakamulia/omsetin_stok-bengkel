@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
 
 class CardSelectService extends StatelessWidget {
   final int servicePrice;
@@ -33,15 +33,6 @@ class CardSelectService extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.medical_services, color: Colors.grey),
-              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

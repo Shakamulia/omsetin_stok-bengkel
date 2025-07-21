@@ -24,7 +24,7 @@
   ],
   "kind": "codemodel",
   "paths": {
-    "build": "C:/aeratek/lariskas/omsetin_bengkel/android/app/.cxx/RelWithDebInfo/1v6t262c/x86",
+    "build": "C:/aeratek/lariskas/omzetin_bengkel/android/app/.cxx/RelWithDebInfo/1v6t262c/x86",
     "source": "C:/flutter/packages/flutter_tools/gradle/src/main/groovy"
   },
   "version": {

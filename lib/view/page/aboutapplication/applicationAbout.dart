@@ -3,13 +3,13 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/providers/appVersionProvider.dart';
-import 'package:omsetin_bengkel/services/database_service.dart';
-import 'package:omsetin_bengkel/services/db.copy.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/providers/appVersionProvider.dart';
+import 'package:omzetin_bengkel/services/database_service.dart';
+import 'package:omzetin_bengkel/services/db.copy.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class UpdatePage extends StatefulWidget {
@@ -51,9 +51,9 @@ class _UpdatePageState extends State<UpdatePage> {
           ),
           gradient: LinearGradient(
             colors: [
-              const Color(0xff6bbeaa), // turquoise green
-              const Color(0xffa4d9b7), // turquoise green
-              const Color(0xff6bbeaa), // turquoise green
+              const Color(0xff6bbeaa), // Turquoise
+              const Color(0xff3a7a8c), // Turquoise lebih gelap (opsional)
+              const Color(0xff091057), // Navy
             ],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,

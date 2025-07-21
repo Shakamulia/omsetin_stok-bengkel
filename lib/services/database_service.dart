@@ -2,19 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/cashier.dart';
-import 'package:omsetin_bengkel/model/category.dart';
-import 'package:omsetin_bengkel/model/expenceModel.dart';
-import 'package:omsetin_bengkel/model/expense.dart';
-import 'package:omsetin_bengkel/model/income.dart';
-import 'package:omsetin_bengkel/model/paymentMethod.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/model/product.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/model/setting.dart';
-import 'package:omsetin_bengkel/model/stock_addition.dart';
-import 'package:omsetin_bengkel/model/transaction.dart';
-import 'package:omsetin_bengkel/utils/failedAlert.dart';
+import 'package:omzetin_bengkel/model/cashier.dart';
+import 'package:omzetin_bengkel/model/category.dart';
+import 'package:omzetin_bengkel/model/expenceModel.dart';
+import 'package:omzetin_bengkel/model/expense.dart';
+import 'package:omzetin_bengkel/model/income.dart';
+import 'package:omzetin_bengkel/model/paymentMethod.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/model/setting.dart';
+import 'package:omzetin_bengkel/model/stock_addition.dart';
+import 'package:omzetin_bengkel/model/transaction.dart';
+import 'package:omzetin_bengkel/utils/failedAlert.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:synchronized/synchronized.dart';
@@ -371,6 +371,25 @@ class DatabaseService {
             )
         ''');
 
+        await db.insert(_pelangganTable, {
+          _pelangganKode: 'ajdkfajkdf',
+          _pelangganNama: 'Umum',
+          _pelangganNoHp: 1234567890,
+          _pelangganProfileImage: 'assets/newProfiles/owner.png',
+          _pelangganGender: 'Laki-laki',
+          _pelangganAlamat: 'Jl. Kebon Jeruk, Jakarta',
+          _pelangganEmail: 'kiagus@gmail.com'
+        });
+
+        await db.insert(_mekanikTable, {
+          _mekanikNama: 'Hair Stylist',
+          _mekanikProfileImage: 'assets/newProfiles/owner.png',
+          _mekanikNoHp: 019023102,
+          _mekanikGender: "Laki-laki",
+          _mekanikSpesialis: "Potong Rambut",
+          _mekanikAlamat: "halo",
+        });
+
         db.insert(_cashierTable, {
           _cashierName: 'Owner',
           _cashierPhoneNumber: 1234567890,
@@ -471,7 +490,6 @@ class DatabaseService {
           _settingFooterMessage: '',
           _settingPrint: '',
           _settingProfitType: "omzetModal",
-          _settingProfit: '0',
           _settingReceipt: 'default',
           _settingReceiptSize: '58',
           _settingCashdrawer: 'false',
@@ -1101,6 +1119,23 @@ class DatabaseService {
         .toList();
 
     return products;
+  }
+
+  Future<void> addServices(
+      String servicesName, String dateAdded, int servicesPrice) async {
+    final db = await database;
+    try {
+      await db.insert(_serviceTable, {
+        _serviceName: servicesName,
+        _servicePrice: servicesPrice,
+        _serviceDateAdded: dateAdded
+      });
+      // debugPrint("Berhasil menambahkan kategori $name");
+      print("Berhasil menambahkan services $servicesName");
+    } catch (e) {
+      // show error message (debug only) in console
+      print("Error: $e");
+    }
   }
 
   Future<List<Categories>> getCategoriesSorted(

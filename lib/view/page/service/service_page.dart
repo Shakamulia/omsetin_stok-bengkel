@@ -5,21 +5,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bi.dart';
 import 'package:intl/intl.dart';
-import 'package:omsetin_bengkel/model/services.dart';
-import 'package:omsetin_bengkel/providers/securityProvider.dart';
-import 'package:omsetin_bengkel/services/service_db_helper.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/pinModalWithAnimation.dart';
-import 'package:omsetin_bengkel/utils/successAlert.dart';
-import 'package:omsetin_bengkel/view/page/service/add_service.dart';
-import 'package:omsetin_bengkel/view/page/service/update_service.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/confirm_delete_dialog.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/pinModal.dart';
-import 'package:omsetin_bengkel/view/widget/refresWidget.dart';
-import 'package:omsetin_bengkel/view/widget/search.dart';
+import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
+import 'package:omzetin_bengkel/services/service_db_helper.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/pinModalWithAnimation.dart';
+import 'package:omzetin_bengkel/utils/successAlert.dart';
+import 'package:omzetin_bengkel/view/page/service/add_service.dart';
+import 'package:omzetin_bengkel/view/page/service/update_service.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/confirm_delete_dialog.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/pinModal.dart';
+import 'package:omzetin_bengkel/view/widget/refresWidget.dart';
+import 'package:omzetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
@@ -232,24 +232,23 @@ class _ServicePageState extends State<ServicePage> {
                                     if (securityProvider.editServices) {
                                       showPinModalWithAnimation(context,
                                           pinModal: PinModal(
-                                            destination: UpdateServicePage(
-                                                service: service),
+                                            destination: UpdateServicesPage(
+                                                services: service),
                                           ));
-                                    }else{
+                                    } else {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => UpdateServicesPage(
+                                              services: service),
+                                        ),
+                                      );
 
-                                                                     final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            UpdateServicePage(service: service),
-                                      ),
-                                    );
-
-                                    if (result == true) {
-                                      setState(() {
-                                        _futureServices = fetchServices();
-                                      });
-                                    }
+                                      if (result == true) {
+                                        setState(() {
+                                          _futureServices = fetchServices();
+                                        });
+                                      }
                                     }
                                   },
                                   child: Container(
@@ -317,40 +316,40 @@ class _ServicePageState extends State<ServicePage> {
                                           ),
                                           securityProvider.hapusServices
                                               ? const SizedBox.shrink()
-                                              :
-                                            GestureDetector(
-                                              onTap: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return ConfirmDeleteDialog(
-                                                      message:
-                                                          "Hapus layanan ini?",
-                                                      onConfirm: () async {
-                                                        await _serviceHelper
-                                                            .deleteService(
-                                                                service
-                                                                    .serviceId!);
-                                                        Navigator.pop(context);
-                                                        showSuccessAlert(
-                                                            context,
-                                                            "Berhasil Terhapus!");
-                                                        setState(() {
-                                                          _futureServices =
-                                                              fetchServices();
-                                                        });
+                                              : GestureDetector(
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return ConfirmDeleteDialog(
+                                                          message:
+                                                              "Hapus layanan ini?",
+                                                          onConfirm: () async {
+                                                            await _serviceHelper
+                                                                .deleteService(
+                                                                    service
+                                                                        .serviceId!);
+                                                            Navigator.pop(
+                                                                context);
+                                                            showSuccessAlert(
+                                                                context,
+                                                                "Berhasil Terhapus!");
+                                                            setState(() {
+                                                              _futureServices =
+                                                                  fetchServices();
+                                                            });
+                                                          },
+                                                        );
                                                       },
                                                     );
                                                   },
-                                                );
-                                              },
-                                              child: const Iconify(
-                                                Bi.x_circle,
-                                                size: 24,
-                                                color: Colors.red,
-                                              ),
-                                            ),
+                                                  child: const Iconify(
+                                                    Bi.x_circle,
+                                                    size: 24,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     ),

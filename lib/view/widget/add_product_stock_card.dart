@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/model/product.dart';
+import 'package:omzetin_bengkel/model/product.dart';
 import 'package:gap/gap.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
 
 class StockCardScreen extends StatefulWidget {
   final Product product;

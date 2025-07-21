@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:omsetin_bengkel/providers/bluetoothProvider.dart';
-import 'package:omsetin_bengkel/utils/printer_helper.dart';
+import 'package:omzetin_bengkel/providers/bluetoothProvider.dart';
+import 'package:omzetin_bengkel/utils/printer_helper.dart';
 import 'package:provider/provider.dart';
 
 class PrinterPage extends StatelessWidget {

@@ -3,17 +3,17 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/uil.dart';
-import 'package:omsetin_bengkel/model/pelanggan.dart';
-import 'package:omsetin_bengkel/providers/pelangganProvider.dart';
-import 'package:omsetin_bengkel/providers/securityProvider.dart';
-import 'package:omsetin_bengkel/utils/colors.dart';
-import 'package:omsetin_bengkel/utils/responsif/fsize.dart';
-import 'package:omsetin_bengkel/view/page/pelanggan/add_pelanggan.dart';
-import 'package:omsetin_bengkel/view/widget/Notfound.dart';
-import 'package:omsetin_bengkel/view/widget/back_button.dart';
-import 'package:omsetin_bengkel/view/widget/card_pelanggan.dart';
-import 'package:omsetin_bengkel/view/widget/expensiveFloatingButton.dart';
-import 'package:omsetin_bengkel/view/widget/search.dart';
+import 'package:omzetin_bengkel/model/pelanggan.dart';
+import 'package:omzetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
+import 'package:omzetin_bengkel/utils/colors.dart';
+import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
+import 'package:omzetin_bengkel/view/page/pelanggan/add_pelanggan.dart';
+import 'package:omzetin_bengkel/view/widget/Notfound.dart';
+import 'package:omzetin_bengkel/view/widget/back_button.dart';
+import 'package:omzetin_bengkel/view/widget/card_pelanggan.dart';
+import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
+import 'package:omzetin_bengkel/view/widget/search.dart';
 import 'package:provider/provider.dart';
 
 /// Halaman Manajemen pelanggan
@@ -106,14 +106,13 @@ class _PelangganPageState extends State<PelangganPage> {
                             child: _buildPelangganGridView(),
                           ),
                           securityProvider.kunciAddPelanggan
-                          ? SizedBox.shrink()
-                          :
-                          ExpensiveFloatingButton(
-                            onPressed: () {
-                              _navigateToAddPelangganPage();
-                            },
-                            text: "TAMBAH pelanggan",
-                          ),
+                              ? SizedBox.shrink()
+                              : ExpensiveFloatingButton(
+                                  onPressed: () {
+                                    _navigateToAddPelangganPage();
+                                  },
+                                  text: "TAMBAH pelanggan",
+                                ),
                         ],
                       ),
                     )

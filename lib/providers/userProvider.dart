@@ -4,11 +4,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-import 'package:omsetin_bengkel/constants/apiConstants.dart';
-import 'package:omsetin_bengkel/model/serialNumberPayload.dart';
-import 'package:omsetin_bengkel/model/tokenPayload.dart';
-import 'package:omsetin_bengkel/services/authService.dart';
-import 'package:omsetin_bengkel/services/userService.dart';
+import 'package:omzetin_bengkel/constants/apiConstants.dart';
+import 'package:omzetin_bengkel/model/serialNumberPayload.dart';
+import 'package:omzetin_bengkel/model/tokenPayload.dart';
+import 'package:omzetin_bengkel/services/authService.dart';
+import 'package:omzetin_bengkel/services/userService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {

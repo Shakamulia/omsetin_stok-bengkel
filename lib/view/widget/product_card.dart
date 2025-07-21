@@ -11,8 +11,8 @@
 // import 'package:iconify_flutter/iconify_flutter.dart';
 // import 'package:iconify_flutter/icons/bi.dart';
 // import 'package:intl/intl.dart';
-// import 'package:omsetin_bengkel/services/database_service.dart';
-// import 'package:omsetin_bengkel/view/page/product/product.dart';
+// import 'package:omzetin_bengkel/services/database_service.dart';
+// import 'package:omzetin_bengkel/view/page/product/product.dart';
 
 // class ProductCard extends StatelessWidget {
 //   // product image (assets)
