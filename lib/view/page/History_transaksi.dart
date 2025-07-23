@@ -25,11 +25,12 @@ class RiwayatTransaksi extends StatefulWidget {
 class _RiwayatTransaksiState extends State<RiwayatTransaksi>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Color _tabColor = greenColor;
   DateTime dateFrom = DateTime.now().subtract(const Duration(days: 7));
   DateTime dateTo = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
   String keyword = '';
+
+  Map<String, Future<List<TransactionData>>> transactionFutures = {};
 
   final DatabaseService _databaseService = DatabaseService.instance;
 
@@ -42,6 +43,22 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
     }
   }
 
+  Future<List<TransactionData>> _getTransactionsDataByStatus(
+      String status) async {
+    try {
+      return await _databaseService.getTransactionsByStatus(status);
+    } catch (e) {
+      print('Error fetching transactions: $e');
+      return [];
+    }
+  }
+
+  void _refreshTab(String status) {
+    setState(() {
+      transactionFutures[status] = _getTransactionsDataByStatus(status);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,25 +67,29 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
         keyword = _searchController.text.toLowerCase();
       });
     });
-
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
-      setState(() {
-        switch (_tabController.index) {
-          case 0:
-            _tabColor = greenColor;
-            break;
-          case 1:
-            _tabColor = yellowColor;
-            break;
-          case 2:
-            _tabColor = redColor;
-            break;
-          case 3:
-            _tabColor = const Color.fromARGB(255, 71, 68, 68);
-            break;
-        }
-      });
+      setState(() {});
+    });
+
+    for (var status in [
+      'Selesai',
+      'Belum Lunas',
+      'Belum Dibayar',
+      'Dibatalkan'
+    ]) {
+      transactionFutures[status] = _getTransactionsDataByStatus(status);
+    }
+
+    Future.delayed(Duration.zero, () {
+      for (var s in [
+        'Selesai',
+        'Belum Lunas',
+        'Belum Dibayar',
+        'Dibatalkan',
+      ]) {
+        _refreshTab(s);
+      }
     });
   }
 
@@ -216,7 +237,13 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.grey,
                     indicator: BoxDecoration(
-                      color: _tabColor,
+                      color: _tabController.index == 0
+                          ? greenColor
+                          : _tabController.index == 1
+                              ? yellowColor
+                              : _tabController.index == 2
+                                  ? redColor
+                                  : greyColor,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
@@ -274,15 +301,19 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
 
   Widget _buildTransactionPage(String status) {
     return FutureBuilder<List<TransactionData>>(
-      future: _getTransactionsData(),
+      future: transactionFutures[status],
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(
-              child: CustomRefreshWidget(child: NotFoundPage()));
+          return Center(
+              child: CustomRefreshWidget(
+                  onRefresh: () async {
+                    _refreshTab(status);
+                  },
+                  child: NotFoundPage()));
         } else {
           final transactions = snapshot.data!.where((transaction) {
             try {
@@ -299,8 +330,6 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
                   (transactionDate.isBefore(endDate) ||
                       transactionDate.isAtSameMomentAs(endDate));
 
-              final matchStatus = transaction.transactionStatus == status;
-
               final matchSearch = keyword.isEmpty ||
                   transaction.transactionCustomerName
                       .toLowerCase()
@@ -310,7 +339,7 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
                       .toLowerCase()
                       .contains(keyword);
 
-              return matchDate && matchStatus && matchSearch;
+              return matchDate && matchSearch;
             } catch (e) {
               print(
                   "Error parsing date: ${transaction.transactionDate}, Error: $e");
@@ -350,6 +379,9 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
           }
 
           return CustomRefreshWidget(
+            onRefresh: () async {
+              _refreshTab(status);
+            },
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: transactions.length,
@@ -357,8 +389,8 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
               itemBuilder: (context, index) {
                 final transaction = transactions[index];
                 return ZoomTapAnimation(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => DetailHistoryTransaction(
@@ -366,6 +398,15 @@ class _RiwayatTransaksiState extends State<RiwayatTransaksi>
                         ),
                       ),
                     );
+
+                    for (var s in [
+                      'Selesai',
+                      'Belum Lunas',
+                      'Belum Dibayar',
+                      'Dibatalkan',
+                    ]) {
+                      _refreshTab(s);
+                    }
                   },
                   child: CardReportTransactions(transaction: transaction),
                 );

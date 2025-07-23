@@ -79,7 +79,7 @@ class _ChangepasswordPageState extends State<ChangepasswordPage> {
     try {
       final response = await http.post(
         Uri.parse(
-            '${ApiConstants.baseUrl}/api/serial-number/$serialNumberId/change-password'),
+            '${ApiConstants.baseUrl}/api/serial-number-bengkel/$serialNumberId/change-password'),
         headers: {
           'Authorization': 'Bearer ${await storage.read(key: "token") ?? ""}',
           'Content-Type': 'application/json'

@@ -60,7 +60,8 @@ class UserService {
       };
 
       final response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}/api/serial-number/$serialNumber'),
+        Uri.parse(
+            '${ApiConstants.baseUrl}/api/serial-number-bengkel/$serialNumber'),
         headers: headers,
       );
 
@@ -82,7 +83,7 @@ class UserService {
     });
 
     final response = await Dio().post(
-      '${ApiConstants.baseUrl}/api/serial-number',
+      '${ApiConstants.baseUrl}/api/serial-number-bengkel',
       data: formData,
       options: Options(
         headers: {
@@ -146,7 +147,7 @@ class UserService {
 
       // 5. Send request
       final response = await Dio().post(
-        '${ApiConstants.baseUrl}/api/serial-number/$serialNumberId/update',
+        '${ApiConstants.baseUrl}/api/serial-number-bengkel/$serialNumberId/update',
         data: formData,
         options: Options(
           headers: {
@@ -206,7 +207,7 @@ class UserService {
   //     // Update the serial number details via the API
   //     final response = await http.put(
   //       Uri.parse(
-  //           '${ApiConstants.baseUrl}/api/serial-number/$serialNumberId/update'),
+  //           '${ApiConstants.baseUrl}/api/serial-number-bengkel/$serialNumberId/update'),
   //       headers: {
   //         'Authorization': 'Bearer $token',
   //         'Content-Type': 'application/json',
@@ -274,7 +275,7 @@ class UserService {
       // Post the serial number to the API
       final response = await http.post(
           Uri.parse(
-              'http://localhost:3000/api/serial-number/$extractedSerialNumber'),
+              'http://localhost:3000/api/serial-number-bengkel/$extractedSerialNumber'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',

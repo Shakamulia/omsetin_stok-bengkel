@@ -913,9 +913,7 @@ class _ProductPageState extends State<ProductPage>
                                                                 horizontal: 17),
                                                       ),
                                                       onPressed:
-                                                          _isEditServicesOn !=
-                                                                  true
-                                                              ? () async {
+                                                      () async {
                                                                   final result =
                                                                       await Navigator
                                                                           .push(
@@ -938,7 +936,7 @@ class _ProductPageState extends State<ProductPage>
                                                                     });
                                                                   }
                                                                 }
-                                                              : null,
+                                                              ,
                                                       child: Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -996,9 +994,7 @@ class _ProductPageState extends State<ProductPage>
                                                           horizontal: 17),
                                                     ),
                                                     onPressed:
-                                                        _isEditServicesOn !=
-                                                                true
-                                                            ? () async {
+                                                      () async {
                                                                 final result =
                                                                     await Navigator
                                                                         .push(
@@ -1019,7 +1015,7 @@ class _ProductPageState extends State<ProductPage>
                                                                   });
                                                                 }
                                                               }
-                                                            : null,
+                                                            ,
                                                     child: Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
@@ -1088,22 +1084,23 @@ class _ProductPageState extends State<ProductPage>
                         },
                       )
                     else
+                    if (!securityProvider.tambahServices)
                       ExpensiveFloatingButton(
-                        text: 'TAMBAH',
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AddServicePage(),
-                            ),
-                          );
+                      text: 'TAMBAH',
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AddServicePage(),
+                        ),
+                        );
 
-                          if (result == true) {
-                            setState(() {
-                              _futureServices = fetchServices();
-                            });
-                          }
-                        },
+                        if (result == true) {
+                        setState(() {
+                          _futureServices = fetchServices();
+                        });
+                        }
+                      },
                       ),
                   ],
                 ),

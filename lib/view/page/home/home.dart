@@ -906,7 +906,7 @@ class _HomeState extends State<Home> {
                                 // Baris 1
                                 MainCard(
                                   onTap: () {
-                                    if (securityProvider.kunciProduk) {
+                                    if (securityProvider.kunciProduk || securityProvider.kunciServices) {
                                       showPinModalWithAnimation(context,
                                           pinModal: PinModal(
                                               destination: ProductPage()));

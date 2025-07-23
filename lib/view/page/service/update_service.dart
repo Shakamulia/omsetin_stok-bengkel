@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:omzetin_bengkel/model/services.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
 import 'package:omzetin_bengkel/services/database_service.dart';
 import 'package:omzetin_bengkel/utils/colors.dart';
 import 'package:omzetin_bengkel/utils/failedAlert.dart';
@@ -12,6 +13,7 @@ import 'package:omzetin_bengkel/view/widget/back_button.dart';
 import 'package:omzetin_bengkel/view/widget/custom_textfield.dart';
 import 'package:omzetin_bengkel/view/widget/expensiveFloatingButton.dart';
 import 'package:gap/gap.dart';
+import 'package:provider/provider.dart';
 
 class UpdateServicesPage extends StatefulWidget {
   final Service services;
@@ -38,6 +40,8 @@ class _UpdateServicesPageState extends State<UpdateServicesPage> {
 
   @override
   Widget build(BuildContext context) {
+    var securityProvider = Provider.of<SecurityProvider>(context);
+
     return Scaffold(
         backgroundColor: bgColor,
         appBar: PreferredSize(
@@ -172,6 +176,7 @@ class _UpdateServicesPageState extends State<UpdateServicesPage> {
                     // Fixed button at the bottom
                   ],
                 ),
+                if (!securityProvider.editServices)
                 ExpensiveFloatingButton(
                   left: 20,
                   right: 20,

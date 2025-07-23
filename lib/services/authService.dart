@@ -71,7 +71,7 @@ class AuthService {
 
       if (token != null) {
         final response = await http.post(
-          Uri.parse('$api/api/serial-number/logout'),
+          Uri.parse('$api/api/serial-number-bengkel/logout'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ class AuthService {
     try {
       // Validate inputs
       final response = await http.post(
-        Uri.parse('$api/api/serial-number/signin'),
+        Uri.parse('$api/api/serial-number-bengkel/signin'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'serialNumber': serialNumber, 'password': password}),
       );

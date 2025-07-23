@@ -632,8 +632,8 @@ class _UpdateProductPageState extends State<UpdateProductPage> {
 
     if (productName.isEmpty ||
         productBarcode.isEmpty ||
-        productSatuan.isEmpty ||
-        productCategory.isEmpty) {
+        productSatuan.isEmpty
+        ) {
       showNullDataAlert(context,
           message: "Harap isi semua kolom yang wajib diisi!");
       return;

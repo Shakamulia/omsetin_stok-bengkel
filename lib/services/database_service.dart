@@ -7,6 +7,7 @@ import 'package:omzetin_bengkel/model/category.dart';
 import 'package:omzetin_bengkel/model/expenceModel.dart';
 import 'package:omzetin_bengkel/model/expense.dart';
 import 'package:omzetin_bengkel/model/income.dart';
+import 'package:omzetin_bengkel/model/mekanik.dart';
 import 'package:omzetin_bengkel/model/paymentMethod.dart';
 import 'package:omzetin_bengkel/model/pelanggan.dart';
 import 'package:omzetin_bengkel/model/product.dart';
@@ -1306,6 +1307,47 @@ class DatabaseService {
     );
   }
 
+   Future<Pelanggan?> getPelangganByName(String name) async {
+  final db = await database;
+  
+  try {
+    final List<Map<String, dynamic>> maps = await db.query(
+      _pelangganTable, // Use the correct table name
+      where: '$_pelangganNama = ?', // Use the correct column name
+      whereArgs: [name],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      return Pelanggan.fromJson(maps.first);
+    }
+    return null;
+  } catch (e) {
+    print('Error getting employee by name: $e');
+    return null;
+  }
+}
+Future<Mekanik?> getEmployeeByName(String name) async {
+  final db = await database;
+  
+  try {
+    final List<Map<String, dynamic>> maps = await db.query(
+      _mekanikTable, // Use the correct table name
+      where: '$_mekanikNama = ?', // Use the correct column name
+      whereArgs: [name],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      return Mekanik.fromJson(maps.first);
+    }
+    return null;
+  } catch (e) {
+    print('Error getting employee by name: $e');
+    return null;
+  }
+}
+
   Future<int> addMekanik(Map<String, dynamic> mekanik) async {
     final db = await database;
     return await db.insert(_mekanikTable, mekanik);
@@ -1888,7 +1930,7 @@ class DatabaseService {
     await db.insert('transactions', transaction);
   }
 
-  Future<List<TransactionData>> getTransactionsByStatus(
+ Future<List<TransactionData>> getTransactionsByStatus(
     String statusTransaction,
   ) async {
     return await _dbLock.synchronized(() async {
@@ -1948,6 +1990,7 @@ class DatabaseService {
       }).toList();
     });
   }
+
 
   Future<List<TransactionData>> getTransactionByDateRange(
     String fromDate,

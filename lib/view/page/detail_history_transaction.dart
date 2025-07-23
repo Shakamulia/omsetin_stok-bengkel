@@ -372,7 +372,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                       Row(
                         children: [
                           Text(
-                            "Pegawai ${_transactionDetail!.transactionPegawaiName}",
+                            "Mekanik ${_transactionDetail!.transactionPegawaiName}",
                             style: GoogleFonts.poppins(
                                 fontSize: 14, fontWeight: FontWeight.w500),
                           )
@@ -524,7 +524,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                             fontSize: 16, fontWeight: FontWeight.w700)),
                     const Spacer(),
                     GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           List<Product> selectedProducts = [];
                           List<Service> selectedServices = [];
                           Map<int, int> quantities = {};
@@ -547,7 +547,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                               quantities[service.serviceId] = s['quantity'];
                             }
                           }
-
+    final selectedCustomer = await DatabaseService.instance.getPelangganByName(_transactionDetail!.transactionCustomerName);
+    final selectedEmployee = await DatabaseService.instance.getEmployeeByName(_transactionDetail!.transactionPegawaiName);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -557,6 +558,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                   ...selectedServices
                                 ],
                                 initialQuantities: quantities,
+                                selectedCustomer: selectedCustomer,
+                                selectedEmployee: selectedEmployee,
                                 transactionId:
                                     _transactionDetail!.transactionId,
                                 isUpdate: false,
@@ -587,7 +590,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                     _transactionDetail!.transactionStatus == "Dibatalkan"
                         ? const Gap(1)
                         : GestureDetector(
-                            onTap: () {
+                            onTap: () async{
                               List<Product> selectedProducts = [];
                               List<Service> selectedServices = [];
                               Map<int, int> quantities = {};
@@ -611,6 +614,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                   quantities[service.serviceId] = s['quantity'];
                                 }
                               }
+                                  final selectedCustomer = await DatabaseService.instance.getPelangganByName(_transactionDetail!.transactionCustomerName);
+    final selectedEmployee = await DatabaseService.instance.getEmployeeByName(_transactionDetail!.transactionPegawaiName);
 
                               Navigator.push(
                                 context,
@@ -620,6 +625,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                       ...selectedProducts,
                                       ...selectedServices
                                     ],
+                                    selectedCustomer: selectedCustomer,
+                                    selectedEmployee: selectedEmployee,
                                     initialQuantities: quantities,
                                     transactionId:
                                         widget.transactionDetail!.transactionId,
@@ -651,7 +658,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                 ),
               ),
               const Gap(5),
-              Container(
+                Container(
                 constraints: const BoxConstraints(
                   minHeight: 100,
                   maxHeight: 300,
@@ -660,25 +667,38 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                   shrinkWrap: true,
                   physics: const ClampingScrollPhysics(),
                   itemCount: (_transactionDetail!.transactionProduct.length +
-                      (_transactionDetail!.transactionServices?.length ?? 0)),
+                    (_transactionDetail!.transactionServices?.length ?? 0) +
+                    // Tambahkan 1 jika ada produk dan services untuk Gap
+                    ((_transactionDetail!.transactionProduct.isNotEmpty &&
+                        (_transactionDetail!.transactionServices?.isNotEmpty ?? false))
+                      ? 1
+                      : 0)),
                   itemBuilder: (context, index) {
-                    // Jika index masih dalam range produk
-                    if (index < _transactionDetail!.transactionProduct.length) {
-                      return _buildProductItem(
-                          _transactionDetail!.transactionProduct[index]);
+                  final productCount = _transactionDetail!.transactionProduct.length;
+                  final serviceCount = _transactionDetail!.transactionServices?.length ?? 0;
+
+                  // Produk
+                  if (index < productCount) {
+                    return _buildProductItem(_transactionDetail!.transactionProduct[index]);
+                  }
+                  // Gap antara produk dan services
+                  else if (index == productCount &&
+                    productCount > 0 &&
+                    serviceCount > 0) {
+                    return const Gap(10);
+                  }
+                  // Services
+                  else if (index > productCount) {
+                    final serviceIndex = index - productCount - 1;
+                    if (_transactionDetail!.transactionServices != null &&
+                      serviceIndex < serviceCount) {
+                    return _buildServiceItem(_transactionDetail!.transactionServices![serviceIndex]);
                     }
-                    // Jika ada services dan index dalam range services
-                    else if (_transactionDetail!.transactionServices != null &&
-                        index - _transactionDetail!.transactionProduct.length <
-                            _transactionDetail!.transactionServices!.length) {
-                      return _buildServiceItem(
-                          _transactionDetail!.transactionServices![index -
-                              _transactionDetail!.transactionProduct.length]);
-                    }
-                    return const SizedBox();
+                  }
+                  return const SizedBox();
                   },
                 ),
-              ),
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
@@ -753,6 +773,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                             .transactionQueueNumber,
                                         products: _transactionDetail!
                                             .transactionProduct,
+                                        service: _transactionDetail!.transactionServices,
                                         transactionId:
                                             _transactionDetail!.transactionId,
                                         transactionDate:

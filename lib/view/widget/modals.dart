@@ -1591,19 +1591,30 @@ class CustomModals {
       sheet.cell(CellIndex.indexByString('B1')).value = 'Tanggal Transaksi';
       sheet.cell(CellIndex.indexByString('C1')).value = 'Status';
       sheet.cell(CellIndex.indexByString('D1')).value = 'Nama Pelanggan';
-      sheet.cell(CellIndex.indexByString('E1')).value = 'Produk Transaksi';
-      sheet.cell(CellIndex.indexByString('F1')).value = 'Total Transaksi';
-      sheet.cell(CellIndex.indexByString('G1')).value = 'Diskon';
-      sheet.cell(CellIndex.indexByString('H1')).value = 'Jumlah yang Dibayar';
-      sheet.cell(CellIndex.indexByString('I1')).value = 'Profit';
+      sheet.cell(CellIndex.indexByString('E1')).value = 'Nama Pegawai';
+      sheet.cell(CellIndex.indexByString('F1')).value = 'Produk Transaksi';
+      sheet.cell(CellIndex.indexByString('G1')).value = 'Layanan Transaksi';
+      sheet.cell(CellIndex.indexByString('H1')).value = 'Total Transaksi';
+      sheet.cell(CellIndex.indexByString('I1')).value = 'Diskon';
+      sheet.cell(CellIndex.indexByString('J1')).value = 'Jumlah yang Dibayar';
+      sheet.cell(CellIndex.indexByString('K1')).value = 'Profit';
 
       List<TransactionData> transactions = await getTransactionData();
 
       // Filter by date range
       transactions = transactions.where((transaction) {
-        String dateStr = transaction.transactionDate.split(', ')[1];
-        DateTime transactionDate =
-            DateFormat("dd/MM/yyyy HH:mm").parse(dateStr).toLocal();
+        // transaction.transactionDate: Kamis, 17/07/2025 08:50
+        // Extract date part after comma
+        String dateStr = transaction.transactionDate.split(', ').length > 1
+            ? transaction.transactionDate.split(', ')[1]
+            : transaction.transactionDate;
+        DateTime? transactionDate;
+        try {
+          transactionDate =
+              DateFormat("dd/MM/yyyy HH:mm").parse(dateStr).toLocal();
+        } catch (e) {
+          return false;
+        }
         DateTime startDate =
             DateTime(fromDate.year, fromDate.month, fromDate.day, 0, 0, 0)
                 .toLocal();
@@ -1616,40 +1627,52 @@ class CustomModals {
                 transactionDate.isAtSameMomentAs(endDate));
       }).toList();
 
+      debugPrint(transactions.map((tx) => tx.toJson()).toList().toString());
       int rowIndex = 2;
 
       for (TransactionData transaction in transactions) {
-        // Ensure transactionProduct is processed correctly
-        debugPrint(
-            'Processing transaction product for transaction ID: ${transaction.transactionId}');
-
-        List<String> products = (transaction.transactionProduct as List)
-            .map((e) => e['product_name'].toString())
-            .toList();
-
-        for (int j = 0; j < products.length; j++) {
-          if (j == 0) {
-            sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
-                transaction.transactionId;
-            sheet.cell(CellIndex.indexByString('B$rowIndex')).value =
-                transaction.transactionDate;
-            sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
-                transaction.transactionStatus;
-            sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
-                transaction.transactionCustomerName;
-            sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
-                products.join(', ');
-            sheet.cell(CellIndex.indexByString('F$rowIndex')).value =
-                transaction.transactionTotal;
-            sheet.cell(CellIndex.indexByString('G$rowIndex')).value =
-                transaction.transactionDiscount;
-            sheet.cell(CellIndex.indexByString('H$rowIndex')).value =
-                transaction.transactionPayAmount;
-            sheet.cell(CellIndex.indexByString('I$rowIndex')).value =
-                transaction.transactionProfit;
-          }
-          rowIndex++;
+        // Produk
+        String produkStr = '';
+        if (transaction.transactionProduct != null &&
+            transaction.transactionProduct is List &&
+            (transaction.transactionProduct as List).isNotEmpty) {
+          produkStr = (transaction.transactionProduct as List)
+              .map((e) => e['product_name'].toString())
+              .join(', ');
         }
+
+        // Layanan
+        String layananStr = '';
+        if (transaction.transactionServices != null &&
+            transaction.transactionServices is List &&
+            (transaction.transactionServices as List).isNotEmpty) {
+          layananStr = (transaction.transactionServices as List)
+              .map((e) => e['services_name'].toString())
+              .join(', ');
+        }
+
+        sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+            transaction.transactionId;
+        sheet.cell(CellIndex.indexByString('B$rowIndex')).value =
+            transaction.transactionDate;
+        sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
+            transaction.transactionStatus;
+        sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
+            transaction.transactionCustomerName;
+        sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
+            transaction.transactionPegawaiName;
+        sheet.cell(CellIndex.indexByString('F$rowIndex')).value = produkStr;
+        sheet.cell(CellIndex.indexByString('G$rowIndex')).value = layananStr;
+        sheet.cell(CellIndex.indexByString('H$rowIndex')).value =
+            transaction.transactionTotal;
+        sheet.cell(CellIndex.indexByString('I$rowIndex')).value =
+            transaction.transactionDiscount;
+        sheet.cell(CellIndex.indexByString('J$rowIndex')).value =
+            transaction.transactionPayAmount;
+        sheet.cell(CellIndex.indexByString('K$rowIndex')).value =
+            transaction.transactionProfit;
+
+        rowIndex++;
       }
 
       List<int>? fileBytes = excel.save();
@@ -1660,9 +1683,12 @@ class CustomModals {
           print('Folder Download tidak ditemukan');
           return;
         }
-
-        final directory = Directory('/storage/emulated/0/Download');
-        final filePath = join(directory.path, '$fileName.xlsx');
+        // Membuat folder khusus jika belum ada
+        final customDir = Directory('/storage/emulated/0/Download/Omzetin Bengkel');
+        if (!await customDir.exists()) {
+          await customDir.create(recursive: true);
+        }
+        final filePath = join(customDir.path, '$fileName.xlsx');
         final file = File(filePath);
         await file.writeAsBytes(fileBytes);
 

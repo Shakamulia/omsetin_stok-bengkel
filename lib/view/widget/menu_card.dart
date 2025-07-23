@@ -51,6 +51,7 @@ class MainCard extends StatelessWidget {
               child: Text(
                 title!,
                 textAlign: TextAlign.center,
+                maxLines: 2,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
