@@ -919,7 +919,7 @@ class _HomeState extends State<Home> {
                                   },
                                   title: "Spare Part &\n Layanan",
                                   color: Colors.black,
-                                  imagePath: 'assets/images/produk.png',
+                                  imagePath: 'assets/images/Layanan.png',
                                 ),
                                 MainCard(
                                   onTap: () {
@@ -970,7 +970,7 @@ class _HomeState extends State<Home> {
                                   },
                                   title: "Pelanggan\n",
                                   color: Colors.black,
-                                  imagePath: 'assets/images/expense.png',
+                                  imagePath: 'assets/images/Pelanggan.png',
                                 ),
 
                                 MainCard(
@@ -988,7 +988,7 @@ class _HomeState extends State<Home> {
                                   },
                                   title: "Mekanik\n",
                                   color: Colors.black,
-                                  imagePath: 'assets/images/income.png',
+                                  imagePath: 'assets/images/Mekanik.png',
                                 ),
 
                                 MainCard(

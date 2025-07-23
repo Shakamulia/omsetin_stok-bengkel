@@ -92,7 +92,7 @@ class _ReportPageState extends State<ReportPage> {
                               // const Gap(20),
                               _buildMainCard(
                                 title: "Spare Part Terjual",
-                                imagePath: 'assets/images/laporan-terjual.png',
+                                imagePath: 'assets/images/laporan-layanan.png',
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -116,7 +116,7 @@ class _ReportPageState extends State<ReportPage> {
                               ),
                               _buildMainCard(
                                 title: "Service Terjual",
-                                imagePath: 'assets/images/laporan-terjual.png',
+                                imagePath: 'assets/images/laporan-layanan.png',
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -160,7 +160,7 @@ class _ReportPageState extends State<ReportPage> {
                               ),
                               _buildMainCard(
                                 title: "Pelanggan",
-                                imagePath: 'assets/images/laporan-kasir.png',
+                                imagePath: 'assets/images/laporan-pelanggan.png',
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -172,7 +172,7 @@ class _ReportPageState extends State<ReportPage> {
                               ),
                               _buildMainCard(
                                 title: "Mekanik",
-                                imagePath: 'assets/images/laporan-kategori.png',
+                                imagePath: 'assets/images/laporan-kasir.png',
                                 onTap: () {
                                   Navigator.push(
                                     context,
