@@ -37,27 +37,12 @@ class _CardMekanikState extends State<CardMekanik> {
       width: MediaQuery.of(context).size.width * 0.45,
       child: ZoomTapAnimation(
         onTap: () {
-          if (securityProvider.kunciUpdatePegawai) {
-            showPinModalWithAnimation(
-              context,
-              pinModal: PinModal(onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AddPegawaiPage(pegawai: widget.mekanik),
-                  ),
-                );
-              }),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddPegawaiPage(pegawai: widget.mekanik),
-              ),
-            );
-          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddPegawaiPage(pegawai: widget.mekanik),
+            ),
+          );
         },
         child: Card(
           elevation: 0,
@@ -128,20 +113,10 @@ class _CardMekanikState extends State<CardMekanik> {
                       alignment: Alignment.bottomRight,
                       child: GestureDetector(
                         onTap: () {
-                          if (securityProvider.kunciDeletePegawai) {
-                            showPinModalWithAnimation(
-                              context,
-                              pinModal: PinModal(onTap: () {
-                                _showDeleteDialog(context);
-                              }),
-                            );
-                          } else {
-                            _showDeleteDialog(context);
-                          }
+                        _showDeleteDialog(context);    
                         },
-                        child: securityProvider.kunciDeletePegawai
-                            ? SizedBox.shrink()
-                            : Container(
+                        child: securityProvider.kunciDeletePegawai           
+                            ?  Container(
                                 alignment: Alignment.center,
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
@@ -157,7 +132,8 @@ class _CardMekanikState extends State<CardMekanik> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
+                              )
+                            : SizedBox.shrink()
                       ),
                     ),
                   ),

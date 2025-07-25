@@ -38,28 +38,13 @@ class _CardPelangganState extends State<CardPelanggan> {
       width: MediaQuery.of(context).size.width * 0.45,
       child: ZoomTapAnimation(
         onTap: () {
-          if (securityProvider.kunciUpdatePelanggan) {
-            showPinModalWithAnimation(
-              context,
-              pinModal: PinModal(onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AddPelangganPage(pelanggan: widget.pelanggan),
-                  ),
-                );
-              }),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    AddPelangganPage(pelanggan: widget.pelanggan),
-              ),
-            );
-          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddPelangganPage(pelanggan: widget.pelanggan),
+            ),
+          );
         },
         child: Card(
           elevation: 0,
@@ -126,38 +111,29 @@ class _CardPelangganState extends State<CardPelanggan> {
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: GestureDetector(
-                        onTap: () {
-                          if (securityProvider.kunciDeletePelanggan) {
-                            showPinModalWithAnimation(
-                              context,
-                              pinModal: PinModal(onTap: () {
-                                _showDeleteDialog(context);
-                              }),
-                            );
-                          } else {
-                            _showDeleteDialog(context);
-                          }
-                        },
-                        child: securityProvider.kunciDeletePelanggan
-                            ? SizedBox.shrink()
-                            : Container(
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  "Hapus",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                          onTap: () {
+                          
+                                  _showDeleteDialog(context);
+                          },
+                          child: securityProvider.kunciDeletePelanggan
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                ),
-                              ),
-                      ),
+                                  child: Text(
+                                    "Hapus",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox.shrink()),
                     ),
                   ),
               ],

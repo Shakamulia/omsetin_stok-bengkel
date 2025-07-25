@@ -42,14 +42,13 @@ class _CustomRefreshWidgetState extends State<CustomRefreshWidget> {
   Widget build(BuildContext context) {
     return SmartRefresher(
       enablePullDown: true,
-      enablePullUp: true,
+      enablePullUp: false,
       header: WaterDropMaterialHeader(
         backgroundColor: primaryColor,
         color: Colors.white,
       ),
       footer: ClassicFooter(
         loadingText: "Sedang memuat...",
-        idleText: "Tarik untuk memuat lebih banyak",
         canLoadingText: "Lepaskan untuk memuat lebih banyak",
         failedText: "Gagal memuat!",
         noDataText: "Tidak ada data lagi",

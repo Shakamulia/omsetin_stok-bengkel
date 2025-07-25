@@ -2,56 +2,77 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecurityProvider with ChangeNotifier {
-  bool _kunciRiwayatTransaksi = false;
-  bool _kunciProduk = false;
-  bool _kunciTambahKategori = false;
-  bool _tambahProduk = false;
-  bool _tambahStokProduk = false;
-  bool _hapusStokProduk = false;
-  bool _editProduk = false;
-  bool _hapusProduk = false;
+   bool _kunciProduk = false;
+  bool _tambahProduk = true;
+  bool _editProduk = true;
+  bool _hapusProduk = true;
+
+  // === STOK PRODUK ===
+  bool _tambahStokProduk = true;
+  bool _hapusStokProduk = true;
+
+  // === KATEGORI ===
   bool _kunciKategori = false;
-  bool _editKategori = false;
-  bool _hapusKategori = false;
-  bool _kunciPengeluaran = false;
-  bool _tambahPengeluaran = false;
-  bool _editPengeluaran = false;
-  bool _hapusPengeluaran = false;
+  bool _kunciTambahKategori = true;
+  bool _editKategori = true;
+  bool _hapusKategori = true;
+
+  // === PEMASUKAN ===
   bool _kunciPemasukan = false;
-  bool _tambahPemasukan = false;
-  bool _editPemasukan = false;
-  bool _hapusPemasukan = false;
-  bool _sembunyikanProfit = false;
+  bool _tambahPemasukan = true;
+  bool _editPemasukan = true;
+  bool _hapusPemasukan = true;
+
+  // === PENGELUARAN ===
+  bool _kunciPengeluaran = false;
+  bool _tambahPengeluaran = true;
+  bool _editPengeluaran = true;
+  bool _hapusPengeluaran = true;
+
+  // === TRANSAKSI ===
   bool _tanggalTransaksi = false;
   bool _batalkanTransaksi = false;
-  bool _editTransaksi = false;
-  bool _hapusTransaksi = false;
-  bool _tambahMetode = false;
-  bool _editMetode = false;
-  bool _hapusMetode = false;
+  bool _editTransaksi = true;
+  bool _hapusTransaksi = true;
+  bool _sembunyikanProfit = false;
+
+  // === RIWAYAT ===
+  bool _kunciRiwayatTransaksi = false;
+
+  // === METODE BAYAR ===
+  bool _tambahMetode = true;
+  bool _editMetode = true;
+  bool _hapusMetode = true;
+
+  // === CETAK ===
   bool _kunciCetakStruk = false;
   bool _kunciBagikanStruk = false;
+
+  // === LAPORAN ===
   bool _kunciLaporan = false;
+
+  // === PENGATURAN TOKO ===
   bool _kunciPengaturanToko = false;
+  bool _kunciPengaturan = false;
   bool _kunciRestoreData = false;
+  bool _kunciGantiPassword = true;
+  bool _kunciKeamanan = true;
+  
   bool _sembunyikanHapusBackup = false;
   bool _sembunyikanLogout = false;
       bool _kunciPelanggan = false;
-  bool _kunciAddPelanggan = false;
-  bool _kunciUpdatePelanggan = false;
-  bool _kunciDeletePelanggan = false;
+  bool _kunciAddPelanggan = true;
+  bool _kunciUpdatePelanggan = true;
+  bool _kunciDeletePelanggan = true;
   bool _kunciPegawai = false;
-  bool _kunciAddPegawai = false;
-  bool _kunciUpdatePegawai = false;
-  bool _kunciDeletePegawai = false;
+  bool _kunciAddPegawai = true;
+  bool _kunciUpdatePegawai = true;
+  bool _kunciDeletePegawai = true;
     bool _kunciServices = false;
-  bool _tambahServices = false;
-  bool _editServices = false;
-  bool _hapusServices = false;
+  bool _tambahServices = true;
+  bool _editServices = true;
+  bool _hapusServices = true;
 
-  // true
-  bool _kunciGantiPassword = true;
-  bool _kunciKeamanan = true;
 
   bool get kunciRiwayatTransaksi => _kunciRiwayatTransaksi;
   bool get kunciProduk => _kunciProduk;
@@ -108,54 +129,54 @@ class SecurityProvider with ChangeNotifier {
 
   Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    _kunciRiwayatTransaksi = prefs.getBool('kunciRiwayatTransaksi') ?? false;
-    _kunciProduk = prefs.getBool('kunciProduk') ?? false;
-    _tambahProduk = prefs.getBool('tambahProduk') ?? false;
-    _tambahStokProduk = prefs.getBool('tambahStokProduk') ?? false;
-    _hapusStokProduk = prefs.getBool('hapusStokProduk') ?? false;
-    _editProduk = prefs.getBool('editProduk') ?? false;
-    _hapusProduk = prefs.getBool('hapusProduk') ?? false;
-    _kunciTambahKategori = prefs.getBool('kunciTambahKategori') ?? false;
-    _kunciKategori = prefs.getBool('kunciKategori') ?? false;
-    _editKategori = prefs.getBool('editKategori') ?? false;
-    _hapusKategori = prefs.getBool('hapusKategori') ?? false;
-    _kunciPengeluaran = prefs.getBool('kunciPengeluaran') ?? false;
-    _tambahPengeluaran = prefs.getBool('tambahPengeluaran') ?? false;
-    _editPengeluaran = prefs.getBool('editPengeluaran') ?? false;
-    _hapusPengeluaran = prefs.getBool('hapusPengeluaran') ?? false;
-    _kunciPemasukan = prefs.getBool('kunciPemasukan') ?? false;
-    _tambahPemasukan = prefs.getBool('tambahPemasukan') ?? false;
-    _editPemasukan = prefs.getBool('editPemasukan') ?? false;
-    _hapusPemasukan = prefs.getBool('hapusPemasukan') ?? false;
-    _sembunyikanProfit = prefs.getBool('sembunyikanProfit') ?? false;
-    _tanggalTransaksi = prefs.getBool('tanggalTransaksi') ?? false;
-    _batalkanTransaksi = prefs.getBool('batalkanTransaksi') ?? false;
-    _editTransaksi = prefs.getBool('editTransaksi') ?? false;
-    _hapusTransaksi = prefs.getBool('hapusTransaksi') ?? false;
-    _tambahMetode = prefs.getBool('tambahMetode') ?? false;
-    _editMetode = prefs.getBool('editMetode') ?? false;
-    _hapusMetode = prefs.getBool('hapusMetode') ?? false;
-    _kunciCetakStruk = prefs.getBool('kunciCetakStruk') ?? false;
-    _kunciBagikanStruk = prefs.getBool('kunciBagikanStruk') ?? false;
-    _kunciLaporan = prefs.getBool('kunciLaporan') ?? false;
-    _kunciPengaturanToko = prefs.getBool('kunciPengaturanToko') ?? false;
-    _kunciGantiPassword = prefs.getBool('kunciGantiPassword') ?? false;
-    _kunciKeamanan = prefs.getBool('kunciKeamanan') ?? false;
-    _kunciRestoreData = prefs.getBool('kunciRestoreData') ?? false;
-    _kunciPelanggan = prefs.getBool('kunciPelanggan') ?? false;
-    _kunciAddPelanggan = prefs.getBool('kunciAddPelanggan') ?? false;
-    _kunciUpdatePelanggan = prefs.getBool('kunciUpdatePelanggan') ?? false;
-    _kunciDeletePelanggan = prefs.getBool('kunciDeletePelanggan') ?? false;
-    _kunciPegawai = prefs.getBool('kunciPegawai') ?? false;
-    _kunciAddPegawai = prefs.getBool('kunciAddPegawai') ?? false;
-    _kunciUpdatePegawai = prefs.getBool('kunciUpdatePegawai') ?? false;
-    _kunciDeletePegawai = prefs.getBool('kunciDeletePegawai') ?? false;
-    _kunciServices = prefs.getBool('kunciServices') ?? false;
-    _tambahServices = prefs.getBool('tambahServices') ?? false;
-    _editServices = prefs.getBool('editServices') ?? false;
-    _hapusServices = prefs.getBool('hapusServices') ?? false;
-    _sembunyikanHapusBackup = prefs.getBool('sembunyikanHapusBackup') ?? false;
-    _sembunyikanLogout = prefs.getBool('sembunyikanLogout') ?? false;
+    _kunciRiwayatTransaksi = prefs.getBool('kunciRiwayatTransaksi') ?? _kunciRiwayatTransaksi;
+    _kunciProduk = prefs.getBool('kunciProduk') ?? _kunciProduk;
+    _tambahProduk = prefs.getBool('tambahProduk') ?? _tambahProduk;
+    _tambahStokProduk = prefs.getBool('tambahStokProduk') ?? _tambahStokProduk;
+    _hapusStokProduk = prefs.getBool('hapusStokProduk') ?? _hapusStokProduk;
+    _editProduk = prefs.getBool('editProduk') ?? _editProduk;
+    _hapusProduk = prefs.getBool('hapusProduk') ?? _hapusProduk;
+    _kunciTambahKategori = prefs.getBool('kunciTambahKategori') ?? _kunciTambahKategori;
+    _kunciKategori = prefs.getBool('kunciKategori') ?? _kunciKategori;
+    _editKategori = prefs.getBool('editKategori') ?? _editKategori;
+    _hapusKategori = prefs.getBool('hapusKategori') ?? _hapusKategori;
+    _kunciPengeluaran = prefs.getBool('kunciPengeluaran') ?? _kunciPengeluaran;
+    _tambahPengeluaran = prefs.getBool('tambahPengeluaran') ?? _tambahPengeluaran;
+    _editPengeluaran = prefs.getBool('editPengeluaran') ?? _editPengeluaran;
+    _hapusPengeluaran = prefs.getBool('hapusPengeluaran') ?? _hapusPengeluaran;
+    _kunciPemasukan = prefs.getBool('kunciPemasukan') ?? _kunciPemasukan;
+    _tambahPemasukan = prefs.getBool('tambahPemasukan') ?? _tambahPemasukan;
+    _editPemasukan = prefs.getBool('editPemasukan') ?? _editPemasukan;
+    _hapusPemasukan = prefs.getBool('hapusPemasukan') ?? _hapusPemasukan;
+    _sembunyikanProfit = prefs.getBool('sembunyikanProfit') ?? _sembunyikanProfit;
+    _tanggalTransaksi = prefs.getBool('tanggalTransaksi') ?? _tanggalTransaksi;
+    _batalkanTransaksi = prefs.getBool('batalkanTransaksi') ?? _batalkanTransaksi;
+    _editTransaksi = prefs.getBool('editTransaksi') ?? _editTransaksi;
+    _hapusTransaksi = prefs.getBool('hapusTransaksi') ?? _hapusTransaksi;
+    _tambahMetode = prefs.getBool('tambahMetode') ?? _tambahMetode;
+    _editMetode = prefs.getBool('editMetode') ?? _editMetode;
+    _hapusMetode = prefs.getBool('hapusMetode') ?? _hapusMetode;
+    _kunciCetakStruk = prefs.getBool('kunciCetakStruk') ?? _kunciCetakStruk;
+    _kunciBagikanStruk = prefs.getBool('kunciBagikanStruk') ?? _kunciBagikanStruk;
+    _kunciLaporan = prefs.getBool('kunciLaporan') ?? _kunciLaporan;
+    _kunciPengaturanToko = prefs.getBool('kunciPengaturanToko') ?? _kunciPengaturanToko;
+    _kunciGantiPassword = prefs.getBool('kunciGantiPassword') ?? _kunciGantiPassword;
+    _kunciKeamanan = prefs.getBool('kunciKeamanan') ?? _kunciKeamanan;
+    _kunciRestoreData = prefs.getBool('kunciRestoreData') ?? _kunciRestoreData;
+    _kunciPelanggan = prefs.getBool('kunciPelanggan') ?? _kunciPelanggan;
+    _kunciAddPelanggan = prefs.getBool('kunciAddPelanggan') ?? _kunciAddPelanggan;
+    _kunciUpdatePelanggan = prefs.getBool('kunciUpdatePelanggan') ?? _kunciUpdatePelanggan;
+    _kunciDeletePelanggan = prefs.getBool('kunciDeletePelanggan') ?? _kunciDeletePelanggan;
+    _kunciPegawai = prefs.getBool('kunciPegawai') ?? _kunciPegawai;
+    _kunciAddPegawai = prefs.getBool('kunciAddPegawai') ?? _kunciAddPegawai;
+    _kunciUpdatePegawai = prefs.getBool('kunciUpdatePegawai') ?? _kunciUpdatePegawai;
+    _kunciDeletePegawai = prefs.getBool('kunciDeletePegawai') ?? _kunciDeletePegawai;
+    _kunciServices = prefs.getBool('kunciServices') ?? _kunciServices;
+    _tambahServices = prefs.getBool('tambahServices') ?? _tambahServices;
+    _editServices = prefs.getBool('editServices') ?? _editServices;
+    _hapusServices = prefs.getBool('hapusServices') ?? _hapusServices;
+    _sembunyikanHapusBackup = prefs.getBool('sembunyikanHapusBackup') ?? _sembunyikanHapusBackup;
+    _sembunyikanLogout = prefs.getBool('sembunyikanLogout') ?? _sembunyikanLogout;
     notifyListeners();
   }
 }

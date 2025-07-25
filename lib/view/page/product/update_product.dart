@@ -1100,7 +1100,7 @@ class _UpdateProductPageState extends State<UpdateProductPage> {
                   ],
                 ),
               ),
-              if (!securityProvider.editProduk)
+              if (securityProvider.editProduk)
                 ExpensiveFloatingButton(onPressed: () => _updateProduct())
             ],
           ),

@@ -2,7 +2,7 @@
 
 
     <application
-        android:label="OMSETin Bengkel"
+        android:label="OMZETin Bengkel"
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">

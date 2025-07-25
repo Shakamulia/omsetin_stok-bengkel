@@ -187,125 +187,132 @@ class _UpdateCashierPageState extends State<UpdateCashierPage> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
+    body: SafeArea(
+  child: Stack(
+    children: [
+      Column(
+        children: [
+          Expanded(
+            child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              onTap: () => _selectProfileImage(context),
-                              child: Container(
-                                width: 70,
-                                height: 70,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  shape: BoxShape.circle,
-                                  image: image != "assets/products/no-image"
-                                      ? DecorationImage(
-                                          image: AssetImage(image),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : DecorationImage(
-                                          image: AssetImage(
-                                              'assets/products/no-image.png'),
-                                          fit: BoxFit.cover,
-                                        ),
-                                ),
-                              ),
+                        GestureDetector(
+                          onTap: () => _selectProfileImage(context),
+                          child: Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              shape: BoxShape.circle,
+                              image: image !=
+                                      "assets/products/no-image"
+                                  ? DecorationImage(
+                                      image: AssetImage(image),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : DecorationImage(
+                                      image: AssetImage(
+                                          'assets/products/no-image.png'),
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
-                          ],
-                        ),
-                        Gap(15),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Text(
-                                    "Nama Kasir",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: primaryColor,
-                                        fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              CustomTextField(
-                                obscureText: false,
-                                fillColor: Colors.grey[200],
-                                hintText: "Masukkan Nama Kasir",
-                                prefixIcon: null,
-                                hintStyle: TextStyle(
-                                    fontSize: 17, color: Colors.grey[400]),
-                                controller: nameController,
-                                maxLines: 1,
-                                enabled: widget.cashier.cashierName != 'Owner',
-                                suffixIcon: null,
-                              ),
-                              Gap(15),
-                              Row(
-                                children: const [
-                                  Text(
-                                    "Nomor Handphone",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: primaryColor,
-                                        fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              CustomTextField(
-                                obscureText: false,
-                                fillColor: Colors.grey[200],
-                                hintText: "Masukkan Nomor Handphone",
-                                prefixIcon: null,
-                                controller: phoneController,
-                                hintStyle: TextStyle(
-                                    fontSize: 17, color: Colors.grey[400]),
-                                maxLines: 1,
-                                keyboardType: TextInputType.number,
-                                suffixIcon: null,
-                              ),
-                              Gap(15),
-                              Row(
-                                children: const [
-                                  Text(
-                                    "PIN",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: primaryColor,
-                                        fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                            ],
                           ),
-                        ),
-                        PinInputWidget(
-                          controllers: pinController,
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    Gap(15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: const [
+                              Text(
+                                "Nama Kasir",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          CustomTextField(
+                            obscureText: false,
+                            fillColor: Colors.grey[200],
+                            hintText: "Masukkan Nama Kasir",
+                            prefixIcon: null,
+                            hintStyle: TextStyle(
+                                fontSize: 17,
+                                color: Colors.grey[400]),
+                            controller: nameController,
+                            maxLines: 1,
+                            enabled: widget.cashier.cashierName !=
+                                'Owner',
+                            suffixIcon: null,
+                          ),
+                          Gap(15),
+                          Row(
+                            children: const [
+                              Text(
+                                "Nomor Handphone",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          CustomTextField(
+                            obscureText: false,
+                            fillColor: Colors.grey[200],
+                            hintText: "Masukkan Nomor Handphone",
+                            prefixIcon: null,
+                            controller: phoneController,
+                            hintStyle: TextStyle(
+                                fontSize: 17,
+                                color: Colors.grey[400]),
+                            maxLines: 1,
+                            keyboardType: TextInputType.number,
+                            suffixIcon: null,
+                          ),
+                          Gap(15),
+                          Row(
+                            children: const [
+                              Text(
+                                "PIN",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          PinInputWidget(
+                            controllers: pinController,
+                          ),
+                          SizedBox(height: 100), // Memberikan ruang untuk floating button
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            ExpensiveFloatingButton(
-                left: 12, right: 12, onPressed: _updateCashier)
-          ],
-        ),
+          ),
+        ],
       ),
+      ExpensiveFloatingButton(
+          left: 12, right: 12, onPressed: _updateCashier)
+    ],
+  ),
+),
     );
   }
 }

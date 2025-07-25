@@ -234,7 +234,7 @@ class _AddStockProductPageState extends State<AddStockProductPage> {
             ),
           ],
         ),
-        if (securityProvider.tambahStokProduk != true)
+        if (securityProvider.tambahStokProduk)
           ExpensiveFloatingButton(
             right: 12,
             left: 12,

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:omzetin_bengkel/model/pelanggan.dart';
 import 'package:omzetin_bengkel/providers/pelangganProvider.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
 import 'package:omzetin_bengkel/utils/colors.dart';
 import 'package:omzetin_bengkel/utils/null_data_alert.dart';
 import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
@@ -498,17 +499,26 @@ class _AddPelangganPageState extends State<AddPelangganPage> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 20,
-                    left: 20,
-                    right: 20,
-                    child: ExpensiveFloatingButton(
-                      onPressed: _submitForm,
-                      text: widget.pelanggan == null
-                          ? 'SIMPAN DATA'
-                          : 'UPDATE DATA',
-                    ),
-                  ),
+                Positioned(
+  bottom: 20,
+  left: 20,
+  right: 20,
+  child: Consumer<SecurityProvider>(
+    builder: (context, securityProvider, _) {
+      // Tampilkan tombol jika:
+      // 1. Bukan mode edit (tambah baru) ATAU
+      // 2. Mode edit tapi kunci TIDAK aktif
+      final shouldShow = widget.pelanggan == null || securityProvider.kunciUpdatePelanggan;
+      
+      return shouldShow
+          ? ExpensiveFloatingButton(
+              onPressed: _submitForm,
+              text: widget.pelanggan == null ? 'SIMPAN DATA' : 'UPDATE DATA',
+            )
+          : SizedBox.shrink();
+    },
+  ),
+),
                 ],
               ),
             ),

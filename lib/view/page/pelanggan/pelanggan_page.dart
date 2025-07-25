@@ -72,7 +72,7 @@ class _PelangganPageState extends State<PelangganPage> {
             ),
             child: AppBar(
               title: Text(
-                'KELOLA Pelanggan',
+                'KELOLA PELANGGAN',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: SizeHelper.Fsize_normalTitle(context),
@@ -102,17 +102,17 @@ class _PelangganPageState extends State<PelangganPage> {
                       child: Stack(
                         children: [
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.6,
                             child: _buildPelangganGridView(),
                           ),
                           securityProvider.kunciAddPelanggan
-                              ? SizedBox.shrink()
-                              : ExpensiveFloatingButton(
+                              ? 
+                               ExpensiveFloatingButton(
                                   onPressed: () {
                                     _navigateToAddPelangganPage();
                                   },
                                   text: "TAMBAH pelanggan",
-                                ),
+                                )
+                              : SizedBox.shrink()
                         ],
                       ),
                     )
@@ -241,7 +241,12 @@ class _PelangganPageState extends State<PelangganPage> {
             } else {
               final pelangganList = snapshot.data!;
               return GridView.builder(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.only(
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  bottom: 80,
+                ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.8,

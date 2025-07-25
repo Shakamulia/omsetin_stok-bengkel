@@ -103,10 +103,7 @@ class _AddCashierPageState extends State<AddCashierPage> {
           message: '${e.toString().replaceFirst('Exception: ', '')}');
       return;
     }
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => CashierPage()),
-    );
+    Navigator.pop(context);
   }
 
   @override
@@ -200,16 +197,14 @@ class _AddCashierPageState extends State<AddCashierPage> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -305,20 +300,24 @@ class _AddCashierPageState extends State<AddCashierPage> {
                                 PinInputWidget(
                                   controllers: pinController,
                                   autoFocus: false,
+                                  
                                 ),
                               ],
                             ),
                           ),
+                          SizedBox(
+                            height: 100,
+                          )
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              ExpensiveFloatingButton(
-                  left: 12, right: 12, onPressed: _saveCashier)
-            ],
-          ),
+              ],
+            ),
+            ExpensiveFloatingButton(
+                left: 12, right: 12, onPressed: _saveCashier)
+          ],
         ),
       ),
     );

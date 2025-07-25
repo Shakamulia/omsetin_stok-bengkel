@@ -149,40 +149,38 @@ class _UpdateCashierFromHomeState extends State<UpdateCashierFromHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
+       appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + 20), // Tambah tinggi AppBar
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
+        bottomLeft: Radius.circular(20),
+        bottomRight: Radius.circular(20),
           ),
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  secondaryColor, // Warna akhir gradient
-                  primaryColor, // Warna awal gradient
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+        gradient: LinearGradient(
+          colors: [
+            secondaryColor, // Warna akhir gradient
+            primaryColor, // Warna awal gradient
+          ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+        ),
+      ),
             child: AppBar(
-              title: Text(
-                'PERBARUI KASIR',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize:
-                      SizeHelper.Fsize_normalTitle(context), // Perbesar font
-                  color: bgColor,
-                ),
-              ),
-              centerTitle: true,
-              leading: CustomBackButton(),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
+                    title: Text(
+            'PERBARUI KASIR',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: SizeHelper.Fsize_normalTitle(context), // Perbesar font
+              color: bgColor,
+            ),
+                    ),
+                    centerTitle: true,
+                    leading: CustomBackButton(),
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    toolbarHeight: kToolbarHeight + 20, // Tambah tinggi toolbar
             ),
           ),
         ),
@@ -255,8 +253,8 @@ class _UpdateCashierFromHomeState extends State<UpdateCashierFromHome> {
                                             color: Colors.grey[400]),
                                         controller: nameIsOwnerController,
                                         maxLines: 1,
-                                        enabled: widget.cashier.cashierName !=
-                                            'Owner',
+                                        enabled:
+                                            widget.cashier.cashierName != 'Owner',
                                         suffixIcon: null,
                                       )
                                     : CustomTextField(
@@ -269,8 +267,8 @@ class _UpdateCashierFromHomeState extends State<UpdateCashierFromHome> {
                                             color: Colors.grey[400]),
                                         controller: nameController,
                                         maxLines: 1,
-                                        enabled: widget.cashier.cashierName !=
-                                            'Owner',
+                                        enabled:
+                                            widget.cashier.cashierName != 'Owner',
                                         suffixIcon: null,
                                       ),
                                 Gap(15),

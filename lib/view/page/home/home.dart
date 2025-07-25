@@ -422,12 +422,21 @@ class _HomeState extends State<Home> {
                                 title: 'Keamanan',
                                 iconColor: bgColor,
                                 onTap: () {
-                                  showPinModalWithAnimation(
-                                    context,
-                                    pinModal: PinModal(
-                                      destination: SecuritySettingsPage(),
-                                    ),
-                                  );
+                                  if (securityProvider.kunciKeamanan) {
+                                    showPinModalWithAnimation(
+                                      context,
+                                      pinModal: PinModal(
+                                        destination: SecuritySettingsPage(),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SecuritySettingsPage()),
+                                    );
+                                  }
                                 },
                               ),
                             if (cashierProvider.cashierData?['cashierName'] ==
@@ -510,367 +519,78 @@ class _HomeState extends State<Home> {
               CustomRefreshWidget(
                 onRefresh: _handleRefresh,
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(30),
-                              bottomRight: Radius.circular(30),
-                            ),
-                            color: bgColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 2,
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
                               ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          _scaffoldKey.currentState
-                                              ?.openDrawer();
-                                        },
-                                        icon: const Icon(Icons.menu,
-                                            color: primaryColor, size: 32),
-                                      ),
-                                    ]),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        CashierData? cashier =
-                                            await cashierProvider
-                                                .getCashierById(int.parse(
-                                                    cashierProvider
-                                                            .cashierData?[
-                                                        'cashierId']));
-
-                                        // if (cashier != null) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //           builder: (_) =>
-                                        //               UpdateCashierFromHome(
-                                        //                   cashier: cashier)));
-                                        // } else {
-                                        //   print('Cashier data is null');
-                                        // }
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Text(cashierProvider.cashierData?[
-                                                  'cashierName'] ??
-                                              ''),
-                                          Gap(10),
-                                          ClipOval(
-                                            child: Image.asset(
-                                              "assets/newProfiles/owner.png",
-                                              width: 40,
-                                              height: 40,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                              color: bgColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
                                 ),
-                                Gap(10),
-                                GestureDetector(onTap: () {
-                                  if (securityProvider.kunciPengaturanToko) {
-                                    showPinModalWithAnimation(context,
-                                        pinModal: PinModal(
-                                          destination: ProfilTokoPage(),
-                                        ));
-                                  } else {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) => ProfilTokoPage()));
-                                  }
-                                }, child: Consumer<SettingProvider>(
-                                    builder: (context, settingProvider, child) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            child: settingProvider
-                                                            .settingImage !=
-                                                        null &&
-                                                    settingProvider
-                                                        .settingImage!
-                                                        .isNotEmpty &&
-                                                    File(settingProvider
-                                                            .settingImage!)
-                                                        .existsSync()
-                                                ? Hero(
-                                                    tag: "settingImage",
-                                                    child: Image.file(
-                                                      File(settingProvider
-                                                          .settingImage!),
-                                                      width: 50,
-                                                      height: 50,
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Image.asset(
-                                                          "assets/products/no-image.png",
-                                                          width: 50,
-                                                          height: 50,
-                                                          fit: BoxFit.cover,
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                                : Hero(
-                                                    tag: "settingNoImage",
-                                                    child: Image.asset(
-                                                      "assets/products/no-image.png",
-                                                      width: 50,
-                                                      height: 50,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                        const Gap(15),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              (settingProvider.getSettingName
-                                                          ?.isEmpty ??
-                                                      true)
-                                                  ? 'Nama Bengkel'
-                                                  : (settingProvider
-                                                              .getSettingName!
-                                                              .replaceAll(
-                                                                  '\n', ' ')
-                                                              .length >
-                                                          15
-                                                      ? '${settingProvider.getSettingName!.replaceAll('\n', ' ').substring(0, 20)}...'
-                                                      : settingProvider
-                                                          .getSettingName!
-                                                          .replaceAll(
-                                                              '\n', ' ')),
-                                              style: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                            const Gap(5),
-                                            // Text(
-                                            //   (settingProvider.getSettingAddress
-                                            //               ?.isEmpty ??
-                                            //           true)
-                                            //       ? 'Alamat Toko'
-                                            //       : (settingProvider
-                                            //                   .getSettingAddress!
-                                            //                   .replaceAll(
-                                            //                       '\n', ' ')
-                                            //                   .length >
-                                            //               30
-                                            //           ? '${settingProvider.getSettingAddress!.replaceAll('\n', ' ').substring(0, 30)}...'
-                                            //           : settingProvider
-                                            //               .getSettingAddress!
-                                            //               .replaceAll(
-                                            //                   '\n', ' ')),
-                                            //   style: GoogleFonts.poppins(
-                                            //       fontSize: 16),
-                                            // ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                })),
-                                Gap(20),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Stack(
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: const BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              primaryColor,
-                                              secondaryColor
-                                            ],
-                                            begin: Alignment(0, 2),
-                                            end: Alignment(-0, -2),
-                                          ),
+                                      Row(children: [
+                                        IconButton(
+                                          onPressed: () {
+                                            _scaffoldKey.currentState
+                                                ?.openDrawer();
+                                          },
+                                          icon: const Icon(Icons.menu,
+                                              color: primaryColor, size: 32),
                                         ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                      ]),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          CashierData? cashier =
+                                              await cashierProvider
+                                                  .getCashierById(int.parse(
+                                                      cashierProvider
+                                                              .cashierData?[
+                                                          'cashierId']));
+
+                                          // if (cashier != null) {
+                                          //   Navigator.push(
+                                          //       context,
+                                          //       MaterialPageRoute(
+                                          //           builder: (_) =>
+                                          //               UpdateCashierFromHome(
+                                          //                   cashier: cashier)));
+                                          // } else {
+                                          //   print('Cashier data is null');
+                                          // }
+                                        },
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              "Total Penjualan Hari Ini",
-                                              style: GoogleFonts.poppins(
-                                                  color: bgColor, fontSize: 16),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            FutureBuilder<int>(
-                                              future: _getTodayTotalOmzet(),
-                                              builder: (context, snapshot) {
-                                                final total =
-                                                    snapshot.data ?? 0;
-                                                return Text(
-                                                  NumberFormat.currency(
-                                                    locale: 'id_ID',
-                                                    symbol: 'Rp. ',
-                                                    decimalDigits: 0,
-                                                  ).format(total),
-                                                  style: GoogleFonts.poppins(
-                                                    color: bgColor,
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                            SizedBox(
-                                              height: 100,
-                                              width: double.infinity,
-                                              child: AspectRatio(
-                                                aspectRatio: 2.0,
-                                                child: FutureBuilder<
-                                                    Map<String, dynamic>>(
-                                                  future:
-                                                      _getWeeklyOmzetSpots(),
-                                                  builder: (context, snapshot) {
-                                                    if (!snapshot.hasData) {
-                                                      return Center(
-                                                          child:
-                                                              CircularProgressIndicator());
-                                                    }
-
-                                                    final spots =
-                                                        snapshot.data!['spots']
-                                                            as List<FlSpot>;
-                                                    final labels =
-                                                        snapshot.data!['labels']
-                                                            as List<String>;
-
-                                                    return LineChart(
-                                                      LineChartData(
-                                                        lineBarsData: [
-                                                          LineChartBarData(
-                                                            show: true,
-                                                            spots: spots,
-                                                            gradient:
-                                                                const LinearGradient(
-                                                              colors: [
-                                                                secondaryColor,
-                                                                Colors.white
-                                                              ],
-                                                              begin: Alignment
-                                                                  .bottomCenter,
-                                                              end: Alignment
-                                                                  .topCenter,
-                                                            ),
-                                                            barWidth: 4,
-                                                            isCurved: true,
-                                                            isStrokeCapRound:
-                                                                true,
-                                                            belowBarData:
-                                                                BarAreaData(
-                                                                    show: true),
-                                                            preventCurveOverShooting:
-                                                                true,
-                                                          )
-                                                        ],
-                                                        borderData:
-                                                            FlBorderData(
-                                                                show: false),
-                                                        gridData: FlGridData(
-                                                            show: false),
-                                                        titlesData:
-                                                            FlTitlesData(
-                                                          leftTitles: AxisTitles(
-                                                              sideTitles:
-                                                                  SideTitles(
-                                                                      showTitles:
-                                                                          false)),
-                                                          topTitles: AxisTitles(
-                                                              sideTitles:
-                                                                  SideTitles(
-                                                                      showTitles:
-                                                                          false)),
-                                                          rightTitles: AxisTitles(
-                                                              sideTitles:
-                                                                  SideTitles(
-                                                                      showTitles:
-                                                                          false)),
-                                                          bottomTitles:
-                                                              AxisTitles(
-                                                            sideTitles:
-                                                                SideTitles(
-                                                              showTitles: true,
-                                                              interval: 1,
-                                                              getTitlesWidget:
-                                                                  (value,
-                                                                      meta) {
-                                                                int index = value
-                                                                    .toInt();
-                                                                if (index < 0 ||
-                                                                    index >=
-                                                                        labels
-                                                                            .length) {
-                                                                  return const SizedBox
-                                                                      .shrink();
-                                                                }
-
-                                                                DateTime
-                                                                    parsedDate =
-                                                                    DateTime.parse(
-                                                                        labels[
-                                                                            index]);
-                                                                String
-                                                                    formatted =
-                                                                    DateFormat(
-                                                                            'dd/MM')
-                                                                        .format(
-                                                                            parsedDate);
-                                                                return Text(
-                                                                  formatted,
-                                                                  style: GoogleFonts.poppins(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          10),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
+                                            Text(cashierProvider.cashierData?[
+                                                    'cashierName'] ??
+                                                ''),
+                                            Gap(10),
+                                            ClipOval(
+                                              child: Image.asset(
+                                                "assets/newProfiles/owner.png",
+                                                width: 40,
+                                                height: 40,
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ],
@@ -878,182 +598,574 @@ class _HomeState extends State<Home> {
                                       ),
                                     ],
                                   ),
-                                ),
-                                // Gap(20),
-                                Gap(10),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          children: [
-                            Gap(10),
-
-                            // GRIDVIEW 3x3 UNTUK MENU UTAMA
-                            GridView.count(
-                              crossAxisCount: 3, // 3 kolom
-                              crossAxisSpacing:
-                                  10, // Jarak horizontal antar item
-                              mainAxisSpacing: 10, // Jarak vertikal antar item
-                              shrinkWrap:
-                                  true, // Agar tidak mengambil ruang berlebih
-                              physics:
-                                  NeverScrollableScrollPhysics(), // Tidak bisa discroll
-                              children: [
-                                // Baris 1
-                                MainCard(
-                                  onTap: () {
-                                    if (securityProvider.kunciProduk || securityProvider.kunciServices) {
+                                  Gap(10),
+                                  GestureDetector(onTap: () {
+                                    if (securityProvider.kunciPengaturanToko) {
                                       showPinModalWithAnimation(context,
                                           pinModal: PinModal(
-                                              destination: ProductPage()));
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) => ProductPage()));
-                                    }
-                                  },
-                                  title: "Spare Part &\n Layanan",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/Layanan.png',
-                                ),
-                                MainCard(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                const AddStockProductPage()));
-                                  },
-                                  title: "Tambah\nStok Spare Part",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/add-produk.png',
-                                ),
-
-                                MainCard(
-                                  onTap: () {
-                                    if (securityProvider
-                                        .kunciRiwayatTransaksi) {
-                                      showPinModalWithAnimation(context,
-                                          pinModal: PinModal(
-                                              destination: RiwayatTransaksi()));
+                                            destination: ProfilTokoPage(),
+                                          ));
                                     } else {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (_) =>
-                                                  RiwayatTransaksi()));
+                                                  ProfilTokoPage()));
                                     }
-                                  },
-                                  title: "Riwayat\nTransaksi",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/riwayat.png',
-                                ),
+                                  }, child: Consumer<SettingProvider>(builder:
+                                      (context, settingProvider, child) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: settingProvider
+                                                              .settingImage !=
+                                                          null &&
+                                                      settingProvider
+                                                          .settingImage!
+                                                          .isNotEmpty &&
+                                                      File(settingProvider
+                                                              .settingImage!)
+                                                          .existsSync()
+                                                  ? Hero(
+                                                      tag: "settingImage",
+                                                      child: Image.file(
+                                                        File(settingProvider
+                                                            .settingImage!),
+                                                        width: 50,
+                                                        height: 50,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Image.asset(
+                                                            "assets/products/no-image.png",
+                                                            width: 50,
+                                                            height: 50,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
+                                                    )
+                                                  : Hero(
+                                                      tag: "settingNoImage",
+                                                      child: Image.asset(
+                                                        "assets/products/no-image.png",
+                                                        width: 50,
+                                                        height: 50,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
+                                          const Gap(15),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  (settingProvider
+                                                              .getSettingName
+                                                              ?.isEmpty ??
+                                                          true)
+                                                      ? 'Nama Bengkel'
+                                                      : settingProvider
+                                                          .getSettingName!
+                                                          .replaceAll(
+                                                              '\n', ' '),
+                                                  style: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                const Gap(5),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  })),
+                                  Gap(20),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: const BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                primaryColor,
+                                                secondaryColor
+                                              ],
+                                              begin: Alignment(0, 2),
+                                              end: Alignment(-0, -2),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Total Penjualan Hari Ini",
+                                                style: GoogleFonts.poppins(
+                                                    color: bgColor,
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              FutureBuilder<int>(
+                                                future: _getTodayTotalOmzet(),
+                                                builder: (context, snapshot) {
+                                                  final total =
+                                                      snapshot.data ?? 0;
+                                                  return Text(
+                                                    NumberFormat.currency(
+                                                      locale: 'id_ID',
+                                                      symbol: 'Rp. ',
+                                                      decimalDigits: 0,
+                                                    ).format(total),
+                                                    style: GoogleFonts.poppins(
+                                                      color: bgColor,
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: 100,
+                                                width: double.infinity,
+                                                child: AspectRatio(
+                                                  aspectRatio: 2.0,
+                                                  child: FutureBuilder<
+                                                      Map<String, dynamic>>(
+                                                    future:
+                                                        _getWeeklyOmzetSpots(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (!snapshot.hasData) {
+                                                        return Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      }
 
-                                // Baris 2
-                                MainCard(
-                                  onTap: () {
-                                    if (securityProvider.kunciPelanggan) {
-                                      showPinModalWithAnimation(context,
-                                          pinModal: PinModal(
-                                              destination: PelangganPage()));
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) => PelangganPage()));
-                                    }
-                                  },
-                                  title: "Pelanggan\n",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/Pelanggan.png',
-                                ),
+                                                      final spots = snapshot
+                                                              .data!['spots']
+                                                          as List<FlSpot>;
+                                                      final labels = snapshot
+                                                              .data!['labels']
+                                                          as List<String>;
 
-                                MainCard(
-                                  onTap: () {
-                                    if (securityProvider.kunciPegawai) {
-                                      showPinModalWithAnimation(context,
-                                          pinModal: PinModal(
-                                              destination: mekanikPage()));
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) => mekanikPage()));
-                                    }
-                                  },
-                                  title: "Mekanik\n",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/Mekanik.png',
-                                ),
+                                                      return LineChart(
+                                                        LineChartData(
+                                                          lineBarsData: [
+                                                            LineChartBarData(
+                                                              show: true,
+                                                              spots: spots,
+                                                              gradient:
+                                                                  const LinearGradient(
+                                                                colors: [
+                                                                  secondaryColor,
+                                                                  Colors.white
+                                                                ],
+                                                                begin: Alignment
+                                                                    .bottomCenter,
+                                                                end: Alignment
+                                                                    .topCenter,
+                                                              ),
+                                                              barWidth: 4,
+                                                              isCurved: true,
+                                                              isStrokeCapRound:
+                                                                  true,
+                                                              belowBarData:
+                                                                  BarAreaData(
+                                                                      show:
+                                                                          true),
+                                                              preventCurveOverShooting:
+                                                                  true,
+                                                            )
+                                                          ],
+                                                          borderData:
+                                                              FlBorderData(
+                                                                  show: false),
+                                                          gridData: FlGridData(
+                                                              show: false),
+                                                          titlesData:
+                                                              FlTitlesData(
+                                                            leftTitles: AxisTitles(
+                                                                sideTitles: SideTitles(
+                                                                    showTitles:
+                                                                        false)),
+                                                            topTitles: AxisTitles(
+                                                                sideTitles: SideTitles(
+                                                                    showTitles:
+                                                                        false)),
+                                                            rightTitles: AxisTitles(
+                                                                sideTitles: SideTitles(
+                                                                    showTitles:
+                                                                        false)),
+                                                            bottomTitles:
+                                                                AxisTitles(
+                                                              sideTitles:
+                                                                  SideTitles(
+                                                                showTitles:
+                                                                    true,
+                                                                interval: 1,
+                                                                getTitlesWidget:
+                                                                    (value,
+                                                                        meta) {
+                                                                  int index = value
+                                                                      .toInt();
+                                                                  if (index <
+                                                                          0 ||
+                                                                      index >=
+                                                                          labels
+                                                                              .length) {
+                                                                    return const SizedBox
+                                                                        .shrink();
+                                                                  }
 
-                                MainCard(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) => CashierPage()));
-                                    },
-                                    title: "Kasir\n",
-                                    color: Colors.black,
-                                    imagePath: 'assets/images/kasir.png'),
-
-                                // Baris 3
-                                MainCard(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                const ExpensePage()));
-                                  },
-                                  title: "Pengeluaran\n",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/expense.png',
-                                ),
-
-                                MainCard(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                const IncomePage()));
-                                  },
-                                  title: "Pemasukan\n",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/income.png',
-                                ),
-
-                                MainCard(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) => ProfitPercent()));
-                                  },
-                                  title: "Setting Profit\n",
-                                  color: Colors.black,
-                                  imagePath: 'assets/images/setprofit.png',
-                                ),
-                              ],
+                                                                  DateTime
+                                                                      parsedDate =
+                                                                      DateTime.parse(
+                                                                          labels[
+                                                                              index]);
+                                                                  String
+                                                                      formatted =
+                                                                      DateFormat(
+                                                                              'dd/MM')
+                                                                          .format(
+                                                                              parsedDate);
+                                                                  return Text(
+                                                                    formatted,
+                                                                    style: GoogleFonts.poppins(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontSize:
+                                                                            10),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Gap(20),
+                                  Gap(10),
+                                ],
+                              ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: bgColor,
-                          borderRadius: BorderRadius.circular(30),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            children: [
+                              Gap(10),
+
+                              // GRIDVIEW 3x3 UNTUK MENU UTAMA
+                              GridView.count(
+                                crossAxisCount: 3, // 3 kolom
+                                crossAxisSpacing:
+                                    10, // Jarak horizontal antar item
+                                mainAxisSpacing:
+                                    10, // Jarak vertikal antar item
+                                shrinkWrap:
+                                    true, // Agar tidak mengambil ruang berlebih
+                                physics:
+                                    NeverScrollableScrollPhysics(), // Tidak bisa discroll
+                                children: [
+                                  // Baris 1
+                                  Expanded(
+                                    child: MainCard(
+                                      onTap: () {
+                                        if (securityProvider.kunciProduk ||
+                                            securityProvider.kunciServices) {
+                                          showPinModalWithAnimation(context,
+                                              pinModal: PinModal(
+                                                  destination: ProductPage()));
+                                        } else {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) => ProductPage()));
+                                        }
+                                      },
+                                      title: "Spare Part &\n Layanan",
+                                      color: Colors.black,
+                                      imagePath: 'assets/images/Layanan.png',
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: MainCard(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const AddStockProductPage()));
+                                      },
+                                      title: "Tambah\nStok Spare Part",
+                                      color: Colors.black,
+                                      imagePath: 'assets/images/add-produk.png',
+                                    ),
+                                  ),
+
+                                  Expanded(
+                                    child: MainCard(
+                                      onTap: () {
+                                        if (securityProvider
+                                            .kunciRiwayatTransaksi) {
+                                          showPinModalWithAnimation(context,
+                                              pinModal: PinModal(
+                                                  destination:
+                                                      RiwayatTransaksi()));
+                                        } else {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      RiwayatTransaksi()));
+                                        }
+                                      },
+                                      title: "Riwayat\nTransaksi",
+                                      color: Colors.black,
+                                      imagePath: 'assets/images/riwayat.png',
+                                    ),
+                                  ),
+
+                                  // Baris 2
+                                  Expanded(
+                                    child: MainCard(
+                                      onTap: () {
+                                        if (securityProvider.kunciPelanggan) {
+                                          showPinModalWithAnimation(context,
+                                              pinModal: PinModal(
+                                                  destination: PelangganPage()));
+                                        } else {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      PelangganPage()));
+                                        }
+                                      },
+                                      title: "Pelanggan\n",
+                                      color: Colors.black,
+                                      imagePath: 'assets/images/Pelanggan.png',
+                                    ),
+                                  ),
+
+                                  Expanded(
+                                    child: MainCard(
+                                      onTap: () {
+                                        if (securityProvider.kunciPegawai) {
+                                          showPinModalWithAnimation(context,
+                                              pinModal: PinModal(
+                                                  destination: mekanikPage()));
+                                        } else {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) => mekanikPage()));
+                                        }
+                                      },
+                                      title: "Mekanik\n",
+                                      color: Colors.black,
+                                      imagePath: 'assets/images/Mekanik.png',
+                                    ),
+                                  ),
+
+                                  Consumer<CashierProvider>(builder:
+                                      (context, cashierProvider, child) {
+                                    return cashierProvider
+                                                .cashierData?['cashierName'] ==
+                                            "Owner"
+                                        ? Expanded(
+                                          child: MainCard(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            CashierPage()));
+                                              },
+                                              title: "Kasir\n",
+                                              color: Colors.black,
+                                              imagePath:
+                                                  'assets/images/kasir.png'),
+                                        )
+                                        : Expanded(
+                                          child: MainCard(
+                                              onTap: () {
+                                                if (securityProvider
+                                                    .kunciPengeluaran) {
+                                                  showPinModalWithAnimation(
+                                                      context,
+                                                      pinModal: PinModal(
+                                                          destination:
+                                                              ExpensePage()));
+                                                } else {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              ExpensePage()));
+                                                }
+                                              },
+                                              title: "Pengeluaran\n",
+                                              color: Colors.black,
+                                              imagePath:
+                                                  'assets/images/expense.png',
+                                            ),
+                                        );
+                                  }),
+
+                                  // Baris 3
+                                  Consumer<CashierProvider>(builder:
+                                      (context, cashierProvider, child) {
+                                    return cashierProvider
+                                                .cashierData?['cashierName'] ==
+                                            "Owner"
+                                        ? Expanded(
+                                          child: MainCard(
+                                              onTap: () {
+                                                if (securityProvider
+                                                    .kunciPengeluaran) {
+                                                  showPinModalWithAnimation(
+                                                      context,
+                                                      pinModal: PinModal(
+                                                          destination:
+                                                              ExpensePage()));
+                                                } else {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              ExpensePage()));
+                                                }
+                                              },
+                                              title: "Pengeluaran\n",
+                                              color: Colors.black,
+                                              imagePath:
+                                                  'assets/images/expense.png',
+                                            ),
+                                        )
+                                        : Expanded(
+                                          child: MainCard(
+                                              onTap: () {
+                                                if (securityProvider
+                                                    .kunciPemasukan) {
+                                                  showPinModalWithAnimation(
+                                                      context,
+                                                      pinModal: PinModal(
+                                                          destination:
+                                                              IncomePage()));
+                                                } else {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              IncomePage()));
+                                                }
+                                              },
+                                              title: "Pemasukan\n",
+                                              color: Colors.black,
+                                              imagePath:
+                                                  'assets/images/income.png',
+                                            ),
+                                        );
+                                  }),
+
+                                Consumer<CashierProvider>(builder:
+                                      (context, cashierProvider, child) {
+                                    return cashierProvider
+                                                .cashierData?['cashierName'] ==
+                                            "Owner"
+                                        ? Expanded(
+                                            child: MainCard(
+                                            onTap: () {
+                                      if (securityProvider.kunciPemasukan) {
+                                        showPinModalWithAnimation(context,
+                                            pinModal: PinModal(
+                                                destination: IncomePage()));
+                                      } else {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) => IncomePage()));
+                                      }
+                                    },
+                                    title: "Pemasukan\n",
+                                    color: Colors.black,
+                                    imagePath: 'assets/images/income.png',
+                                            ),
+                                          )
+                                        : Container();
+                                  }),
+
+                                  Consumer<CashierProvider>(builder:
+                                      (context, cashierProvider, child) {
+                                    return cashierProvider
+                                                .cashierData?['cashierName'] ==
+                                            "Owner"
+                                        ? Expanded(
+                                            child: MainCard(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            ProfitPercent()));
+                                              },
+                                              title: "Setting Profit\n",
+                                              color: Colors.black,
+                                              imagePath:
+                                                  'assets/images/setprofit.png',
+                                            ),
+                                          )
+                                        : Container();
+                                  })
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      )
-                    ],
+                        Container(
+                          width: double.infinity,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

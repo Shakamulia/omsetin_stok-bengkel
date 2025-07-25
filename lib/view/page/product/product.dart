@@ -373,7 +373,7 @@ class _ProductPageState extends State<ProductPage>
                                     return Padding(
                                       padding: const EdgeInsets.only(
                                           top: 5.0, bottom: 5.0),
-                                      child: _isDeleteProductOn != true
+                                      child: securityProvider.editProduk
                                           ? Slidable(
                                               key: ValueKey(product.productId),
                                               endActionPane: ActionPane(
@@ -814,7 +814,7 @@ class _ProductPageState extends State<ProductPage>
                                           children: [
                                             if (index == 0) Gap(5),
                                             const Gap(5),
-                                            _isDeleteServicesOn != true
+                                            securityProvider.hapusServices
                                                 ? Slidable(
                                                     key: ValueKey(
                                                         service.serviceName),
@@ -1065,7 +1065,7 @@ class _ProductPageState extends State<ProductPage>
                             }),
                       ],
                     ),
-                    if (_tabController.index == 0)
+                    if (_tabController.index == 0 && securityProvider.tambahProduk)
                       ExpensiveFloatingButton(
                         text: 'TAMBAH',
                         onPressed: () async {
@@ -1084,7 +1084,7 @@ class _ProductPageState extends State<ProductPage>
                         },
                       )
                     else
-                    if (!securityProvider.tambahServices)
+                    if (securityProvider.tambahServices)
                       ExpensiveFloatingButton(
                       text: 'TAMBAH',
                       onPressed: () async {

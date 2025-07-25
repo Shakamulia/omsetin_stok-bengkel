@@ -61,6 +61,40 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
     }
   }
 
+void _showCancelTransactionDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => ConfirmDeleteDialog(
+      message: "Batalkan transaksi ini?",
+      onConfirm: () async {
+        await DatabaseService.instance.updateTransactionStatus(
+          _transactionDetail!.transactionId,
+          "Dibatalkan",
+        );
+        Navigator.pop(context);
+        showSuccessAlert(context, "Transaksi berhasil dibatalkan!");
+        await refreshTransactionDetail();
+      },
+    ),
+  );
+}
+
+void _showDeleteTransactionDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => ConfirmDeleteDialog(
+      message: "Hapus transaksi ini?",
+      onConfirm: () async {
+        await DatabaseService.instance.deleteTransaction(
+          _transactionDetail!.transactionId,
+        );
+        Navigator.pop(context);
+        Navigator.pop(context, 'true');
+        showSuccessAlert(context, "Transaksi berhasil dihapus!");
+      },
+    ),
+  );
+}
   Future<String> calculateTransactionStatus(
       int jumlahBayar, int totalPrice) async {
     if (jumlahBayar < 1) {
@@ -547,8 +581,12 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                               quantities[service.serviceId] = s['quantity'];
                             }
                           }
-    final selectedCustomer = await DatabaseService.instance.getPelangganByName(_transactionDetail!.transactionCustomerName);
-    final selectedEmployee = await DatabaseService.instance.getEmployeeByName(_transactionDetail!.transactionPegawaiName);
+                          final selectedCustomer =
+                              await DatabaseService.instance.getPelangganByName(
+                                  _transactionDetail!.transactionCustomerName);
+                          final selectedEmployee =
+                              await DatabaseService.instance.getEmployeeByName(
+                                  _transactionDetail!.transactionPegawaiName);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -590,7 +628,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                     _transactionDetail!.transactionStatus == "Dibatalkan"
                         ? const Gap(1)
                         : GestureDetector(
-                            onTap: () async{
+                            onTap: () async {
                               List<Product> selectedProducts = [];
                               List<Service> selectedServices = [];
                               Map<int, int> quantities = {};
@@ -614,8 +652,14 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                   quantities[service.serviceId] = s['quantity'];
                                 }
                               }
-                                  final selectedCustomer = await DatabaseService.instance.getPelangganByName(_transactionDetail!.transactionCustomerName);
-    final selectedEmployee = await DatabaseService.instance.getEmployeeByName(_transactionDetail!.transactionPegawaiName);
+                              final selectedCustomer = await DatabaseService
+                                  .instance
+                                  .getPelangganByName(_transactionDetail!
+                                      .transactionCustomerName);
+                              final selectedEmployee = await DatabaseService
+                                  .instance
+                                  .getEmployeeByName(_transactionDetail!
+                                      .transactionPegawaiName);
 
                               Navigator.push(
                                 context,
@@ -658,7 +702,7 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                 ),
               ),
               const Gap(5),
-                Container(
+              Container(
                 constraints: const BoxConstraints(
                   minHeight: 100,
                   maxHeight: 300,
@@ -667,38 +711,44 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                   shrinkWrap: true,
                   physics: const ClampingScrollPhysics(),
                   itemCount: (_transactionDetail!.transactionProduct.length +
-                    (_transactionDetail!.transactionServices?.length ?? 0) +
-                    // Tambahkan 1 jika ada produk dan services untuk Gap
-                    ((_transactionDetail!.transactionProduct.isNotEmpty &&
-                        (_transactionDetail!.transactionServices?.isNotEmpty ?? false))
-                      ? 1
-                      : 0)),
+                      (_transactionDetail!.transactionServices?.length ?? 0) +
+                      // Tambahkan 1 jika ada produk dan services untuk Gap
+                      ((_transactionDetail!.transactionProduct.isNotEmpty &&
+                              (_transactionDetail!
+                                      .transactionServices?.isNotEmpty ??
+                                  false))
+                          ? 1
+                          : 0)),
                   itemBuilder: (context, index) {
-                  final productCount = _transactionDetail!.transactionProduct.length;
-                  final serviceCount = _transactionDetail!.transactionServices?.length ?? 0;
+                    final productCount =
+                        _transactionDetail!.transactionProduct.length;
+                    final serviceCount =
+                        _transactionDetail!.transactionServices?.length ?? 0;
 
-                  // Produk
-                  if (index < productCount) {
-                    return _buildProductItem(_transactionDetail!.transactionProduct[index]);
-                  }
-                  // Gap antara produk dan services
-                  else if (index == productCount &&
-                    productCount > 0 &&
-                    serviceCount > 0) {
-                    return const Gap(10);
-                  }
-                  // Services
-                  else if (index > productCount) {
-                    final serviceIndex = index - productCount - 1;
-                    if (_transactionDetail!.transactionServices != null &&
-                      serviceIndex < serviceCount) {
-                    return _buildServiceItem(_transactionDetail!.transactionServices![serviceIndex]);
+                    // Produk
+                    if (index < productCount) {
+                      return _buildProductItem(
+                          _transactionDetail!.transactionProduct[index]);
                     }
-                  }
-                  return const SizedBox();
+                    // Gap antara produk dan services
+                    else if (index == productCount &&
+                        productCount > 0 &&
+                        serviceCount > 0) {
+                      return const Gap(10);
+                    }
+                    // Services
+                    else if (index > productCount) {
+                      final serviceIndex = index - productCount - 1;
+                      if (_transactionDetail!.transactionServices != null &&
+                          serviceIndex < serviceCount) {
+                        return _buildServiceItem(_transactionDetail!
+                            .transactionServices![serviceIndex]);
+                      }
+                    }
+                    return const SizedBox();
                   },
                 ),
-                ),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
@@ -773,7 +823,8 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                                             .transactionQueueNumber,
                                         products: _transactionDetail!
                                             .transactionProduct,
-                                        service: _transactionDetail!.transactionServices,
+                                        service: _transactionDetail!
+                                            .transactionServices,
                                         transactionId:
                                             _transactionDetail!.transactionId,
                                         transactionDate:
@@ -814,120 +865,82 @@ class _DetailHistoryTransactionState extends State<DetailHistoryTransaction> {
                         )
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        children: [
-                          if (_transactionDetail!.transactionStatus !=
-                              "Dibatalkan") ...[
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  await DatabaseService.instance
-                                      .updateTransactionStatus(
-                                    _transactionDetail!.transactionId,
-                                    "Dibatalkan",
-                                  );
-                                  Navigator.pop(context);
-                                  await refreshTransactionDetail();
-                                },
-                                child: Container(
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      color: redColor,
-                                      borderRadius: BorderRadius.circular(15)),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(4),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.close_outlined,
-                                            color: Colors.white, size: 20),
-                                        Gap(4),
-                                        Text("Batalkan Pesanan",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const Gap(10),
-                          ],
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return ConfirmDeleteDialog(
-                                      message: "Hapus transaksi ini?",
-                                      onConfirm: () async {
-                                        try {
-                                          // Tutup dialog konfirmasi
-                                          Navigator.pop(context);
+            Padding(
+  padding: const EdgeInsets.symmetric(vertical: 10),
+  child: Row(
+    children: [
+      // Batalkan Transaksi Button
+      if (securityProvider.batalkanTransaksi && 
+          _transactionDetail?.transactionStatus != "Dibatalkan")
+        Expanded(
+          child: InkWell(
+            onTap: () => _showCancelTransactionDialog(context),
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: redColor,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.close_outlined, color: Colors.white, size: 20),
+                    Gap(4),
+                    Text(
+                      "Batalkan Pesanan",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
 
-                                          // Tampilkan loading indicator
-                                          showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (context) => Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                          );
+      // Gap between buttons if both are visible
+      if (securityProvider.batalkanTransaksi && securityProvider.hapusTransaksi)
+        const Gap(10),
 
-                                          // Hapus transaksi
-                                          await DatabaseService.instance
-                                              .deleteTransaction(
-                                                  _transactionDetail!
-                                                      .transactionId);
-
-                                          // Tutup loading indicator
-                                          Navigator.pop(context);
-
-                                          // Kembali ke halaman sebelumnya dengan hasil sukses
-                                          Navigator.pop(context, true);
-                                          await refreshTransactionDetail();
-                                        } catch (e) {
-                                          // Tutup loading indicator jika ada error
-                                          Navigator.pop(context);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                                    'Gagal menghapus transaksi: $e')),
-                                          );
-                                        }
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                              child: Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(4),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.delete_outline_outlined,
-                                          color: redColor, size: 20),
-                                      Gap(4),
-                                      Text("Hapus Pesanan",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: redColor,
-                                              fontWeight: FontWeight.w600))
-                                    ],
-                                  ),
-                                ),
+      // Hapus Transaksi Button
+      if (securityProvider.hapusTransaksi)
+        Expanded(
+          child: InkWell(
+            onTap: () => _showDeleteTransactionDialog(context),
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: redColor),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.delete_outline_outlined,
+                      color: redColor,
+                      size: 20,
+                    ),
+                    Gap(4),
+                    Text(
+                      "Hapus Pesanan",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: redColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
                               ),
                             ),
                           ),

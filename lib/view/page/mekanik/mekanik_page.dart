@@ -106,10 +106,9 @@ class _mekanikPageState extends State<mekanikPage> {
                       child: Stack(
                         children: [
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.6,
                             child: _buildPegawaiGridView(),
                           ),
-                          if (!Provider.of<SecurityProvider>(context)
+                          if (Provider.of<SecurityProvider>(context)
                               .kunciAddPegawai)
                             ExpensiveFloatingButton(
                               onPressed: () {
@@ -245,7 +244,12 @@ class _mekanikPageState extends State<mekanikPage> {
             } else {
               final pegawaiList = snapshot.data!;
               return GridView.builder(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.only(
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  bottom: 80, // Tambahkan padding bawah untuk tombol
+                ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.8,

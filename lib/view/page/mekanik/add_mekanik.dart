@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:omzetin_bengkel/model/mekanik.dart';
 import 'package:omzetin_bengkel/providers/mekanikProvider.dart';
+import 'package:omzetin_bengkel/providers/securityProvider.dart';
 import 'package:omzetin_bengkel/utils/colors.dart';
 import 'package:omzetin_bengkel/utils/null_data_alert.dart';
 import 'package:omzetin_bengkel/utils/responsif/fsize.dart';
@@ -492,16 +493,25 @@ class _AddPegawaiPageState extends State<AddPegawaiPage> {
                     ),
                   ),
                   Positioned(
-                    bottom: 20,
-                    left: 20,
-                    right: 20,
-                    child: ExpensiveFloatingButton(
-                      onPressed: _submitForm,
-                      text: widget.pegawai == null
-                          ? 'SIMPAN DATA'
-                          : 'UPDATE DATA',
-                    ),
-                  ),
+  bottom: 20,
+  left: 20,
+  right: 20,
+  child: Consumer<SecurityProvider>(
+    builder: (context, securityProvider, _) {
+      // Tampilkan tombol jika:
+      // 1. Bukan mode edit (tambah baru) ATAU
+      // 2. Mode edit tapi kunci TIDAK aktif
+      final shouldShow = widget.pegawai == null || securityProvider.kunciUpdatePegawai;
+      
+      return shouldShow
+          ? ExpensiveFloatingButton(
+              onPressed: _submitForm,
+              text: widget.pegawai == null ? 'SIMPAN DATA' : 'UPDATE DATA',
+            )
+          : SizedBox.shrink();
+    },
+  ),
+),
                 ],
               ),
             ),

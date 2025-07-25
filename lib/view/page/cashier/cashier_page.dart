@@ -101,7 +101,6 @@ class _CashierPageState extends State<CashierPage> {
                       child: Stack(
                         children: [
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.6,
                             child: _buildCashierGridView(),
                           ),
                           ExpensiveFloatingButton(
@@ -239,7 +238,12 @@ class _CashierPageState extends State<CashierPage> {
             } else {
               final cashiers = snapshot.data!;
               return GridView.builder(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.only(
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  bottom: 80,
+                ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.8,

@@ -176,7 +176,7 @@ class _UpdateServicesPageState extends State<UpdateServicesPage> {
                     // Fixed button at the bottom
                   ],
                 ),
-                if (!securityProvider.editServices)
+                if (securityProvider.editServices)
                 ExpensiveFloatingButton(
                   left: 20,
                   right: 20,

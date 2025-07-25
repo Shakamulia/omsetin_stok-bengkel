@@ -38,9 +38,9 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         _requestPermissions();
         _checkTokenAndNavigate();
-        if (!_hasAttemptedReconnect) {
-          _autoReconnectBluetooth();
-        }
+        // if (!_hasAttemptedReconnect) {
+        //   _autoReconnectBluetooth();
+        // }
       }
     });
 
